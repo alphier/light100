@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Light</title>
+	<link rel="stylesheet" type="text/css" href="css/default/easyui.css">
+	<link rel="stylesheet" type="text/css" href="css/color.css">	
+	<link rel="stylesheet" type="text/css" href="css/icon.css">
+	<script type="text/javascript" src="lib/jquery.min.js"></script>
+	<script type="text/javascript" src="lib/jquery.easyui.min.js"></script>
+	<script type="text/javascript" src="lib/socket.io/socket.io.js"></script>
+	<script type="text/javascript" src="lib/sc_clock.js"></script>
+</head>
+<body>
+	<div style="margin-top:6px;padding:5px;">
+		用户名：<%= user.username %>
+		编号：<%= user.index %>
+		机器密码：<%= user.code %>
+		控制器编号：<%= user.cid %>
+		<a href="#" id="modifyItem" class="easyui-linkbutton" style="margin-left:150px">
+			<span style="font-size:14px;">更改</span>
+		</a>
+		<a href="#" id="modifyAll" class="easyui-linkbutton">
+			<span style="font-size:14px;">全部更改</span>
+		</a>
+		<a href="#" id="modifySingle" class="easyui-linkbutton">
+			<span style="font-size:14px;">单数更改</span>
+		</a>
+		<a href="#" id="modifyDouble" class="easyui-linkbutton">
+			<span style="font-size:14px;">双数更改</span>
+		</a>
+		<span style="font-size:14px;">当前时间：</span>
+		<input class="easyui-textbox" type="text" id="currTime" name="currTime" style="width:130px;height:20px;padding:5px" data-options="readonly:true">
+		<a id="quit" class="btn" href="/home">
+			<span style="font-size:16px;">退出</span>
+		</a>		
+	</div>	
+	<table id="dg" class="easyui-datagrid" style="width:100%;padding:10px"	data-options="
+		singleSelect:true,
+		url:'light_datagrid.json',
+		method:'post',
+		onClickCell: onClickCell,
+		onLoadSuccess: onLoadSuccess">
+		<style>
+		  .datagrid-cell{
+			font-size:14px;
+		  }
+		</style>
+		<thead>
+			<tr>
+				<th data-options="field:'index',width:30">
+				<span style="font-size:12px;font-weight: bolder">编号</span>
+				</th>
+				<th data-options="field:'state',width:40,
+						formatter:function(value,row){
+							if(value === 0)
+								return '正常';
+							if(value === 1)
+                            	return '故障';
+                        }">
+				<span style="font-size:12px;font-weight: bolder">状态</span>
+				</th>
+				<th data-options="field:'charging',width:40,
+						formatter:function(value,row){
+							if(value === 0)
+								return '停';
+							if(value === 1)
+                            	return '充';
+                        }">
+				<span style="font-size:12px;font-weight: bolder">充电</span>
+				</th>
+				<th data-options="field:'onoff',width:40,
+						formatter:function(value,row){
+							if(value === 0)
+								return '关';
+							if(value === 1)
+                            	return '开';
+                        }">
+				<span style="font-size:12px;font-weight: bolder">开关 </span>
+				</th>
+				<th data-options="field:'cpower',width:60,
+						formatter:function(value,row){
+							return value + 'w';
+                        }">
+				<span style="font-size:12px;font-weight: bolder">充电功率</span>
+				</th>
+				<th data-options="field:'lpower',width:60,
+						formatter:function(value,row){
+							return value + 'w';
+                        }">
+				<span style="font-size:12px;font-weight: bolder">放电功率</span>
+				</th>
+				<th data-options="field:'battery',width:60,
+						formatter:function(value,row){
+							return value + '%';
+                        }">
+				<span style="font-size:12px;font-weight: bolder">电池电量</span>
+				</th>
+				<th data-options="field:'temp',width:40,
+						formatter:function(value,row){
+							return value + 'C°';
+                        }">
+				<span style="font-size:12px;font-weight: bolder">温度</span>
+				</th>
+				<th data-options="field:'batype',width:60,
+						formatter:function(value,row){
+							if(value === 0)
+								return '锂11V';
+							if(value === 1)
+                            	return '锂16V';
+                            if(value === 2)
+								return '铅12V';
+							if(value === 3)
+                            	return '铅24V';
+                        }">
+				<span style="font-size:12px;font-weight: bolder">电池类型</span>
+				</th>
+				<th data-options="field:'capacity',width:40,
+						formatter:function(value,row){
+							return value + 'A';
+                        }">
+				<span style="font-size:12px;font-weight: bolder">容量</span>
+				</th>
+				<th data-options="field:'voltage',width:40,
+						formatter:function(value,row){
+							return value + 'V';
+                        }">
+				<span style="font-size:12px;font-weight: bolder">电压</span>
+				</th>
+				<th data-options="field:'pdate',width:75">
+				<span style="font-size:12px;font-weight: bolder">生产日期</span>
+				</th>
+				<th data-options="field:'ctltype',width:60,
+						styler:function(value,row,index){
+							return 'background-color:#aaee00;';
+						},
+						formatter:function(value,row){
+							if(String(value) === '0')
+								return '关';
+							if(String(value) === '1')
+                            	return '开';
+                            if(String(value) === '2')
+                            	return '自动';
+                        },
+						editor:{type:'combobox',
+								options: {valueField:'ctypeValue',
+										textField:'ctypeName',
+										data:ctypeData}
+								}">
+				<span style="font-size:12px;font-weight: bolder">控制方式</span>
+				</th>
+				<th data-options="field:'autotype',width:60,
+						styler:function(value,row,index){
+							return 'background-color:#aaee00;';
+						},
+						formatter:function(value,row){
+							if(String(value) === '0'){
+								return '光控';
+							}
+							if(String(value) === '1'){
+                            	return '时控';
+                            }                            
+                        },
+						editor:{type:'combobox',
+								options: {valueField:'atypeValue',
+										textField:'atypeName',
+										data:atypeData}
+								}">
+				<span style="font-size:12px;font-weight: bolder">自动方式</span>
+				</th>
+				<th data-options="field:'ontime',width:70,
+						styler:function(value,row,index){
+							return 'background-color:#aaee00;';
+						},
+						editor:{type:'textbox'}">
+				<span style="font-size:12px;font-weight: bolder">开灯时间</span>
+				</th>
+				<th data-options="field:'lcvoltage',width:60,
+						styler:function(value,row,index){
+							return 'background-color:#aaee00;';
+						},
+						formatter:function(value,row){
+                            return value + 'V';
+                        },
+						editor:{type:'numberbox',options:{min:0,max:22,precision:1}}">
+				<span style="font-size:12px;font-weight: bolder">光控电压</span>
+				</th>
+				<th data-options="field:'abright',width:60,
+						styler:function(value,row,index){
+							return 'background-color:#aaee00;';
+						},
+						formatter:function(value,row){
+                            return value + '%';
+                        },
+						editor:{type:'numberbox',options:{min:0,max:100}}">
+				<span style="font-size:12px;font-weight: bolder">1亮度</span>
+				</th>
+				<th data-options="field:'atime',width:50,
+						styler:function(value,row,index){
+							return 'background-color:#aaee00;';
+						},
+						formatter:function(value,row){
+                            return value + '时';
+                        },
+						editor:{type:'numberbox',options:{min:0,max:10,precision:1}}">
+				<span style="font-size:12px;font-weight: bolder">1时间</span>
+				</th>
+				<th data-options="field:'bbright',width:60,
+						styler:function(value,row,index){
+							return 'background-color:#aaee00;';
+						},
+						formatter:function(value,row){
+                            return value + '%';
+                        },
+						editor:{type:'numberbox',options:{min:0,max:100}}">
+				<span style="font-size:12px;font-weight: bolder">2亮度</span>
+				</th>
+				<th data-options="field:'btime',width:50,
+						styler:function(value,row,index){
+							return 'background-color:#aaee00;';
+						},
+						formatter:function(value,row){
+                            return value + '时';
+                        },
+						editor:{type:'numberbox',options:{min:0,max:10,precision:1}}">
+				<span style="font-size:12px;font-weight: bolder">2时间</span>
+				</th>
+				<th data-options="field:'cbright',width:60,
+						styler:function(value,row,index){
+							return 'background-color:#aaee00;';
+						},
+						formatter:function(value,row){
+                            return value + '%';
+                        },
+						editor:{type:'numberbox',options:{min:0,max:100}}">
+				<span style="font-size:12px;font-weight: bolder">3亮度</span>
+				</th>
+				<th data-options="field:'ctime',width:50,
+						styler:function(value,row,index){
+							return 'background-color:#aaee00;';
+						},
+						formatter:function(value,row){
+                            return value + '时';
+                        },
+						editor:{type:'numberbox',options:{min:0,max:10,precision:1}}">
+				<span style="font-size:12px;font-weight: bolder">3时间</span>
+				</th>
+				<th data-options="field:'dbright',width:60,
+						styler:function(value,row,index){
+							return 'background-color:#aaee00;';
+						},
+						formatter:function(value,row){
+                            return value + '%';
+                        },
+						editor:{type:'numberbox',options:{min:0,max:100}}">
+				<span style="font-size:12px;font-weight: bolder">4亮度</span>
+				</th>
+				<th data-options="field:'dtime',width:50,
+						styler:function(value,row,index){
+							return 'background-color:#aaee00;';
+						},
+						formatter:function(value,row){
+                            return value + '时';
+                        },
+						editor:{type:'numberbox',options:{min:0,max:10,precision:1}}">
+				<span style="font-size:12px;font-weight: bolder">4时间</span>
+				</th>
+				<th field='bSet' width=60 align='center' formatter="formatSetting">
+				<span style="font-size:12px;font-weight: bolder">操作</span>
+				</th>
+			</tr>
+		</thead>
+	</table>
+
+</body>
+<script type="text/javascript">
+var ctypeData = [{ctypeValue:0,ctypeName:'关'},
+				{ctypeValue:1,ctypeName:'开'},
+				{ctypeValue:2,ctypeName:'自动'}];
+var atypeData = [{atypeValue:0,atypeName:'光控'},
+				{atypeValue:1,atypeName:'时控'}];
+
+$.extend($.fn.datagrid.methods, {
+	editCell: function(jq,param){
+		return jq.each(function(){
+			var opts = $(this).datagrid('options');
+			var fields = $(this).datagrid('getColumnFields',true).concat($(this).datagrid('getColumnFields'));
+			for(var i=0; i<fields.length; i++){
+				var col = $(this).datagrid('getColumnOption', fields[i]);
+				col.editor1 = col.editor;
+				if (fields[i] != param.field){
+					col.editor = null;
+				}
+			}
+			$(this).datagrid('beginEdit', param.index);
+			for(var i=0; i<fields.length; i++){
+				var col = $(this).datagrid('getColumnOption', fields[i]);
+				col.editor = col.editor1;
+			}
+		});
+	}
+});
+
+var editIndex = undefined;
+function endEditing(){
+	if (editIndex == undefined){return true}
+	if ($('#dg').datagrid('validateRow', editIndex)){
+		$('#dg').datagrid('endEdit', editIndex);
+		editIndex = undefined;
+		return true;
+	} else {
+		return false;
+	}
+}
+function onClickCell(index, field){
+	if (endEditing()){
+		$('#dg').datagrid('selectRow', index)
+				.datagrid('editCell', {index:index,field:field});
+		editIndex = index;
+	}
+}
+
+function onLoadSuccess(data){
+	$('#dg')[0].data = jQuery.extend(true, {}, data);
+}
+
+function startupClock() { 
+	if (window.scClock) { 
+		window.scClock.startup(function(time){ 
+			$("#currTime").text(time); 
+			$("#currTime").textbox('setText',time);
+		}); 
+	} 
+}
+
+function chooseChangeFileds(Old, New){
+	var na = {};
+	for(var a in Old){
+		if(New.hasOwnProperty(a)){
+			if(String(New[a]) !== String(Old[a])){
+				na[a] = New[a];
+			}
+		}
+	}
+	return na;
+};
+
+function loadSystemTime() { 
+
+	$.get('/getTime?'+new Date(), {}, function(data){ 
+		if (window.scClock) 
+			window.scClock.updateTime(data);
+	}); 
+	setTimeout("loadSystemTime()", 60000*15); 
+} 
+var l = window.location.href.split('/'),
+	url = 'http://' + l[2];
+var socket = io.connect(url+':8080');
+
+socket.on('connect', function (argument) {
+    console.log('@@@@@connected.');    
+});
+
+socket.on('disconnect', function (argument) {
+    console.log('!!!!!disconnected.');    
+});
+
+socket.on('onLightGetSet', function (argument) {
+    console.log('!!!!onLightGetSet.',argument);
+    if(String(argument.uindex) === "<%= user.index %>" && 
+    	String(argument.ucode) === "<%= user.code %>" && 
+    	String(argument.cid) === "<%= user.cid %>"){
+	    var rows = $('#dg').datagrid('getRows');    
+	    for(var i in rows){
+	    	if(rows[i].index === argument.index){
+	    		$('#dg').datagrid('updateRow',{
+					index: i,
+					row: {bSet: ''}
+				});
+	    		break;
+	    	}
+	    }
+    }
+});
+
+socket.on('onLightPutSet', function (argument) {
+    console.log('!!!!onLightPutSet.',argument);
+    if(String(argument.uindex) === "<%= user.index %>" && 
+    	String(argument.ucode) === "<%= user.code %>" && 
+    	String(argument.cid) === "<%= user.cid %>"){
+	    var rows = $('#dg').datagrid('getRows');
+	    var bExist = false;
+	    for(var i in rows){
+	    	if(rows[i].index === argument.index){
+	    		bExist = true;
+	    		$('#dg').datagrid('updateRow',{
+					index: i,
+					row: argument
+				});
+	    		break;
+	    	}
+	    }
+	    if(!bExist){
+	    	$('#dg').datagrid('appendRow',argument);
+	    }
+    }
+});
+
+loadSystemTime();
+startupClock();	
+
+function formatSetting(value,row){
+	if(value === 1)
+		return '<span style="color:red;font-weight: bolder">待更新</span>';
+};
+
+function setChanging(idx){
+	$("#btnset")[idx].style.backgroundColor = "rgb(100,100,100)";
+};
+
+$('#modifyItem').click(function(){
+	var row = $('#dg').datagrid('getSelected');	
+	if(!row) return;
+	
+	var index = $('#dg').datagrid('getRowIndex',row);
+	var old = $('#dg')[0].data.rows[index];		
+	var changes = chooseChangeFileds(old, row);
+	if(jQuery.isEmptyObject(changes)) return;	
+	
+	$.post('updateLight',row,function(result, status){
+		if(result === "success"){
+			location.reload();
+		}
+		else {
+			alert('failed');
+		}
+	});
+});
+
+$('#modifyAll').click(function(){
+	var row = $('#dg').datagrid('getSelected');	
+	if(!row) return;	
+	
+	var index = $('#dg').datagrid('getRowIndex',row);
+	var old = $('#dg')[0].data.rows[index];		
+	var changes = chooseChangeFileds(old, row);
+	if(jQuery.isEmptyObject(changes)) return;	
+	
+	if(!changes.hasOwnProperty('uindex')){
+		changes['uindex'] = row.uindex;
+	}
+	if(!changes.hasOwnProperty('ucode')){
+		changes['ucode'] = row.ucode;
+	}
+	if(!changes.hasOwnProperty('cid')){
+		changes['cid'] = row.cid;
+	}
+	$.post('updateAllLights',changes,function(result, status){
+		if(result === "success"){
+			location.reload();
+		}
+		else {
+			alert('操作失败！');
+		}
+	});
+});
+
+$('#modifySingle').click(function(){
+	var row = $('#dg').datagrid('getSelected');	
+	if(!row) return;
+	
+	var index = $('#dg').datagrid('getRowIndex',row);
+	var old = $('#dg')[0].data.rows[index];		
+	var changes = chooseChangeFileds(old, row);
+	if(jQuery.isEmptyObject(changes)) return;
+	
+	if(!changes.hasOwnProperty('uindex')){
+		changes['uindex'] = row.uindex;
+	}
+	if(!changes.hasOwnProperty('ucode')){
+		changes['ucode'] = row.ucode;
+	}
+	if(!changes.hasOwnProperty('cid')){
+		changes['cid'] = row.cid;
+	}
+	$.post('updateSingleLights',changes,function(result, status){
+		if(result === "success"){
+			location.reload();
+		}
+		else {
+			alert('failed');
+		}
+	});
+});
+
+$('#modifyDouble').click(function(){
+	var row = $('#dg').datagrid('getSelected');	
+	if(!row) return;
+	
+	var index = $('#dg').datagrid('getRowIndex',row);
+	var old = $('#dg')[0].data.rows[index];		
+	var changes = chooseChangeFileds(old, row);
+	if(jQuery.isEmptyObject(changes)) return;
+	
+	if(!changes.hasOwnProperty('uindex')){
+		changes['uindex'] = row.uindex;
+	}
+	if(!changes.hasOwnProperty('ucode')){
+		changes['ucode'] = row.ucode;
+	}
+	if(!changes.hasOwnProperty('cid')){
+		changes['cid'] = row.cid;
+	}
+	$.post('updateDoubleLights',changes,function(result, status){
+		if(result === "success"){
+			location.reload();
+		}
+		else {
+			alert('failed');
+		}
+	});
+});
+
+</script>
+</html>

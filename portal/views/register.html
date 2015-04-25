@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Register</title>
+	<link rel="stylesheet" type="text/css" href="css/default/easyui.css">
+	<link rel="stylesheet" type="text/css" href="css/icon.css">
+	<script type="text/javascript" src="lib/jquery.min.js"></script>
+	<script type="text/javascript" src="lib/jquery.easyui.min.js"></script>
+</head>
+<body>
+	<div style="width:100%;padding:5px;font-size:24px;">
+	<a id="quit" class="btn" href="/admin" style="font-size:24px">退出</a>
+	</div>
+	<form method="post">
+	<div class='contaner' style='display:block;width:400px;margin-left:auto;margin-right:auto;margin-top:100px'>
+	<div class="easyui-panel" title="注册新用户" style="width:400px;padding:30px 60px;font-size:16px">
+		<style>.panel-title{font-size:16px}</style>
+		<div style="margin-bottom:20px">
+			<div>用户名</div>
+			<input class="easyui-textbox" type="text" id="username" name="username" data-options="required:true,prompt:'请输入字符',iconCls:'icon-man',iconWidth:38" style="width:100%;height:32px">
+		</div>
+		<div style="margin-bottom:20px">
+			<div>密码</div>
+			<input class="easyui-textbox" type="password" id="password" name="password" style="width:100%;height:32px" data-options="required:true,prompt:'请输入6位字符加数字',iconCls:'icon-lock',iconWidth:38">
+		</div>
+		<div style="margin-bottom:20px">
+			<div>确认密码</div>
+			<input class="easyui-textbox" type="password" id="confirm" name="confirm" style="width:100%;height:32px" data-options="required:true,prompt:'再次输入密码',iconCls:'icon-lock',iconWidth:38">
+		</div>
+		<div class="alert alert-error" style="color:red">
+			<%- message %>
+		</div>
+		<div class="form-actions">
+			<button type="submit" class="easyui-linkbutton" data-options="iconCls:'icon-ok'" style="padding:5px 0px;width:100%;">
+				<span style="font-size:16px;">注册</span>
+			</button>
+		</div>
+	</div>
+	</div>
+	</form>
+</body>
+</html>

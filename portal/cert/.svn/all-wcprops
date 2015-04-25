@@ -1,0 +1,17 @@
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/wiucsserviceiv/!svn/ver/3/2-DevelopLib/24-Code/src/wiucs/lynckia/extras/portal/cert
+END
+key.pem
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/wiucsserviceiv/!svn/ver/3/2-DevelopLib/24-Code/src/wiucs/lynckia/extras/portal/cert/key.pem
+END
+cert.pem
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/wiucsserviceiv/!svn/ver/3/2-DevelopLib/24-Code/src/wiucs/lynckia/extras/portal/cert/cert.pem
+END

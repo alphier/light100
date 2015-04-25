@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Administrator</title>
+	<link rel="stylesheet" type="text/css" href="css/default/easyui.css">
+	<link rel="stylesheet" type="text/css" href="css/color.css">	
+	<link rel="stylesheet" type="text/css" href="css/icon.css">
+	<script type="text/javascript" src="lib/jquery.min.js"></script>
+	<script type="text/javascript" src="lib/jquery.easyui.min.js"></script>
+</head>
+<body>
+<div style="width:100%;padding:5px;font-size:32px;">
+	管理员用户
+	<a id="quit" class="btn" href="/register" style="font-size:32px">注册</a>	
+	<a id="quit" class="btn" href="/logout" style="font-size:32px">退出</a>
+	</div>	
+	<div style="margin:5px 0;">
+	<span style="font-size:22px;font-weight: bolder">用户列表：</span>
+	<label id="delResult" style="font-size:16px;"></label>
+	</div>
+	
+	<table id="dg" class="easyui-datagrid" style="width:600px;"	data-options="
+		singleSelect:true,
+		url:'user_datagrid.json'
+		,method:'post'">
+		<style>
+		  .datagrid-cell{
+			font-size:24px;
+		  }
+		</style>
+		<thead>
+			<tr>
+				<th data-options="field:'index',width:100">
+				<span style="font-size:22px;font-weight: bolder">编号</span>
+				</th>
+				<th data-options="field:'username',width:150">
+				<span style="font-size:22px;font-weight: bolder">用户名</span>
+				</th>
+				<th data-options="field:'code',width:120">
+				<span style="font-size:22px;font-weight: bolder">机器码</span>
+				</th>
+				<th data-options="field:'_operate',width:120,align:'center',formatter:formatDelete">
+				<span style="font-size:22px;font-weight: bolder">操作</span>
+				</th>				
+			</tr>
+		</thead>
+	</table>
+
+</body>
+<script type="text/javascript">	
+	function formatDelete(val,row,index){
+		$('#dg').datagrid('selectRow',index);
+		return '<a href="#" style="font-size:22px;" onclick="deleteUser('+index+')">删除</a>';
+	}
+	function deleteUser(index){
+		$('#dg').datagrid('selectRow',index);
+		var row = $('#dg').datagrid('getSelected');
+		$.post('deleteUser',{userid:row._id},function(data, status){
+			if (data === 'success'){
+				$("#result").css({"color":"black"});
+				$('#dg').datagrid('reload');
+			} else if(data === 'session expired'){
+				window.location = "/";
+			}
+			else {
+				$("#delResult").css({"color":"red"});
+				$("#delResult").html("删除失败！");
+			}
+		});
+	}
+</script>
+</html>

@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Home</title>
+	<link rel="stylesheet" type="text/css" href="css/default/easyui.css">
+	<link rel="stylesheet" type="text/css" href="css/color.css">
+	<link rel="stylesheet" type="text/css" href="css/icon.css">
+	<script type="text/javascript" src="lib/jquery.min.js"></script>
+	<script type="text/javascript" src="lib/jquery.easyui.min.js"></script>
+	<script type="text/javascript" src="lib/socket.io/socket.io.js"></script>
+	<script type="text/javascript" src="lib/sc_clock.js"></script>
+</head>
+<body>	
+	<div style="margin-top:6px;padding:5px;">
+	用户名：<%= user.username %>
+	编号：<%= user.index %>
+	机器密码：<%= user.code %>
+	<span style="font-size:16px;padding:5px;">当前时间：</span>
+	<input class="easyui-textbox" type="text" id="currTime" style="width:130px;height:20px;padding:5px;" data-options="readonly:true"></input>
+	<a id="quit" class="btn" href="/logout">退出</a>	
+	</div>
+	<div class="easyui-panel" id="container" title="控制器" style="padding:5px;width:100%;height:100%;">
+		<style>.panel-title{font-size:16px}</style>	
+		<table id="table" style="width: 100%;">
+			<tbody>			
+			<td id="td-0" style="horizon-align: left; width: 200px; padding:5px">
+				<div class="easyui-panel c2" id="p-0" title="未使用" style="width:167px;height:135px;padding:5px;" data-options="footer:'#footer-0', closed:false, tools:[{
+							iconCls:'icon-edit',
+							handler:function(){							
+								var d = $('#p-0')[0].data;									
+								$('#w')[0].data = d;
+								$('#cname').textbox('setText',d.name);
+								$('#w').window('open');
+							}
+							},
+							{
+							iconCls:'icon-reload',
+							handler:function(){
+								var d = $('#p-0')[0].data;
+								$('#container')[0].data = d;
+								refreshCtl();
+							}
+							}]">
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">充电</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">亮灯</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">故障</a>
+					<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-redo', disabled:true" style="height:25px;" >进入</a>
+				</div>
+				<div id="footer-0" style="padding:5px; font-size:12px">
+					未连接.
+				</div>
+			</td>			
+			<td style="horizon-align: left; width: 200px; padding:5px">
+				<div class="easyui-panel c2" id="p-1" title="未使用" style="width:170px;height:135px;padding:5px;" data-options="footer:'#footer-1',closed:false, tools:[{
+							iconCls:'icon-edit',
+							handler:function(){
+								var d = $('#p-1')[0].data;									
+								$('#w')[0].data = d;
+								$('#cname').textbox('setText',d.name);
+								$('#w').window('open');
+							}
+							},
+							{
+							iconCls:'icon-reload',
+							handler:function(){
+								var d = $('#p-1')[0].data;
+								$('#container')[0].data = d;
+								refreshCtl();
+							}
+							}]">
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">充电</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">亮灯</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">故障</a>
+					<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-redo', disabled:true" style="height:25px">进入</a>
+				</div>
+				<div id="footer-1" style="padding:5px; font-size:12px">
+					未连接.
+				</div>
+			</td>			
+			<td style="horizon-align: left; width: 200px; padding:5px">
+				<div class="easyui-panel c2" id="p-2" title="未使用" style="width:170px;height:135px;padding:5px;" data-options="footer:'#footer-2',closed:false, tools:[{
+							iconCls:'icon-edit',
+							handler:function(){
+								var d = $('#p-2')[0].data;									
+								$('#w')[0].data = d;
+								$('#cname').textbox('setText',d.name);
+								$('#w').window('open');
+							}
+							},
+							{
+							iconCls:'icon-reload',
+							handler:function(){
+								var d = $('#p-2')[0].data;
+								$('#container')[0].data = d;
+								refreshCtl();
+							}
+							}]">
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">充电</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">亮灯</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">故障</a>
+					<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-redo', disabled:true" style="height:25px">进入</a>
+				</div>
+				<div id="footer-2" style="padding:5px; font-size:12px">
+					未连接.
+				</div>
+			</td>
+			<td style="horizon-align: left; width: 200px; padding:5px">
+				<div class="easyui-panel c2" id="p-3" title="未使用" style="width:170px;height:135px;padding:5px;" data-options="footer:'#footer-3',closed:false, tools:[{
+							iconCls:'icon-edit',
+							handler:function(){				
+								var d = $('#p-3')[0].data;									
+								$('#w')[0].data = d;
+								$('#cname').textbox('setText',d.name);
+								$('#w').window('open');
+							}
+							},
+							{
+							iconCls:'icon-reload',
+							handler:function(){
+								var d = $('#p-3')[0].data;
+								$('#container')[0].data = d;
+								refreshCtl();
+							}
+							}]">
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px"">充电</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px"">亮灯</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px"">故障</a>
+					<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-redo',disabled:true" style="height:25px">进入</a>
+				</div>
+				<div id="footer-3" style="padding:5px; font-size:12px">
+					未连接.
+				</div>
+			</td>
+			<td style="horizon-align: left; width: 200px; padding:5px">
+				<div class="easyui-panel c2" id="p-4" title="未使用" style="width:170px;height:135px;padding:5px;" data-options="footer:'#footer-4',closed:false, tools:[{
+							iconCls:'icon-edit',
+							handler:function(){
+								var d = $('#p-4')[0].data;									
+								$('#w')[0].data = d;
+								$('#cname').textbox('setText',d.name);
+								$('#w').window('open');
+							}
+							},
+							{
+							iconCls:'icon-reload',
+							handler:function(){
+								var d = $('#p-4')[0].data;
+								$('#container')[0].data = d;
+								refreshCtl();
+							}
+							}]">
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">充电</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">亮灯</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">故障</a>
+					<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-redo',disabled:true" style="height:25px">进入</a>
+				</div>
+				<div id="footer-4" style="padding:5px; font-size:12px">
+					未连接.
+				</div>
+			</td>
+			<td style="horizon-align: left; width: 200px; padding:5px">
+				<div class="easyui-panel c2" id="p-5" title="未使用" style="width:170px;height:135px;padding:5px;" data-options="footer:'#footer-5',closed:false, tools:[{
+							iconCls:'icon-edit',
+							handler:function(){
+								var d = $('#p-5')[0].data;									
+								$('#w')[0].data = d;
+								$('#cname').textbox('setText',d.name);
+								$('#w').window('open');
+							}
+							},
+							{
+							iconCls:'icon-reload',
+							handler:function(){
+								var d = $('#p-5')[0].data;
+								$('#container')[0].data = d;
+								refreshCtl();
+							}
+							}]">
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">充电</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">亮灯</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">故障</a>
+					<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-redo',disabled:true" style="height:25px">进入</a>
+				</div>
+				<div id="footer-5" style="padding:5px; font-size:12px">
+					未连接.
+				</div>
+			</td>
+			<td style="horizon-align: left; width: 200px; padding:5px">
+				<div class="easyui-panel c2" id="p-6" title="未使用" style="width:170px;height:135px;padding:5px;" data-options="footer:'#footer-6',closed:false, tools:[{
+							iconCls:'icon-edit',
+							handler:function(){
+								var d = $('#p-6')[0].data;									
+								$('#w')[0].data = d;
+								$('#cname').textbox('setText',d.name);
+								$('#w').window('open');
+							}
+							},
+							{
+							iconCls:'icon-reload',
+							handler:function(){
+								var d = $('#p-6')[0].data;
+								$('#container')[0].data = d;
+								refreshCtl();
+							}
+							}]">
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">充电</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">亮灯</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">故障</a>
+					<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-redo',disabled:true" style="height:25px">进入</a>
+				</div>
+				<div id="footer-6" style="padding:5px; font-size:12px">
+					未连接.
+				</div>
+			</td>
+			<tr>
+			<td style="horizon-align: left; width: 200px; padding:5px">
+				<div class="easyui-panel c2" id="p-7" title="未使用" style="width:170px;height:135px;padding:5px;" data-options="footer:'#footer-7',closed:false, tools:[{
+							iconCls:'icon-edit',
+							handler:function(){
+								var d = $('#p-0')[7].data;									
+								$('#w')[0].data = d;
+								$('#cname').textbox('setText',d.name);
+								$('#w').window('open');
+							}
+							},
+							{
+							iconCls:'icon-reload',
+							handler:function(){
+								var d = $('#p-7')[0].data;
+								$('#container')[0].data = d;
+								refreshCtl();
+							}
+							}]">
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">充电</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">亮灯</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">故障</a>
+					<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-redo',disabled:true" style="height:25px">进入</a>
+				</div>
+				<div id="footer-7" style="padding:5px; font-size:12px">
+					未连接.
+				</div>
+			</td>
+			<td style="horizon-align: left; width: 200px; padding:5px">
+				<div class="easyui-panel c2" id="p-8" title="未使用" style="width:170px;height:135px;padding:5px;" data-options="footer:'#footer-8',closed:false, tools:[{
+							iconCls:'icon-edit',
+							handler:function(){
+								var d = $('#p-0')[8].data;									
+								$('#w')[0].data = d;
+								$('#cname').textbox('setText',d.name);
+								$('#w').window('open');
+							}
+							},
+							{
+							iconCls:'icon-reload',
+							handler:function(){
+								var d = $('#p-8')[0].data;
+								$('#container')[0].data = d;
+								refreshCtl();
+							}
+							}]">
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">充电</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">亮灯</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">故障</a>
+					<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-redo',disabled:true" style="height:25px">进入</a>
+				</div>
+				<div id="footer-8" style="padding:5px; font-size:12px">
+					未连接.
+				</div>
+			</td>
+			<td style="horizon-align: left; width: 200px; padding:5px">
+				<div class="easyui-panel c2" id="p-9" title="未使用" style="width:170px;height:135px;padding:5px;" data-options="footer:'#footer-9',closed:false, tools:[{
+							iconCls:'icon-edit',
+							handler:function(){
+								var d = $('#p-9')[0].data;									
+								$('#w')[0].data = d;
+								$('#cname').textbox('setText',d.name);
+								$('#w').window('open');
+							}
+							},
+							{
+							iconCls:'icon-reload',
+							handler:function(){
+								var d = $('#p-9')[0].data;
+								$('#container')[0].data = d;
+								refreshCtl();
+							}
+							}]">
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">充电</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">亮灯</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">故障</a>
+					<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-redo',disabled:true" style="height:25px">进入</a>
+				</div>
+				<div id="footer-9" style="padding:5px; font-size:12px">
+					未连接.
+				</div>
+			</td>
+			<td style="horizon-align: left; width: 200px; padding:5px">
+				<div class="easyui-panel c2" id="p-10" title="未使用" style="width:170px;height:135px;padding:5px;" data-options="footer:'#footer-10',closed:false, tools:[{
+							iconCls:'icon-edit',
+							handler:function(){
+								var d = $('#p-10')[0].data;									
+								$('#w')[0].data = d;
+								$('#cname').textbox('setText',d.name);
+								$('#w').window('open');
+							}
+							},
+							{
+							iconCls:'icon-reload',
+							handler:function(){
+								var d = $('#p-10')[0].data;
+								$('#container')[0].data = d;
+								refreshCtl();
+							}
+							}]">
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">充电</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">亮灯</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">故障</a>
+					<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-redo',disabled:true" style="height:25px">进入</a>
+				</div>
+				<div id="footer-10" style="padding:5px; font-size:12px">
+					未连接.
+				</div>
+			</td>
+			<td style="horizon-align: left; width: 200px; padding:5px">
+				<div class="easyui-panel c2" id="p-11" title="未使用" style="width:170px;height:135px;padding:5px;" data-options="footer:'#footer-11',closed:false, tools:[{
+							iconCls:'icon-edit',
+							handler:function(){
+								var d = $('#p-11')[0].data;									
+								$('#w')[0].data = d;
+								$('#cname').textbox('setText',d.name);
+								$('#w').window('open');
+							}
+							},
+							{
+							iconCls:'icon-reload',
+							handler:function(){
+								var d = $('#p-11')[0].data;
+								$('#container')[0].data = d;
+								refreshCtl();
+							}
+							}]">
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">充电</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">亮灯</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">故障</a>
+					<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-redo',disabled:true" style="height:25px">进入</a>
+				</div>
+				<div id="footer-11" style="padding:5px; font-size:12px">
+					未连接.
+				</div>
+			</td>
+			<td style="horizon-align: left; width: 200px; padding:5px">
+				<div class="easyui-panel c2" id="p-12" title="未使用" style="width:170px;height:135px;padding:5px;" data-options="footer:'#footer-12',closed:false, tools:[{
+							iconCls:'icon-edit',
+							handler:function(){
+								var d = $('#p-12')[0].data;									
+								$('#w')[0].data = d;
+								$('#cname').textbox('setText',d.name);
+								$('#w').window('open');
+							}
+							},
+							{
+							iconCls:'icon-reload',
+							handler:function(){
+								var d = $('#p-12')[0].data;
+								$('#container')[0].data = d;
+								refreshCtl();
+							}
+							}]">
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">充电</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">亮灯</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">故障</a>
+					<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-redo', disabled:true" style="height:25px">进入</a>
+				</div>
+				<div id="footer-12" style="padding:5px; font-size:12px">
+					未连接.
+				</div>
+			</td>
+			<td style="horizon-align: left; width: 200px; padding:5px">
+				<div class="easyui-panel c2" id="p-13" title="未使用" style="width:170px;height:135px;padding:5px;" data-options="footer:'#footer-13',closed:false, tools:[{
+							iconCls:'icon-edit',
+							handler:function(){
+								var d = $('#p-13')[0].data;									
+								$('#w')[0].data = d;
+								$('#cname').textbox('setText',d.name);
+								$('#w').window('open');
+							}
+							},
+							{
+							iconCls:'icon-reload',
+							handler:function(){
+								var d = $('#p-13')[0].data;
+								$('#container')[0].data = d;
+								refreshCtl();
+							}
+							}]">
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">充电</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">亮灯</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">故障</a>
+					<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-redo', disabled:true" style="height:25px">进入</a>
+				</div>
+				<div id="footer-13" style="padding:5px; font-size:12px">
+					未连接.
+				</div>
+			</td>
+			</tr>
+			<tr>
+			<td style="horizon-align: left; width: 200px; padding:5px">
+				<div class="easyui-panel c2" id="p-14" title="未使用" style="width:170px;height:135px;padding:5px;" data-options="footer:'#footer-14',closed:false, tools:[{
+							iconCls:'icon-edit',
+							handler:function(){
+								var d = $('#p-0')[14].data;									
+								$('#w')[0].data = d;
+								$('#cname').textbox('setText',d.name);
+								$('#w').window('open');
+							}
+							},
+							{
+							iconCls:'icon-reload',
+							handler:function(){
+								var d = $('#p-14')[0].data;
+								$('#container')[0].data = d;
+								refreshCtl();
+							}
+							}]">
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">充电</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">亮灯</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">故障</a>
+					<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-redo',disabled:true" style="height:25px">进入</a>
+				</div>
+				<div id="footer-14" style="padding:5px; font-size:12px">
+					未连接.
+				</div>
+			</td>
+			<td style="horizon-align: left; width: 200px; padding:5px">
+				<div class="easyui-panel c2" id="p-15" title="未使用" style="width:170px;height:135px;padding:5px;" data-options="footer:'#footer-15',closed:false, tools:[{
+							iconCls:'icon-edit',
+							handler:function(){
+								var d = $('#p-0')[15].data;									
+								$('#w')[0].data = d;
+								$('#cname').textbox('setText',d.name);
+								$('#w').window('open');
+							}
+							},
+							{
+							iconCls:'icon-reload',
+							handler:function(){
+								var d = $('#p-15')[0].data;
+								$('#container')[0].data = d;
+								refreshCtl();
+							}
+							}]">
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">充电</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">亮灯</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">故障</a>
+					<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-redo',disabled:true" style="height:25px">进入</a>
+				</div>
+				<div id="footer-15" style="padding:5px; font-size:12px">
+					未连接.
+				</div>
+			</td>
+			<td style="horizon-align: left; width: 200px; padding:5px">
+				<div class="easyui-panel c2" id="p-16" title="未使用" style="width:170px;height:135px;padding:5px;" data-options="footer:'#footer-16',closed:false, tools:[{
+							iconCls:'icon-edit',
+							handler:function(){
+								var d = $('#p-0')[16].data;									
+								$('#w')[0].data = d;
+								$('#cname').textbox('setText',d.name);
+								$('#w').window('open');
+							}
+							},
+							{
+							iconCls:'icon-reload',
+							handler:function(){
+								var d = $('#p-16')[0].data;
+								$('#container')[0].data = d;
+								refreshCtl();
+							}
+							}]">
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">充电</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">亮灯</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">故障</a>
+					<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-redo', disabled:true" style="height:25px">进入</a>
+				</div>
+				<div id="footer-16" style="padding:5px; font-size:12px">
+					未连接.
+				</div>
+			</td>
+			<td style="horizon-align: left; width: 200px; padding:5px">
+				<div class="easyui-panel c2" id="p-17" title="未使用" style="width:170px;height:135px;padding:5px;" data-options="footer:'#footer-17',closed:false, tools:[{
+							iconCls:'icon-edit',
+							handler:function(){
+								var d = $('#p-0')[17].data;									
+								$('#w')[0].data = d;
+								$('#cname').textbox('setText',d.name);
+								$('#w').window('open');
+							}
+							},
+							{
+							iconCls:'icon-reload',
+							handler:function(){
+								var d = $('#p-17')[0].data;
+								$('#container')[0].data = d;
+								refreshCtl();
+							}
+							}]">
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">充电</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">亮灯</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">故障</a>
+					<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-redo',disabled:true" style="height:25px">进入</a>
+				</div>
+				<div id="footer-17" style="padding:5px; font-size:12px">
+					未连接.
+				</div>
+			</td>
+			<td style="horizon-align: left; width: 200px; padding:5px">
+				<div class="easyui-panel c2" id="p-18" title="未使用" style="width:170px;height:135px;padding:5px;" data-options="footer:'#footer-18',closed:false, tools:[{
+							iconCls:'icon-edit',
+							handler:function(){
+								var d = $('#p-0')[18].data;									
+								$('#w')[0].data = d;
+								$('#cname').textbox('setText',d.name);
+								$('#w').window('open');
+							}
+							},
+							{
+							iconCls:'icon-reload',
+							handler:function(){
+								var d = $('#p-18')[0].data;
+								$('#container')[0].data = d;
+								refreshCtl();
+							}
+							}]">
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">充电</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">亮灯</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">故障</a>
+					<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-redo', disabled:true" style="height:25px">进入</a>
+				</div>
+				<div id="footer-18" style="padding:5px; font-size:12px">
+					未连接.
+				</div>
+			</td>
+			<td style="horizon-align: left; width: 200px; padding:5px">
+				<div class="easyui-panel c2" id="p-19" title="未使用" style="width:170px;height:135px;padding:5px;" data-options="footer:'#footer-19',closed:false, tools:[{
+							iconCls:'icon-edit',
+							handler:function(){
+								var d = $('#p-0')[19].data;									
+								$('#w')[0].data = d;
+								$('#cname').textbox('setText',d.name);
+								$('#w').window('open');
+							}
+							},
+							{
+							iconCls:'icon-reload',
+							handler:function(){
+								var d = $('#p-19')[0].data;
+								$('#container')[0].data = d;
+								refreshCtl();
+							}
+							}]">
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">充电</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">亮灯</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">故障</a>
+					<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-redo', disabled:true" style="height:25px">进入</a>
+				</div>
+				<div id="footer-19" style="padding:5px; font-size:12px">
+					未连接.
+				</div>
+			</td>
+			<td style="horizon-align: left; width: 200px; padding:5px">
+				<div class="easyui-panel c2" id="p-20" title="未使用" style="width:170px;height:135px;padding:5px;" data-options="footer:'#footer-20',closed:false, tools:[{
+							iconCls:'icon-edit',
+							handler:function(){
+								var d = $('#p-20')[0].data;									
+								$('#w')[0].data = d;
+								$('#cname').textbox('setText',d.name);
+								$('#w').window('open');
+							}
+							},
+							{
+							iconCls:'icon-reload',
+							handler:function(){
+								var d = $('#p-20')[0].data;
+								$('#container')[0].data = d;
+								refreshCtl();
+							}
+							}]">
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">充电</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">亮灯</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">故障</a>
+					<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-redo',disabled:true" style="height:25px">进入</a>
+				</div>
+				<div id="footer-20" style="padding:5px; font-size:12px">
+					未连接.
+				</div>
+			</td>
+			</tr>
+			<tr>
+			<td style="horizon-align: left; width: 200px; padding:5px">
+				<div class="easyui-panel c2" id="p-21" title="未使用" style="width:170px;height:135px;padding:5px;" data-options="footer:'#footer-21',closed:false, tools:[{
+							iconCls:'icon-edit',
+							handler:function(){
+								var d = $('#p-21')[0].data;									
+								$('#w')[0].data = d;
+								$('#cname').textbox('setText',d.name);
+								$('#w').window('open');
+							}
+							},
+							{
+							iconCls:'icon-reload',
+							handler:function(){
+								var d = $('#p-21')[0].data;
+								$('#container')[0].data = d;
+								refreshCtl();
+							}
+							}]">
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">充电</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">亮灯</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">故障</a>
+					<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-redo', disabled:true" style="height:25px">进入</a>
+				</div>
+				<div id="footer-21" style="padding:5px; font-size:12px">
+					未连接.
+				</div>
+			</td>
+			<td style="horizon-align: left; width: 200px; padding:5px">
+				<div class="easyui-panel c2" id="p-22" title="未使用" style="width:170px;height:135px;padding:5px;" data-options="footer:'#footer-22',closed:false, tools:[{
+							iconCls:'icon-edit',
+							handler:function(){
+								var d = $('#p-22')[0].data;									
+								$('#w')[0].data = d;
+								$('#cname').textbox('setText',d.name);
+								$('#w').window('open');
+							}
+							},
+							{
+							iconCls:'icon-reload',
+							handler:function(){
+								var d = $('#p-22')[0].data;
+								$('#container')[0].data = d;
+								refreshCtl();
+							}
+							}]">
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">充电</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">亮灯</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">故障</a>
+					<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-redo',disabled:true" style="height:25px">进入</a>
+				</div>
+				<div id="footer-22" style="padding:5px; font-size:12px">
+					未连接.
+				</div>
+			</td>
+			<td style="horizon-align: left; width: 200px; padding:5px">
+				<div class="easyui-panel c2" id="p-23" title="未使用" style="width:170px;height:135px;padding:5px;" data-options="footer:'#footer-23',closed:false, tools:[{
+							iconCls:'icon-edit',
+							handler:function(){
+								var d = $('#p-23')[0].data;
+								$('#w')[0].data = d;
+								$('#cname').textbox('setText',d.name);
+								$('#w').window('open');
+							}
+							},
+							{
+							iconCls:'icon-reload',
+							handler:function(){
+								var d = $('#p-23')[0].data;
+								$('#container')[0].data = d;
+								refreshCtl();
+							}
+							}]">
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">充电</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">亮灯</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">故障</a>
+					<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-redo',disabled:true" style="height:25px">进入</a>
+				</div>
+				<div id="footer-23" style="padding:5px; font-size:12px">
+					未连接.
+				</div>
+			</td>
+			<td style="horizon-align: left; width: 200px; padding:5px">
+				<div class="easyui-panel c2" id="p-24" title="未使用" style="width:170px;height:135px;padding:5px;" data-options="footer:'#footer-24',closed:false, tools:[{
+							iconCls:'icon-edit',
+							handler:function(){
+								var d = $('#p-24')[0].data;									
+								$('#w')[0].data = d;
+								$('#cname').textbox('setText',d.name);
+								$('#w').window('open');
+							}
+							},
+							{
+							iconCls:'icon-reload',
+							handler:function(){
+								var d = $('#p-24')[0].data;
+								$('#container')[0].data = d;
+								refreshCtl();
+							}
+							}]">
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">充电</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">亮灯</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">故障</a>
+					<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-redo',disabled:true" style="height:25px">进入</a>
+				</div>
+				<div id="footer-24" style="padding:5px; font-size:12px">
+					未连接.
+				</div>
+			</td>
+			<td style="horizon-align: left; width: 200px; padding:5px">
+				<div class="easyui-panel c2" id="p-25" title="未使用" style="width:170px;height:135px;padding:5px;" data-options="footer:'#footer-25',closed:false, tools:[{
+							iconCls:'icon-edit',
+							handler:function(){
+								var d = $('#p-25')[0].data;									
+								$('#w')[0].data = d;
+								$('#cname').textbox('setText',d.name);
+								$('#w').window('open');
+							}
+							},
+							{
+							iconCls:'icon-reload',
+							handler:function(){
+								var d = $('#p-25')[0].data;
+								$('#container')[0].data = d;
+								refreshCtl();
+							}
+							}]">
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">充电</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">亮灯</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">故障</a>
+					<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-redo',disabled:true" style="height:25px">进入</a>
+				</div>
+				<div id="footer-25" style="padding:5px; font-size:12px">
+					未连接.
+				</div>
+			</td>
+			<td style="horizon-align: left; width: 200px; padding:5px">
+				<div class="easyui-panel c2" id="p-26" title="未使用" style="width:170px;height:135px;padding:5px;" data-options="footer:'#footer-26',closed:false, tools:[{
+							iconCls:'icon-edit',
+							handler:function(){
+								var d = $('#p-26')[0].data;									
+								$('#w')[0].data = d;
+								$('#cname').textbox('setText',d.name);
+								$('#w').window('open');
+							}
+							},
+							{
+							iconCls:'icon-reload',
+							handler:function(){
+								var d = $('#p-26')[0].data;
+								$('#container')[0].data = d;
+								refreshCtl();
+							}
+							}]">
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">充电</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">亮灯</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">故障</a>
+					<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-redo',disabled:true" style="height:25px">进入</a>
+				</div>
+				<div id="footer-26" style="padding:5px; font-size:12px">
+					未连接.
+				</div>
+			</td>
+			<td style="horizon-align: left; width: 200px; padding:5px">
+				<div class="easyui-panel c2" id="p-27" title="未使用" style="width:170px;height:135px;padding:5px;" data-options="footer:'#footer-27',closed:false, tools:[{
+							iconCls:'icon-edit',
+							handler:function(){
+								var d = $('#p-27')[0].data;									
+								$('#w')[0].data = d;
+								$('#cname').textbox('setText',d.name);
+								$('#w').window('open');
+							}
+							},
+							{
+							iconCls:'icon-reload',
+							handler:function(){
+								var d = $('#p-27')[0].data;
+								$('#container')[0].data = d;
+								refreshCtl();
+							}
+							}]">
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">充电</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">亮灯</a>
+					<a href="#" class="easyui-linkbutton c6" style="width:27px;height:70px">故障</a>
+					<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-redo',disabled:true" style="height:25px">进入</a>
+				</div>
+				<div id="footer-27" style="padding:5px; font-size:12px">
+					未连接.
+				</div>
+			</td>
+			</tr>
+			<tbody>			
+		</table>
+	</div>	
+	<div id="w" class="easyui-dialog" title="添加名称" closed="true" style="text-align:center;width:200px;height:110px;padding:5px;">		
+		<style>.panel-title{font-size:12px}</style>	
+		<div style="margin-top:6px">
+			<span style="font-size:12px;">名称：</span>
+			<input class="easyui-textbox" type="text" id="cname" name="cname" style="width:100px;height:20px;padding:5px" data-options="required:true,prompt:'名称'">
+		</div>		
+		<div style="margin-top:7px">
+			<a href="#" id="setName" class="easyui-linkbutton" data-options="iconCls:'icon-ok'">确定</a>
+			
+		</div>
+	</div>
+</body>
+<script type="text/javascript">
+
+function loadSystemTime() { 
+
+	$.get('/getTime?ts:'+new Date(), {}, function(data){ 
+		if (window.scClock) 
+			window.scClock.updateTime(data);
+	}); 
+	setTimeout("loadSystemTime()", 60000*15); 
+} 
+
+function startupClock() { 
+	if (window.scClock) { 
+		window.scClock.startup(function(time){ 
+			$("#currTime").text(time); 
+			$("#currTime").textbox('setText',time);
+		}); 
+	} 
+}
+
+loadSystemTime();
+startupClock();
+
+var l = window.location.href.split('/'),
+	url = 'http://' + l[2];
+var socket = io.connect(url+':8080');
+
+socket.on('connect', function (argument) {
+    console.log('!!!!connected.');
+});
+
+socket.on('onCtlRegistered', function (data) {
+    console.log('onCtlRegistered...',data);
+    if(data.index === "<%= user.index %>" && 
+    	data.code === "<%= user.code %>"){
+	    var a=document.getElementById("table").getElementsByTagName("td");
+	    for(var i in a){
+	    	if(!$("#p-"+i)[0].data){
+	    		console.log('#####None used panel!!!p-',i);
+	    		$("#p-"+i).panel({title:data.name + ":" + data.cid + "/0"});
+				$("#p-"+i)[0].data = data;
+				$("#p-"+i)[0].data.pid = "p-" + i;
+				$("#p-"+i)[0].data.fid = "footer-" + i;
+				reloadCtl($("#p-"+i)[0].data);
+	    		break;
+	    	}
+	    }
+    }
+});
+
+socket.on('disconnect', function (argument) {
+    console.log('!!!!!disconnected.');
+});
+
+socket.on('onCtlOnline', function (argument) {
+    console.log('!!!!onCtlOnline.',argument);
+    if(String(argument.index) === "<%= user.index %>" && 
+    	String(argument.code) === "<%= user.code %>"){
+	    var a=document.getElementById("table").getElementsByTagName("td");
+	    for(var i in a){
+	    	if($("#p-"+i)[0].data && $("#p-"+i)[0].data.cid === argument.cid){
+				$("#p-"+i)[0].data.state = 1;
+				reloadCtl($("#p-"+i)[0].data);
+	    		break;
+	    	}
+	    }
+    }
+});
+
+socket.on('onCtlOffline', function (argument) {
+    console.log('!!!!onCtlOffline.',argument);
+    if(String(argument.index) === "<%= user.index %>" && 
+    	String(argument.code) === "<%= user.code %>"){
+	    var a=document.getElementById("table").getElementsByTagName("td");
+	    for(var i in a){
+	    	if($("#p-"+i)[0].data && $("#p-"+i)[0].data.cid === argument.cid){
+				$("#p-"+i)[0].data.state = 0;
+				reloadCtl($("#p-"+i)[0].data);
+	    		break;
+	    	}
+	    }
+    }
+});
+
+loadSystemTime();
+startupClock();
+
+function reloadCtl(ctl){
+	$.post('getControllerInfo',{index:ctl.index, code:ctl.code, cid:ctl.cid}, function(data, status){
+		if(data !== "failed"){
+			console.debug('reloadCtl...',data);
+			var pa = document.getElementById(ctl.pid);
+			var libtns = pa.getElementsByClassName("easyui-linkbutton");
+			libtns[3].className = "easyui-linkbutton l-btn l-btn-small";
+			libtns[3].href = "/light?cid=" + data.cid;
+			$("#"+ctl.pid).panel({title:ctl.name+":"+ctl.cid+"/"+data.lightCount});
+			var sps1 = libtns[0].getElementsByTagName("span");
+			sps1[0].style.marginTop = 0;
+			sps1[1].innerHTML = "充电" + data.chargeNum;
+			var sps2 = libtns[1].getElementsByTagName("span");
+			sps2[0].style.marginTop = 0;
+			sps2[1].innerHTML = "亮灯" + data.lightNum;
+			var sps3 = libtns[2].getElementsByTagName("span");
+			sps3[0].style.marginTop = 0;
+			sps3[1].innerHTML = "故障" + data.brokenNum;
+			if(data.state === 1){
+				$("#"+ctl.pid)[0].className = "easyui-panel c4";
+				$("#"+ctl.fid).text("已连接");
+				if(data.chargeState === "charing"){
+					libtns[0].className = "easyui-linkbutton c1 l-btn l-btn-small";
+				}
+				else {
+					libtns[0].className = "easyui-linkbutton c2 l-btn l-btn-small";
+				}
+				if(data.lightState === "lighting"){				
+					libtns[1].className = "easyui-linkbutton c7 l-btn l-btn-small";
+				}
+				else {
+					libtns[1].className = "easyui-linkbutton c2 l-btn l-btn-small";
+				}
+				if(data.brokenState === "broken"){
+					libtns[2].className = "easyui-linkbutton c5 l-btn l-btn-small";
+				}
+				else {
+					libtns[2].className = "easyui-linkbutton c1 l-btn l-btn-small";
+				}
+			}
+			else {
+				$("#"+ctl.pid)[0].className = "easyui-panel c2";
+				$("#"+ctl.fid).text("未连接");
+				$("#"+ctl.pid).panel({title:ctl.name+":"+ctl.cid+"/"+data.lightCount});
+				//libtns[3].className = "easyui-linkbutton l-btn l-btn-small l-btn-disabled";		
+				//libtns[3].href = "#";
+				var sps1 = libtns[0].getElementsByTagName("span");
+				//sps1[0].style.marginTop = "10px";
+				//sps1[1].innerHTML = "充电";
+				libtns[0].className = "easyui-linkbutton c6 l-btn l-btn-small";
+				var sps2 = libtns[1].getElementsByTagName("span");
+				//sps2[0].style.marginTop = "10px";
+				//sps2[1].innerHTML = "亮灯";
+				libtns[1].className = "easyui-linkbutton c6 l-btn l-btn-small";
+				var sps3 = libtns[2].getElementsByTagName("span");
+				//sps3[0].style.marginTop = "10px";
+				//sps3[1].innerHTML = "故障";
+				libtns[2].className = "easyui-linkbutton c6 l-btn l-btn-small";
+			}
+		}
+	});
+}
+
+function reloadAll() {
+	var na = "<%= user.username %>",
+		idx = "<%= user.index %>",
+		co = "<%= user.code %>";
+	$.post('getAllControllers',{index:idx, code:co}, function(data, status){
+		if(data === 'session expired'){
+			window.location = "/";
+		}
+		else if (data !== null && data !== undefined && data !== 'failed'){
+			var a=document.getElementById("table").getElementsByTagName("td");			
+			for (var i=0;i<data.length;i++) {
+				if(i < a.length){					
+					$("#p-"+i).panel({title:data[i].name + ":" + data[i].cid + "/" + data[i].lightCount});
+					$("#p-"+i)[0].data = data[i];				
+					$("#p-"+i)[0].data.pid = "p-" + i;
+					$("#p-"+i)[0].data.fid = "footer-" + i;
+					var libtns = a[i].getElementsByClassName("easyui-linkbutton");
+					libtns[3].className = "easyui-linkbutton l-btn l-btn-small";
+					libtns[3].href = "/light?cid=" + data[i].cid;
+					if(data[i].chargeNum){
+						var sps1 = libtns[0].getElementsByTagName("span");
+						sps1[0].style.marginTop = 0;
+						sps1[1].innerHTML = "充电" + data[i].chargeNum;
+					}
+					else {
+						var sps1 = libtns[0].getElementsByTagName("span");
+						sps1[0].style.marginTop = 0;
+						sps1[1].innerHTML = "充电0";
+					}
+					if(data[i].lightNum){
+						var sps2 = libtns[1].getElementsByTagName("span");
+						sps2[0].style.marginTop = 0;
+						sps2[1].innerHTML = "亮灯" + data[i].lightNum;
+					}else {
+						var sps2 = libtns[1].getElementsByTagName("span");
+						sps2[0].style.marginTop = 0;
+						sps2[1].innerHTML = "亮灯0";
+					}					
+					if(data[i].brokenNum){
+						var sps3 = libtns[2].getElementsByTagName("span");
+						sps3[0].style.marginTop = 0;
+						sps3[1].innerHTML = "故障" + data[i].brokenNum;
+					}else {
+						var sps3 = libtns[2].getElementsByTagName("span");
+						sps3[0].style.marginTop = 0;
+						sps3[1].innerHTML = "故障0";
+					}				
+					if(data[i].state === 1){
+						$("#p-"+i)[0].className = "easyui-panel c4";
+						$("#footer-"+i).text("已连接");		
+						if(data[i].chargeState === "charing"){
+							libtns[0].className = "easyui-linkbutton c1 l-btn l-btn-small";
+						}
+						else {
+							libtns[0].className = "easyui-linkbutton c2 l-btn l-btn-small";
+						}
+						
+						if(data[i].lightState === "lighting"){				
+							libtns[1].className = "easyui-linkbutton c7 l-btn l-btn-small";
+						}
+						else {
+							libtns[1].className = "easyui-linkbutton c2 l-btn l-btn-small";
+						}
+						
+						if(data[i].brokenState === "broken"){
+							libtns[2].className = "easyui-linkbutton c5 l-btn l-btn-small";
+						}
+						else {
+							libtns[2].className = "easyui-linkbutton c1 l-btn l-btn-small";
+						}
+					} else {
+						$("#p-"+i)[0].className = "easyui-panel c2";
+						$("#footer-"+i).text("未连接");
+						$("#p-"+i).panel({title:data[i].name + ":" + data[i].cid + "/" + data[i].lightCount});
+						var libtns = a[i].getElementsByClassName("easyui-linkbutton");
+						var sps1 = libtns[0].getElementsByTagName("span");
+						//sps1[0].style.marginTop = "10px";
+						//sps1[1].innerHTML = "充电";
+						libtns[0].className = "easyui-linkbutton c6 l-btn l-btn-small";
+						var sps2 = libtns[1].getElementsByTagName("span");
+						//sps2[0].style.marginTop = "10px";
+						//sps2[1].innerHTML = "亮灯";
+						libtns[1].className = "easyui-linkbutton c6 l-btn l-btn-small";
+						var sps3 = libtns[2].getElementsByTagName("span");
+						//sps3[0].style.marginTop = "10px";
+						//sps3[1].innerHTML = "故障";
+						libtns[2].className = "easyui-linkbutton c6 l-btn l-btn-small";
+					}
+				}
+			}
+		}
+	});
+	//setTimeout("reloadAll()", 10*1000);
+};
+$("#setName").click(function() {
+	console.debug($('#w')[0].data);
+	var ctl = $('#w')[0].data,
+		na = $('#cname').val();
+	if(!ctl || na == "") return;
+	$.post('updateCtlName',{index:ctl.index,code:ctl.code,cid:ctl.cid,name:na},function(result, status){
+		if(result === "success"){
+			$("#"+ctl.pid).panel({title:na+":"+ctl.cid});
+			$('#w').window('close');
+		}
+	});
+});
+
+function refreshCtl(){	
+	var ctl = $('#container')[0].data;
+	if(!ctl) return;
+	reloadCtl(ctl);
+};
+
+window.onload = function (){
+	reloadAll();	
+}
+</script>
+</html>
