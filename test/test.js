@@ -1,6 +1,8 @@
 var b = new Buffer(2);
 b.write('NA',0);
 
+//mongod --repair --dbpath /var/root/mongo
+//mongod --journal --dbpath /var/root/mongo -logpath /var/root/mongo/mongo.log --logappends
 
 /*var message = new Buffer(12);
 message.writeUInt8(0x0a, 0);
