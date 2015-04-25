@@ -10,3 +10,4 @@ Error: failed to connect to [localhost:27017]
     at net.js:459:14
     at process._tickCallback (node.js:355:11)
 [2015-04-26 00:33:50.910] [INFO] server - UDP Server listening on 0.0.0.0:1000
+[2015-04-26 01:24:50.562] [INFO] server - UDP Server listening on 0.0.0.0:1000
