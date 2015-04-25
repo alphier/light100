@@ -1,0 +1,12 @@
+[2015-04-26 00:24:17.926] [INFO] server - UDP Server listening on 0.0.0.0:1000
+[2015-04-26 00:24:17.934] [ERROR] server - Error caught in uncaughtException event: [Error: failed to connect to [localhost:27017]]
+Error: failed to connect to [localhost:27017]
+    at null.<anonymous> (/Users/renfei/git/light100/node_modules/session-mongoose/node_modules/mongoose/node_modules/mongodb/lib/mongodb/connection/server.js:549:74)
+    at emit (events.js:118:17)
+    at null.<anonymous> (/Users/renfei/git/light100/node_modules/session-mongoose/node_modules/mongoose/node_modules/mongodb/lib/mongodb/connection/connection_pool.js:150:15)
+    at emit (events.js:110:17)
+    at Socket.<anonymous> (/Users/renfei/git/light100/node_modules/session-mongoose/node_modules/mongoose/node_modules/mongodb/lib/mongodb/connection/connection.js:533:10)
+    at Socket.emit (events.js:107:17)
+    at net.js:459:14
+    at process._tickCallback (node.js:355:11)
+[2015-04-26 00:33:50.910] [INFO] server - UDP Server listening on 0.0.0.0:1000
