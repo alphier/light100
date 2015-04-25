@@ -38,7 +38,6 @@ var startProcess = function (){
 	
 	try{
 		process.chdir('portal');
-		//child = spawn('node', ['app.js']);
 		child = cp.fork( './app.js');
 		process.chdir('../');
 		
