@@ -336,39 +336,42 @@ exports.communicate = function (spec) {
 			var inst = msgQueue[0];
 			if(!inst) return;
 			switch(inst[0]){
-			//注册指令
-			case 10:{
-				procRegister(inst, function(result){
+				//注册指令
+				case 10:{
+					procRegister(inst, function(result){
+						msgQueue.splice(0,1);
+						handleInstruction();
+					});
+				}
+				break;
+				//连接指令
+				case 20: {
+					procConnect(inst, function(result){
+						msgQueue.splice(0,1);
+						handleInstruction();
+					});
+				}				
+				break;
+				//获取参数指令
+				case 30:{
+					procGet(inst, function(result){
+						msgQueue.splice(0,1);
+						handleInstruction();
+					});
+				}				
+				break;
+				//发送参数指令
+				case 40:{
+					procPut(inst, function(result){
+						msgQueue.splice(0,1);
+						handleInstruction();
+					});
+				}				
+				break;
+				default:{
 					msgQueue.splice(0,1);
-					handleInstruction();
-				});
-			}
-			break;
-			//连接指令
-			case 20: {
-				procConnect(inst, function(result){
-					msgQueue.splice(0,1);
-					handleInstruction();
-				});
-			}				
-			break;
-			//获取参数指令
-			case 30:{
-				procGet(inst, function(result){
-					msgQueue.splice(0,1);
-					handleInstruction();
-				});
-			}				
-			break;
-			//发送参数指令
-			case 40:{
-				procPut(inst, function(result){
-					msgQueue.splice(0,1);
-					handleInstruction();
-				});
-			}				
-			break;
-			default:				
+				}
+				break;
 			}
 		},
 		handleInstruction0 = function(inst){
@@ -455,7 +458,10 @@ exports.communicate = function (spec) {
 			data.ip = remote.address;
 			data.port = remote.port;
 			//handleInstruction0(data);
-			msgQueue.push(data);
+			if(data[0] === 10 || data[0] === 20 ||
+				data[0] === 30 || data[0] === 40){
+				msgQueue.push(data);
+			}
 		});
 		
 		server.on('close', function () {
