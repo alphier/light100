@@ -885,9 +885,6 @@ socket.on('onCtlOffline', function (argument) {
     }
 });
 
-loadSystemTime();
-startupClock();
-
 function reloadCtl(ctl){
 	$.post('getControllerInfo',{index:ctl.index, code:ctl.code, cid:ctl.cid}, function(data, status){
 		if(data !== "failed"){
