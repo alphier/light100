@@ -4,6 +4,7 @@ exports.communicate = function (spec) {
 	var dgram = require('dgram'),
 		db = require('./dataBase'),
 		dp = require('./dgram_protocal'),
+		fs = require('fs'),
 		server = dgram.createSocket('udp4'),
 		DIS_TIME = 30 * 60 * 1000,	//断线时长设置为30分钟
 		INTERVAL_TIME = 5000,
@@ -12,6 +13,29 @@ exports.communicate = function (spec) {
 		hashMap = {},
 		msgQueue = [],
 		logger = spec.logger,
+		dtstr = function(){
+		    var dt = new Date();
+			var dtstr = dt.getFullYear() + '-' + (dt.getMonth() + 1) + '-' + dt.getDate() +
+						' ' + dt.getHours() + ':' + dt.getMinutes() + ':' + dt.getSeconds() + ':';
+	
+			return dtstr;
+		},
+		log = function(file, content, callback){
+		    "use strict";
+	
+		    var c = dtstr() + content + '\n';
+	
+		    try{
+		       	fs.appendFile(file, c, 'utf8', function(err){
+		        	if(typeof(callback) === 'function'){
+		        		callback();
+		        	}
+		        });
+		       }catch(err){
+		       		console.log(err);
+		       }
+	
+		},
 		channelEvent  = function (spec) {
 			"use strict";
 			
@@ -45,6 +69,30 @@ exports.communicate = function (spec) {
 				}
 			}
 		}, INTERVAL_TIME),
+		isCnnCodeExist = function (cid, cnnCode){
+			"use strict";
+
+			for(var id in hashMap){
+				if(hashMap[id].cnnCode === cnnCode){
+					return true;
+				}
+			}
+			return false;
+		},
+		newCnnCode = function (cid, cnnCode){
+			"use strict";
+
+			if(isCnnCodeExist(cid, cnnCode)){
+				var code = dp.newCnnCode();
+				log('/mnt/light100/portal/log/exception.log','Connecting... controller ' + cid + ' has the same cnnCode ' + cnnCode + ' with controller ' + hashMap[id].cid);
+				log('/mnt/light100/portal/log/exception.log','hashMap is ' + JSON.stringify(hashMap));
+				log('/mnt/light100/portal/log/exception.log','newCnnCode is ' + code);
+				newCnnCode(cid, cnnCode);
+			}
+			else{
+				return cnnCode;
+			}
+		},	
 		findCtlByCnnCode = function(data){
 			for(var index in hashMap){
 				if(hashMap[index].cnnCode === data){
@@ -171,7 +219,9 @@ exports.communicate = function (spec) {
 													hashMap[nctl._id] = nctl;
 												}
 												hashMap[nctl._id].timestamp = new Date();
-												hashMap[nctl._id].cnnCode = ccode;
+												var newCode = newCnnCode(scid, ccode);
+												logger.debug('$$$$$$$$$$$$$$$', scid, ' Connecting...newCnnCode:',newCode);
+												hashMap[nctl._id].cnnCode = newCode;
 											} else {
 												logger.info('Connecting...getController failed!!!',scid);
 											}
@@ -265,22 +315,37 @@ exports.communicate = function (spec) {
 				});
 			}
 		},
+		recordException = function(lt, cnnCode, ip, bExist, qlt){
+			if(lt.cid === '8003' && lt.index !== 0){
+				if(bExist){
+					log('/mnt/light100/portal/log/exception.log',' updating controller 8003 light ' + lt.index + '...' + 'from ' + ip);
+					log('/mnt/light100/portal/log/exception.log',' cnnCode is ' + cnnCode + ' light is ' + JSON.stringify(lt));
+					log('/mnt/light100/portal/log/exception.log',' query result is ' + JSON.stringify(qlt));
+					log('/mnt/light100/portal/log/exception.log',' hashMap is ' + JSON.stringify(hashMap));
+				} else {
+					log('/mnt/light100/portal/log/exception.log',' adding controller 8003 light ' + lt.index + '...' + 'from ' + ip);
+					log('/mnt/light100/portal/log/exception.log',' cnnCode is ' + cnnCode + ' light is ' + JSON.stringify(lt));
+					log('/mnt/light100/portal/log/exception.log',' hashMap is ' + JSON.stringify(hashMap));
+				}
+			}
+		},
 		procPut = function(data, callback){
 			var sec_code = data.readUInt32BE(1),
 			lt = dp.getLightData(data),
 			cnn_code = dp.getCnnCode(sec_code);
 			var ctl_idx = findCtlByCnnCode(cnn_code);
 			if(ctl_idx){
-				logger.debug('Putting...Found controller!!!');
-				var ctl = hashMap[ctl_idx];
+				var ctl = hashMap[ctl_idx];				
 				hashMap[ctl_idx].timestamp = new Date();
 				lt.uindex = ctl.index;
 				lt.ucode = ctl.code;
 				lt.cid = ctl.cid;
+				logger.debug('Putting...Found controller!!!index:',lt.uindex, ' code:', lt.ucode, ' cid:', lt.cid, ' cnnCode:',cnn_code,' ip:',data.ip, ' port:',data.port);
 				db.getLight({index:ctl.index,code:ctl.code,cid:ctl.cid},lt.index,function(qlt){
 					if(qlt){
-						logger.debug('Putting...Found light updating...',lt.index);
-						db.updateLight1(qlt._id.id, lt, function(result){
+						recordException(lt,cnn_code,data.ip,true,qlt);
+						logger.debug('Putting...Found light updating...index',lt.index,' query result:{', qlt._id.toString(),',',qlt.uindex,',',qlt.ucode,',',qlt.cid,'}');
+						db.updateLight1(qlt._id.toString(), lt, function(result){
 							if(result === 'success'){
 								dp.replyPut(server,0,data.ip,data.port,lt.index,function(bytes){
 									if(bytes === -1) {
@@ -288,14 +353,15 @@ exports.communicate = function (spec) {
 										callback('error');
 									}else {
 										logger.debug('Putting!!!Sending succeed');
-										callback('succeed');										
+										callback('succeed');
 										var evt = new channelEvent({type:'light-putparams',data:lt});
-										dispatchEventListener(evt,qlt._id.id);
+										dispatchEventListener(evt,qlt._id.toString());
 									}
 								});
 							}
 						});
 					}else{
+						recordException(lt,cnn_code,data.ip,false);
 						logger.debug('Putting...Not found light adding...',lt.index);
 						db.addLight(lt, function(result){
 							if(result === 'succeed'){
@@ -309,7 +375,7 @@ exports.communicate = function (spec) {
 										db.getLight({index:ctl.index,code:ctl.code,cid:ctl.cid},lt.index,function(qlt){
 											if(qlt){
 												var evt = new channelEvent({type:'light-putparams',data:lt});
-												dispatchEventListener(evt,qlt._id.id);
+												dispatchEventListener(evt,qlt._id.toString());
 											}
 										});											
 									}

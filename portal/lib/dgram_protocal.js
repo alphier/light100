@@ -60,6 +60,11 @@ dp.replyReg = function (conn, state, ip, port, callback){
 	});
 };
 
+dp.newCnnCode = function(){
+	var num = MathRand(4);
+	return String(num);
+};
+
 dp.replyCnn = function (conn, state, ip, port, hasSet, callback){
 	var ab = {},
 		size = 3,
@@ -198,14 +203,14 @@ dp.replyPut = function (conn, state, ip, port, ltid, callback){
 		size = 3;	
 	if(state === 0){
 		ab = new Buffer(4);
-		ab.writeUInt8(0x29,0);
+		ab.writeUInt8(0x1f,0);
 		ab.write('OK',1);
 		ab.writeUInt8(ltid,3);
 		size = 4;
 	}
 	if(state === 1){
 		ab = new Buffer(3);
-		ab.writeUInt8(0x29,0);
+		ab.writeUInt8(0x1f,0);
 		ab.write('ER',1);
 	}
 	conn.send(ab, 0, size, port, ip, function (err, bytes){	
