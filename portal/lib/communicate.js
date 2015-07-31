@@ -4,7 +4,6 @@ exports.communicate = function (spec) {
 	var dgram = require('dgram'),
 		db = require('./dataBase'),
 		dp = require('./dgram_protocal'),
-		fs = require('fs'),
 		server = dgram.createSocket('udp4'),
 		DIS_TIME = 30 * 60 * 1000,	//断线时长设置为30分钟
 		INTERVAL_TIME = 5000,
@@ -13,29 +12,7 @@ exports.communicate = function (spec) {
 		hashMap = {},
 		msgQueue = [],
 		logger = spec.logger,
-		dtstr = function(){
-		    var dt = new Date();
-			var dtstr = dt.getFullYear() + '-' + (dt.getMonth() + 1) + '-' + dt.getDate() +
-						' ' + dt.getHours() + ':' + dt.getMinutes() + ':' + dt.getSeconds() + ':';
-	
-			return dtstr;
-		},
-		log = function(file, content, callback){
-		    "use strict";
-	
-		    var c = dtstr() + content + '\n';
-	
-		    try{
-		       	fs.appendFile(file, c, 'utf8', function(err){
-		        	if(typeof(callback) === 'function'){
-		        		callback();
-		        	}
-		        });
-		       }catch(err){
-		       		console.log(err);
-		       }
-	
-		},
+		exlog = spec.exLogger,		
 		channelEvent  = function (spec) {
 			"use strict";
 			
@@ -49,6 +26,8 @@ exports.communicate = function (spec) {
 			return that;
 		},
 		dispatchEventListener = function (event,index) {
+			"use strict";
+			
 			if (eventListeners.hasOwnProperty(event.type)) {
 				for (var listener in eventListeners[event.type]) {
 		    		if (eventListeners[event.type].hasOwnProperty(listener)) {
@@ -58,6 +37,7 @@ exports.communicate = function (spec) {
 			}
 		},
 		interval = setInterval(function(){
+			
 			//清理长时间未收到心跳的设备
 			for(var index in hashMap){
 				if(new Date() - hashMap[index].timestamp > DIS_TIME){
@@ -84,16 +64,34 @@ exports.communicate = function (spec) {
 
 			if(isCnnCodeExist(cid, cnnCode)){
 				var code = dp.newCnnCode();
-				log('/mnt/light100/portal/log/exception.log','Connecting... controller ' + cid + ' has the same cnnCode ' + cnnCode + ' with controller ' + hashMap[id].cid);
-				log('/mnt/light100/portal/log/exception.log','hashMap is ' + JSON.stringify(hashMap));
-				log('/mnt/light100/portal/log/exception.log','newCnnCode is ' + code);
+				exlog.info('@@@@@@Connecting... controller ' + cid + ' has the same cnnCode ' + cnnCode + ' with controller ' + hashMap[id].cid);
+				exlog.info('@@@@@@hashMap is ' + JSON.stringify(hashMap));
+				exlog.info('@@@@@@newCnnCode is ' + code);
 				newCnnCode(cid, cnnCode);
 			}
 			else{
 				return cnnCode;
 			}
-		},	
+		},
+		recordException = function(lt, cnnCode, ip, bExist, qlt){
+			"use strict";
+			
+			if(lt.cid === '8002' && lt.index !== 0){
+				if(bExist){
+					exlog.info('!!!!!!updating controller 8003 light ' + lt.index + '...' + 'from ' + ip);
+					exlog.info('!!!!!!cnnCode is ' + cnnCode + ' light is ' + JSON.stringify(lt));
+					exlog.info('!!!!!!query result is ' + JSON.stringify(qlt));
+					exlog.info('!!!!!!hashMap is ' + JSON.stringify(hashMap));
+				} else {
+					exlog.info('!!!!!!adding controller 8003 light ' + lt.index + '...' + 'from ' + ip);
+					exlog.info('!!!!!!cnnCode is ' + cnnCode + ' light is ' + JSON.stringify(lt));
+					exlog.info('!!!!!!hashMap is ' + JSON.stringify(hashMap));
+				}
+			}
+		},
 		findCtlByCnnCode = function(data){
+			"use strict";
+			
 			for(var index in hashMap){
 				if(hashMap[index].cnnCode === data){
 					return index;
@@ -102,6 +100,8 @@ exports.communicate = function (spec) {
 			return null;
 		},
 		procRegister = function(data, callback){
+			"use strict";
+			
 			var idx = data[1],
 			code = data.readUInt16BE(2),
 			cid = data.readUInt32BE(4),
@@ -176,6 +176,8 @@ exports.communicate = function (spec) {
 			}
 		},
 		procConnect = function(data, callback){
+			"use strict";
+			
 			var idx = data[1],
 			code = data.readUInt16BE(2),
 			cid = data.readUInt32BE(4),
@@ -220,7 +222,6 @@ exports.communicate = function (spec) {
 												}
 												hashMap[nctl._id].timestamp = new Date();
 												var newCode = newCnnCode(scid, ccode);
-												logger.debug('$$$$$$$$$$$$$$$', scid, ' Connecting...newCnnCode:',newCode);
 												hashMap[nctl._id].cnnCode = newCode;
 											} else {
 												logger.info('Connecting...getController failed!!!',scid);
@@ -248,6 +249,8 @@ exports.communicate = function (spec) {
 			}
 		},
 		procGet = function(data, callback){
+			"use strict";
+			
 			var sec_code = data.readUInt32BE(1),
 			ltId = data.readUInt8(5),
 			cnn_code = dp.getCnnCode(sec_code);
@@ -315,21 +318,9 @@ exports.communicate = function (spec) {
 				});
 			}
 		},
-		recordException = function(lt, cnnCode, ip, bExist, qlt){
-			if(lt.cid === '8003' && lt.index !== 0){
-				if(bExist){
-					log('/mnt/light100/portal/log/exception.log',' updating controller 8003 light ' + lt.index + '...' + 'from ' + ip);
-					log('/mnt/light100/portal/log/exception.log',' cnnCode is ' + cnnCode + ' light is ' + JSON.stringify(lt));
-					log('/mnt/light100/portal/log/exception.log',' query result is ' + JSON.stringify(qlt));
-					log('/mnt/light100/portal/log/exception.log',' hashMap is ' + JSON.stringify(hashMap));
-				} else {
-					log('/mnt/light100/portal/log/exception.log',' adding controller 8003 light ' + lt.index + '...' + 'from ' + ip);
-					log('/mnt/light100/portal/log/exception.log',' cnnCode is ' + cnnCode + ' light is ' + JSON.stringify(lt));
-					log('/mnt/light100/portal/log/exception.log',' hashMap is ' + JSON.stringify(hashMap));
-				}
-			}
-		},
 		procPut = function(data, callback){
+			"use strict";
+			
 			var sec_code = data.readUInt32BE(1),
 			lt = dp.getLightData(data),
 			cnn_code = dp.getCnnCode(sec_code);
@@ -399,6 +390,8 @@ exports.communicate = function (spec) {
 			}
 		},
 		handleInstruction = function(){
+			"use strict";
+			
 			var inst = msgQueue[0];
 			if(!inst) return;
 			switch(inst[0]){
@@ -441,6 +434,8 @@ exports.communicate = function (spec) {
 			}
 		},
 		handleInstruction0 = function(inst){
+			"use strict";
+			
 			switch(inst[0]){
 			//注册指令
 			case 10:{

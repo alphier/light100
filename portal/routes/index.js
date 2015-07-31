@@ -21,7 +21,10 @@ log4js.configure({
     ],
     replaceConsole: true
 });
-var logger = log4js.getLogger('server');
+log4js.addAppender(log4js.appenders.file('./log/exception.log'), 'exception');
+
+var logger = log4js.getLogger('server'),
+	exlog = log4js.getLogger('exception');
 
 process.on('uncaughtException', function(err) {
     logger.error('Error caught in uncaughtException event:', err);
@@ -101,7 +104,7 @@ io.on('connection', function(socket){
   });
 });
 
-var udpServer = new server.communicate({logger: logger});
+var udpServer = new server.communicate({logger: logger, exLogger: exlog});
 
 udpServer.addEventListener("controller-registered", function (data, id){
 	logger.info("controller " + id + " registered!!!" + JSON.stringify(data));
