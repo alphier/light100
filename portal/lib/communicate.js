@@ -54,6 +54,7 @@ exports.communicate = function (spec) {
 
 			for(var id in hashMap){
 				if(hashMap[id].cnnCode === cnnCode){
+					exlog.info('@@@@@@Connecting... controller ' + cid + ' has the same cnnCode ' + cnnCode + ' with controller ' + hashMap[id].cid);
 					return true;
 				}
 			}
@@ -64,7 +65,6 @@ exports.communicate = function (spec) {
 
 			if(isCnnCodeExist(cid, cnnCode)){
 				var code = dp.newCnnCode();
-				exlog.info('@@@@@@Connecting... controller ' + cid + ' has the same cnnCode ' + cnnCode + ' with controller ' + hashMap[id].cid);
 				exlog.info('@@@@@@hashMap is ' + JSON.stringify(hashMap));
 				exlog.info('@@@@@@newCnnCode is ' + code);
 				newCnnCode(cid, cnnCode);
