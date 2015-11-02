@@ -54,7 +54,7 @@ exports.communicate = function (spec) {
 
 			for(var id in hashMap){
 				if(hashMap[id].cnnCode === cnnCode){
-					exlog.info('@@@@@@Connecting... controller ' + cid + ' has the same cnnCode ' + cnnCode + ' with controller ' + hashMap[id].cid);
+					logger.info('@@@@@@Connecting... controller ' + cid + ' has the same cnnCode ' + cnnCode + ' with controller ' + hashMap[id].cid);
 					return true;
 				}
 			}
@@ -65,8 +65,7 @@ exports.communicate = function (spec) {
 
 			if(isCnnCodeExist(cid, cnnCode)){
 				var code = dp.newCnnCode();
-				exlog.info('@@@@@@hashMap is ' + JSON.stringify(hashMap));
-				exlog.info('@@@@@@newCnnCode is ' + code);
+				logger.info('@@@@@@newCnnCode is ' + code);
 				newCnnCode(cid, cnnCode);
 			}
 			else{
@@ -214,15 +213,18 @@ exports.communicate = function (spec) {
 									db.updateControllerState({index:idx,code:code,cid:scid},1,function(res){
 										db.getController({index:idx,code:code,cid:scid},function(nctl){
 											if(nctl){
-												var evt = new channelEvent({type:'controller-connect',data:nctl});
-												dispatchEventListener(evt,nctl._id);
+												//var evt = new channelEvent({type:'controller-connect',data:nctl});
+												//dispatchEventListener(evt,nctl._id);
 												if(!hashMap.hasOwnProperty(nctl._id)){
 													logger.info('Connecting...adding controller to hashmap!!!',scid,' hashKey:', nctl._id);
 													hashMap[nctl._id] = nctl;
+													var evt = new channelEvent({type:'controller-connect',data:nctl});
+													dispatchEventListener(evt,nctl._id);
 												}
 												hashMap[nctl._id].timestamp = new Date();
 												var newCode = newCnnCode(scid, ccode);
 												hashMap[nctl._id].cnnCode = newCode;
+												logger.info('Update ' + scid + ' to hashMap, newCode is ' + newCode);
 											} else {
 												logger.info('Connecting...getController failed!!!',scid);
 											}
@@ -334,7 +336,6 @@ exports.communicate = function (spec) {
 				logger.debug('Putting...Found controller!!!index:',lt.uindex, ' code:', lt.ucode, ' cid:', lt.cid, ' cnnCode:',cnn_code,' ip:',data.ip, ' port:',data.port);
 				db.getLight({index:ctl.index,code:ctl.code,cid:ctl.cid},lt.index,function(qlt){
 					if(qlt){
-						recordException(lt,cnn_code,data.ip,true,qlt);
 						logger.debug('Putting...Found light updating...index',lt.index,' query result:{', qlt._id.toString(),',',qlt.uindex,',',qlt.ucode,',',qlt.cid,'}');
 						db.updateLight1(qlt._id.toString(), lt, function(result){
 							if(result === 'success'){
@@ -352,7 +353,6 @@ exports.communicate = function (spec) {
 							}
 						});
 					}else{
-						recordException(lt,cnn_code,data.ip,false);
 						logger.debug('Putting...Not found light adding...',lt.index);
 						db.addLight(lt, function(result){
 							if(result === 'succeed'){
