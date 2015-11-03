@@ -6,7 +6,12 @@ function MathRand(n){
 		Num+=Math.floor(Math.random()*10); 
 	}	
 	return Num;
-};
+}
+
+function rand(min,max){
+	var c = max - min;
+	return (Math.floor(Math.random() * c + min)).toString();
+}
 
 dp.key1 = new Buffer('1NEW').readUInt32BE(0);
 dp.key2 = new Buffer('HARO').readUInt32BE(0);
@@ -61,22 +66,19 @@ dp.replyReg = function (conn, state, ip, port, callback){
 };
 
 dp.newCnnCode = function(){
-	var num = MathRand(4);
-	return String(num);
+	var num = rand(1000,10000);
+	return num;
 };
 
-dp.replyCnn = function (conn, state, ip, port, hasSet, callback){
+dp.replyCnn = function (conn, state, num, ip, port, hasSet, callback){
 	var ab = {},
-		size = 3,
-		result = 'succeed';
+		size = 3;
 	if(state === 0){
 		size = 11;
 		ab = new Buffer(11);
 		ab.writeUInt8(0x15,0);
 		ab.write('OK',1);
-		var num = MathRand(4);
-		//var num = 1234;
-		num = String(num);
+		//var num = rand(1000,10000);
 		var key = 'XUKE',
 			a = num.charCodeAt(0) ^ key.charCodeAt(0),
 			b = num.charCodeAt(1) ^ key.charCodeAt(1),
@@ -96,8 +98,6 @@ dp.replyCnn = function (conn, state, ip, port, hasSet, callback){
 		ab.writeUInt8(t.getHours(),8);
 		ab.writeUInt8(t.getMinutes(),9);
 		ab.writeUInt8(t.getSeconds(),10);
-		
-		result = num;
 	}
 	if(state === 1){
 		ab = new Buffer(3);
@@ -113,7 +113,7 @@ dp.replyCnn = function (conn, state, ip, port, hasSet, callback){
 		if(err) {
 			if(callback) callback(-1);
 		}else {
-			if(callback) callback(result);
+			if(callback) callback(0);
 		}
 	});
 };

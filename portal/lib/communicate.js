@@ -60,16 +60,16 @@ exports.communicate = function (spec) {
 			}
 			return false;
 		},
-		newCnnCode = function (cid, cnnCode){
+		newCnnCode = function(cid, cnnCode, callback){
 			"use strict";
 
 			if(isCnnCodeExist(cid, cnnCode)){
 				var code = dp.newCnnCode();
-				logger.info('@@@@@@newCnnCode is ' + code);
-				newCnnCode(cid, cnnCode);
+				console.log('@@@@@@newCnnCode is ' + code);
+				newCnnCode(cid, code, callback);
 			}
 			else{
-				return cnnCode;
+				callback(cnnCode);
 			}
 		},
 		recordException = function(lt, cnnCode, ip, bExist, qlt){
@@ -189,7 +189,7 @@ exports.communicate = function (spec) {
 				db.getController({index:idx,code:code,cid:scid},function(result){
 					if(!result){
 						logger.info('Connecting...Unknown controller!!!');
-						dp.replyCnn(server,1,data.ip,data.port,null,function(res){
+						dp.replyCnn(server,1,0,data.ip,data.port,null,function(res){
 							if(res === -1) {
 								logger.debug('Connecting!!!Sending error...');
 								callback('error');
@@ -203,43 +203,45 @@ exports.communicate = function (spec) {
 							var setting;
 							if(lts)	setting = true;
 							else setting = false;
-							
-							dp.replyCnn(server,0,data.ip,data.port,setting,function(ccode){
-								if(ccode === -1) {
-									logger.debug('Connecting!!!Sending error...');
-									callback('error');
-								}else {
-									logger.debug('Connecting!!!Sending succeed');
-									db.updateControllerState({index:idx,code:code,cid:scid},1,function(res){
-										db.getController({index:idx,code:code,cid:scid},function(nctl){
-											if(nctl){
-												//var evt = new channelEvent({type:'controller-connect',data:nctl});
-												//dispatchEventListener(evt,nctl._id);
-												if(!hashMap.hasOwnProperty(nctl._id)){
-													logger.info('Connecting...adding controller to hashmap!!!',scid,' hashKey:', nctl._id);
-													hashMap[nctl._id] = nctl;
-													var evt = new channelEvent({type:'controller-connect',data:nctl});
-													dispatchEventListener(evt,nctl._id);
+							var ccode = dp.newCnnCode();
+							//get new one, make sure no repeat
+							newCnnCode(scid, ccode, function(newCode){
+								dp.replyCnn(server,0,newCode,data.ip,data.port,setting,function(result){
+									if(result === -1) {
+										logger.debug('Connecting!!!Sending error...');
+										callback('error');
+									}else {
+										logger.debug('Connecting!!!Sending succeed');
+										db.updateControllerState({index:idx,code:code,cid:scid},1,function(res){
+											db.getController({index:idx,code:code,cid:scid},function(nctl){
+												if(nctl){
+													//var evt = new channelEvent({type:'controller-connect',data:nctl});
+													//dispatchEventListener(evt,nctl._id);
+													if(!hashMap.hasOwnProperty(nctl._id)){
+														logger.info('Connecting...adding controller to hashmap!!!',scid,' hashKey:', nctl._id);
+														hashMap[nctl._id] = nctl;
+														var evt = new channelEvent({type:'controller-connect',data:nctl});
+														dispatchEventListener(evt,nctl._id);
+													}
+													hashMap[nctl._id].timestamp = new Date();
+													hashMap[nctl._id].cnnCode = newCode;
+													logger.info('Update ' + scid + ' to hashMap, newCode is ' + newCode);
+												} else {
+													logger.info('Connecting...getController failed!!!',scid);
 												}
-												hashMap[nctl._id].timestamp = new Date();
-												var newCode = newCnnCode(scid, ccode);
-												hashMap[nctl._id].cnnCode = newCode;
-												logger.info('Update ' + scid + ' to hashMap, newCode is ' + newCode);
-											} else {
-												logger.info('Connecting...getController failed!!!',scid);
-											}
-											callback('succeed');
+												callback('succeed');
+											});
 										});
-									});
-								}
-							});								
+									}
+								});	
+                            });														
 						});								
 					}
 				});						
 			}
 			else {
 				logger.info('Connecting...verfiy failed...idx:',idx,' code:',code,' cid:',cid,' sec:',sec);
-				dp.replyCnn(server,2,data.ip,data.port,null,function(res){
+				dp.replyCnn(server,2,0,data.ip,data.port,null,function(res){
 					if(res === -1) {
 						logger.debug('Connecting!!!Sending error...');
 						callback('error');
