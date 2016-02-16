@@ -510,7 +510,7 @@ exports.getAllControllers = function (req, res) {
 	
 	var idx = parseInt(req.body.index),
 		code = parseInt(req.body.code);
-	logger.info('getAllControllers...index:', idx, ' code:', code);
+	//logger.info('getAllControllers...index:', idx, ' code:', code);
 	db.getAllControllers({index:idx, code:code},function(result){
 		if(!result){ 
 			res.send('failed');

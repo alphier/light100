@@ -1,6 +1,6 @@
 var PORT = 1000;
 //var HOST = 'localhost';		//115.28.23.23
-var HOST = '115.28.23.23';
+var HOST = '115.28.218.190';
 
 var dgram = require('dgram'),
 	client = dgram.createSocket('udp4');
@@ -25,16 +25,16 @@ function connectInst(){
 	//机器码 5616
 	message.writeUInt8(0x15, 2);
 	message.writeUInt8(0xf0, 3);
-	//控制器编号(字符串) 8002
-	message.writeUInt8(0x38, 4);
+	//控制器编号(字符串) 5000
+	message.writeUInt8(0x35, 4);
 	message.writeUInt8(0x30, 5);
 	message.writeUInt8(0x30, 6);
-	message.writeUInt8(0x32, 7);
-	//验证码 '8002' ^ 'HARO'
-	message.writeUInt8(0x70, 8);
+	message.writeUInt8(0x30, 7);
+	//验证码 '5000' ^ 'HARO'
+	message.writeUInt8(0x7d, 8);
 	message.writeUInt8(0x71, 9);
 	message.writeUInt8(0x62, 10);
-	message.writeUInt8(0x7d, 11);
+	message.writeUInt8(0x7f, 11);
 	
 	return message;
 };
@@ -232,7 +232,7 @@ client.on('message', function (msg, remote) {
 			});
 		}*/
 		
-		for(var i=0;i<5;i++){
+		for(var i=0;i<60;i++){
 			gMsg = getInst(sec_code,i);
 			client.send(gMsg, 0, gMsg.length, PORT, HOST, function(err, bytes) {
 				if (err) throw err;

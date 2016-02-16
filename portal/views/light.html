@@ -17,7 +17,12 @@
 		编号：<%= user.index %>
 		机器密码：<%= user.code %>
 		控制器编号：<%= user.cid %>
-		<a href="#" id="modifyItem" class="easyui-linkbutton" style="margin-left:150px">
+		<span style="font-size:14px;margin-left:120px">灯编号：</span>
+		<input class="easyui-textbox" type="text" id="currLight" style="width:40px;height:20px;padding:5px">
+		<a href="#" id="readItem" class="easyui-linkbutton">
+			<span style="font-size:14px;">读取</span>
+		</a>
+		<a href="#" id="modifyItem" class="easyui-linkbutton">
 			<span style="font-size:14px;">更改</span>
 		</a>
 		<a href="#" id="modifyAll" class="easyui-linkbutton">
@@ -29,17 +34,56 @@
 		<a href="#" id="modifyDouble" class="easyui-linkbutton">
 			<span style="font-size:14px;">双数更改</span>
 		</a>
+		<a href="#" id="clearAll" class="easyui-linkbutton">
+			<span style="font-size:14px;">一键清除</span>
+		</a>
 		<span style="font-size:14px;">当前时间：</span>
 		<input class="easyui-textbox" type="text" id="currTime" name="currTime" style="width:130px;height:20px;padding:5px" data-options="readonly:true">
 		<a id="quit" class="btn" href="/home">
 			<span style="font-size:16px;">退出</span>
 		</a>		
 	</div>	
-	<table id="dg" class="easyui-datagrid" style="width:100%;padding:10px"	data-options="
+	<div style="border-top:2px solid black;border-bottom:2px solid black;border-left:2px solid black;border-right:2px solid black;margin-top:2px;padding:2px;">详细信息：
+		<span style="font-size:8px">控制方式</span>
+		<input id="ctrltype" class="easyui-combobox" style="width:60px;" value=3 data-options="valueField:'ctypeValue',textField:'ctypeName',data:ctypeData">
+		<span style="font-size:8px">自动方式</span>
+		<input id="autotype" class="easyui-combobox" style="width:60px;" value=2 data-options="valueField:'atypeValue',textField:'atypeName',data:atypeData">
+		<span style="font-size:8px">开灯时间</span>
+		<input class="easyui-textbox" type="text" id="ontime" style="width:60px;height:20px">
+		<span style="font-size:8px">光控电压</span>
+		<input class="easyui-textbox" type="text" id="voltage" style="width:40px;height:20px" data-options="
+						formatter:function(value,row){
+                            return value + 'v';}
+						">
+		
+		<span style="font-size:8px">1亮度</span>
+		<input class="easyui-textbox" type="text" id="onelight" style="width:50px;height:20px">
+		<span style="font-size:8px">1时间</span>
+		<input class="easyui-textbox" type="text" id="onetime" style="width:50px;height:20px">
+		
+		<span style="font-size:8px">2亮度</span>
+		<input class="easyui-textbox" type="text" id="twolight" style="width:50px;height:20px;padding:2px">
+		<span style="font-size:8px">2时间</span>
+		<input class="easyui-textbox" type="text" id="twotime" style="width:50px;height:20px;padding:2px">
+		
+		<span style="font-size:8px">3亮度</span>
+		<input class="easyui-textbox" type="text" id="threelight" style="width:50px;height:20px;padding:2px">
+		<span style="font-size:8px">3时间</span>
+		<input class="easyui-textbox" type="text" id="threetime" style="width:50px;height:20px;padding:2px">
+		
+		<span style="font-size:8px">4亮度</span>
+		<input class="easyui-textbox" type="text" id="fourlight" style="width:50px;height:20px;padding:2px">
+		<span style="font-size:8px">4时间</span>
+		<input class="easyui-textbox" type="text" id="fourtime" style="width:50px;height:20px;padding:2px">
+	</div>
+	<div style="margin-top:2px;padding:5px;">
+	</div>
+	<table id="dg" class="easyui-datagrid" style="width:99%;padding:5px"	data-options="
 		singleSelect:true,
 		url:'light_datagrid.json',
 		method:'post',
 		onClickCell: onClickCell,
+		onSelect: onRowSelected,
 		onLoadSuccess: onLoadSuccess">
 		<style>
 		  .datagrid-cell{
@@ -48,17 +92,8 @@
 		</style>
 		<thead>
 			<tr>
-				<th data-options="field:'index',width:30">
-				<span style="font-size:12px;font-weight: bolder">编号</span>
-				</th>
-				<th data-options="field:'state',width:40,
-						formatter:function(value,row){
-							if(value === 0)
-								return '正常';
-							if(value === 1)
-                            	return '故障';
-                        }">
-				<span style="font-size:12px;font-weight: bolder">状态</span>
+				<th field='index' width=60 align='center' styler="indexStyler">
+				<span style="font-size:12px;font-weight: bolder">编号/故障</span>
 				</th>
 				<th data-options="field:'charging',width:40,
 						formatter:function(value,row){
@@ -120,12 +155,6 @@
 							return value + 'A';
                         }">
 				<span style="font-size:12px;font-weight: bolder">容量</span>
-				</th>
-				<th data-options="field:'voltage',width:40,
-						formatter:function(value,row){
-							return value + 'V';
-                        }">
-				<span style="font-size:12px;font-weight: bolder">电压</span>
 				</th>
 				<th data-options="field:'pdate',width:75">
 				<span style="font-size:12px;font-weight: bolder">生产日期</span>
@@ -200,7 +229,7 @@
 							return 'background-color:#aaee00;';
 						},
 						formatter:function(value,row){
-                            return value + '时';
+                            return value + 'h';
                         },
 						editor:{type:'numberbox',options:{min:0,max:10,precision:1}}">
 				<span style="font-size:12px;font-weight: bolder">1时间</span>
@@ -220,7 +249,7 @@
 							return 'background-color:#aaee00;';
 						},
 						formatter:function(value,row){
-                            return value + '时';
+                            return value + 'h';
                         },
 						editor:{type:'numberbox',options:{min:0,max:10,precision:1}}">
 				<span style="font-size:12px;font-weight: bolder">2时间</span>
@@ -240,7 +269,7 @@
 							return 'background-color:#aaee00;';
 						},
 						formatter:function(value,row){
-                            return value + '时';
+                            return value + 'h';
                         },
 						editor:{type:'numberbox',options:{min:0,max:10,precision:1}}">
 				<span style="font-size:12px;font-weight: bolder">3时间</span>
@@ -260,12 +289,12 @@
 							return 'background-color:#aaee00;';
 						},
 						formatter:function(value,row){
-                            return value + '时';
+                            return value + 'h';
                         },
 						editor:{type:'numberbox',options:{min:0,max:10,precision:1}}">
 				<span style="font-size:12px;font-weight: bolder">4时间</span>
 				</th>
-				<th field='bSet' width=60 align='center' formatter="formatSetting">
+				<th field='bSet' width=80 align='center' formatter="formatSetting">
 				<span style="font-size:12px;font-weight: bolder">操作</span>
 				</th>
 			</tr>
@@ -276,9 +305,11 @@
 <script type="text/javascript">
 var ctypeData = [{ctypeValue:0,ctypeName:'关'},
 				{ctypeValue:1,ctypeName:'开'},
-				{ctypeValue:2,ctypeName:'自动'}];
+				{ctypeValue:2,ctypeName:'自动'},
+				{ctypeValue:3,ctypeName:''}];
 var atypeData = [{atypeValue:0,atypeName:'光控'},
-				{atypeValue:1,atypeName:'时控'}];
+				{atypeValue:1,atypeName:'时控'},
+				{atypeValue:2,atypeName:''}];
 
 $.extend($.fn.datagrid.methods, {
 	editCell: function(jq,param){
@@ -319,6 +350,10 @@ function onClickCell(index, field){
 		editIndex = index;
 	}
 }
+function onRowSelected(index,row){
+	$('#currLight').textbox('setValue',row.index);
+	$('#currLight').textbox('setText',row.index+'');
+}
 
 function onLoadSuccess(data){
 	$('#dg')[0].data = jQuery.extend(true, {}, data);
@@ -326,8 +361,7 @@ function onLoadSuccess(data){
 
 function startupClock() { 
 	if (window.scClock) { 
-		window.scClock.startup(function(time){ 
-			$("#currTime").text(time); 
+		window.scClock.startup(function(time){
 			$("#currTime").textbox('setText',time);
 		}); 
 	} 
@@ -414,16 +448,32 @@ function formatSetting(value,row){
 		return '<span style="color:red;font-weight: bolder">待更新</span>';
 };
 
+function indexStyler(value,row,index){
+	if(row.state === 1)
+		return 'background-color:red;';
+	else
+		return 'background-color:none;';
+};
+
 function setChanging(idx){
 	$("#btnset")[idx].style.backgroundColor = "rgb(100,100,100)";
 };
 
 $('#modifyItem').click(function(){
-	var row = $('#dg').datagrid('getSelected');	
-	if(!row) return;
+	//---------------v1.0---------------
+	//var row = $('#dg').datagrid('getSelected');	
+	//if(!row) return;
+	//var index = $('#dg').datagrid('getRowIndex',row);
+	//-----------------------------------
 	
-	var index = $('#dg').datagrid('getRowIndex',row);
-	var old = $('#dg')[0].data.rows[index];		
+	//----------------v2.0--------------
+	var index=$('#currLight').textbox('getText');
+	if(index === '') return;
+	index = parseInt(index);
+	var old = $('#dg')[0].data.rows[index];	
+	var row = getNewData(old);
+	//-----------------------------------
+	
 	var changes = chooseChangeFileds(old, row);
 	if(jQuery.isEmptyObject(changes)) return;	
 	
@@ -437,12 +487,75 @@ $('#modifyItem').click(function(){
 	});
 });
 
+$('#readItem').click(function(){
+	var index=$('#currLight').textbox('getText');
+	if(index === '') return;
+	var row=$("#dg")[0].data.rows[index];
+	$('#ctrltype').combobox('setValue',row.ctltype);
+	$('#autotype').combobox('setValue',row.autotype);
+	$('#ontime').textbox('setValue',row.ontime);
+	$('#voltage').textbox('setValue',row.lcvoltage);
+	$('#voltage').textbox('setText',row.lcvoltage+'v');
+	$('#onelight').textbox('setValue',row.abright);
+	$('#onelight').textbox('setText',row.abright+'%');
+	$('#onetime').textbox('setValue',row.atime);
+	$('#onetime').textbox('setText',row.atime+'h');
+	$('#twolight').textbox('setValue',row.bbright);
+	$('#twolight').textbox('setText',row.bbright+'%');
+	$('#twotime').textbox('setValue',row.btime);
+	$('#twotime').textbox('setText',row.btime+'h');
+	$('#threelight').textbox('setValue',row.cbright);
+	$('#threelight').textbox('setText',row.cbright+'%');
+	$('#threetime').textbox('setValue',row.ctime);
+	$('#threetime').textbox('setText',row.ctime+'h');
+	$('#fourlight').textbox('setValue',row.dbright);
+	$('#fourlight').textbox('setText',row.dbright+'%');
+	$('#fourtime').textbox('setValue',row.dtime);
+	$('#fourtime').textbox('setText',row.dtime+'h');
+});
+
+function getNewData(old){
+	//clone object
+	var row = jQuery.extend({}, old);
+	row.ctltype = parseInt($('#ctrltype').combobox('getValue'));
+	row.autotype = parseInt($('#autotype').combobox('getValue'));
+	row.ontime = $('#ontime').textbox('getText');
+	row.lcvoltage = $('#voltage').textbox('getText');
+	row.lcvoltage = parseInt(row.lcvoltage.replace('v',''));
+	row.abright = $('#onelight').textbox('getText');
+	row.abright = parseInt(row.abright.replace('%',''));
+	row.atime = $('#onetime').textbox('getText');
+	row.atime = parseInt(row.atime.replace('h',''));
+	row.bbright = $('#twolight').textbox('getText');
+	row.bbright = parseInt(row.bbright.replace('%',''));
+	row.btime = $('#twotime').textbox('getText');
+	row.btime = parseInt(row.btime.replace('h',''));
+	row.cbright = $('#threelight').textbox('getText');
+	row.cbright = parseInt(row.cbright.replace('%',''));
+	row.ctime = $('#threetime').textbox('getText');
+	row.ctime = parseInt(row.ctime.replace('h',''));
+	row.dbright = $('#fourlight').textbox('getText');
+	row.dbright = parseInt(row.dbright.replace('%',''));
+	row.dtime = $('#fourtime').textbox('getText');
+	row.dtime = parseInt(row.dtime.replace('h',''));
+	return row;
+}
+
 $('#modifyAll').click(function(){
-	var row = $('#dg').datagrid('getSelected');	
-	if(!row) return;	
+	//---------------v1.0---------------
+	//var row = $('#dg').datagrid('getSelected');	
+	//if(!row) return;	
+	//var index = $('#dg').datagrid('getRowIndex',row);
+	//----------------------------------
 	
-	var index = $('#dg').datagrid('getRowIndex',row);
-	var old = $('#dg')[0].data.rows[index];		
+	//----------------v2.0--------------
+	var index=$('#currLight').textbox('getText');
+	if(index === '') return;
+	index = parseInt(index);
+	var old = $('#dg')[0].data.rows[index];	
+	var row = getNewData(old);
+	//-----------------------------------
+	
 	var changes = chooseChangeFileds(old, row);
 	if(jQuery.isEmptyObject(changes)) return;	
 	
@@ -466,11 +579,20 @@ $('#modifyAll').click(function(){
 });
 
 $('#modifySingle').click(function(){
-	var row = $('#dg').datagrid('getSelected');	
-	if(!row) return;
+	//---------------v1.0---------------
+	//var row = $('#dg').datagrid('getSelected');	
+	//if(!row) return;
+	//var index = $('#dg').datagrid('getRowIndex',row);
+	//-----------------------------------
 	
-	var index = $('#dg').datagrid('getRowIndex',row);
-	var old = $('#dg')[0].data.rows[index];		
+	//----------------v2.0--------------
+	var index=$('#currLight').textbox('getText');
+	if(index === '') return;
+	index = parseInt(index);
+	var old = $('#dg')[0].data.rows[index];	
+	var row = getNewData(old);
+	//-----------------------------------
+	
 	var changes = chooseChangeFileds(old, row);
 	if(jQuery.isEmptyObject(changes)) return;
 	
@@ -494,11 +616,20 @@ $('#modifySingle').click(function(){
 });
 
 $('#modifyDouble').click(function(){
-	var row = $('#dg').datagrid('getSelected');	
-	if(!row) return;
+	//---------------v1.0---------------
+	//var row = $('#dg').datagrid('getSelected');	
+	//if(!row) return;
+	//var index = $('#dg').datagrid('getRowIndex',row);
+	//-----------------------------------
 	
-	var index = $('#dg').datagrid('getRowIndex',row);
-	var old = $('#dg')[0].data.rows[index];		
+	//----------------v2.0--------------
+	var index=$('#currLight').textbox('getText');
+	if(index === '') return;
+	index = parseInt(index);
+	var old = $('#dg')[0].data.rows[index];	
+	var row = getNewData(old);
+	//-----------------------------------
+	
 	var changes = chooseChangeFileds(old, row);
 	if(jQuery.isEmptyObject(changes)) return;
 	
