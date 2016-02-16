@@ -3,6 +3,7 @@ export DRAGON_HOME=/mnt/light100
 
 USER_ID=`id -u`
 DB_DIR=/mnt/mongodb
+DB_BAK=$DB_DIR/bak
 LOG_DIR=$DB_DIR
 PROCESS_NAME="bootstrap.js $DRAGON_HOME"
 
@@ -44,6 +45,38 @@ start_server(){
 	sleep 5
 }
 
+export_database(){
+	if [ ! -d "$DB_BAK" ]; then
+	      mkdir -p "$DB_BAK"
+	fi
+	BAK_CUR_DAY="$DB_BAK/`date +%Y%m%d`"
+	echo "export to $BAK_CUR_DAY"
+	if [ ! -d "$BAK_CUR_DAY" ]; then
+	      mkdir -p "$BAK_CUR_DAY"
+	fi
+	mongodump -d light100 -o $BAK_CUR_DAY
+}
+
+import_database(){
+	dbPath=$YESNO
+	echo "import path is $dbPath"
+	if [ -z "$dbPath" ]; then
+		echo "Please specify DB backup path!"
+		return 0
+	fi
+	if [ ! -d "$dbPath" ]; then
+		echo "DB backup path not exists!"
+		return 0
+	fi
+	if [ ! -d "$dbPath/light100" ]; then
+		echo "DB backup files not found!"
+		return 0
+	fi
+	echo "Import database..."
+	mongorestore -d light100 --drop $dbPath/light100
+	echo "Import succeed."
+}
+
 kill_process(){
 	PIS=`ps -efww | grep "$PROCESS_NAME" | grep -v "grep" | awk '{print $2}'`
 	if [ ! -z ${PIS} ]; then
@@ -71,6 +104,14 @@ stop)
     stop_server
     echo "Server stopped"
     ;;
+export)
+	echo "Export database..."
+	export_database
+	echo "Export succeed."
+	;;
+import)
+	import_database
+	;;
 version)
     if [ -f "$DRAGON_HOME/version" ]; then
         while read VLINE
@@ -84,7 +125,7 @@ version)
 *)
     echo "Unknow command:light $1"
     echo "Command usage:"
-    echo "light [start|stop|version]"
+    echo "light [start|stop|version|export|import]"
     ;;
 esac
 
