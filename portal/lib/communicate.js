@@ -338,6 +338,11 @@ exports.communicate = function (spec) {
 				logger.debug('Putting...Found controller!!!index:',lt.uindex, ' code:', lt.ucode, ' cid:', lt.cid, ' cnnCode:',cnn_code,' ip:',data.ip, ' port:',data.port);
 				db.getLight({index:ctl.index,code:ctl.code,cid:ctl.cid},lt.index,function(qlt){
 					if(qlt){
+						//如果是更新状态，则不设置
+						if(qlt.bSet === 1){
+							logger.info('light ', lt.index, ' is setting status, cannot be udpated!');
+							callback('error');
+						}
 						logger.debug('Putting...Found light updating...index',lt.index,' query result:{', qlt._id.toString(),',',qlt.uindex,',',qlt.ucode,',',qlt.cid,'}');
 						db.updateLight1(qlt._id.toString(), lt, function(result){
 							if(result === 'success'){

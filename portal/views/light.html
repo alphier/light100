@@ -59,26 +59,26 @@
 		<span style="font-size:8px">1亮度</span>
 		<input class="easyui-textbox" type="text" id="onelight" style="width:50px;height:20px">
 		<span style="font-size:8px">1时间</span>
-		<input class="easyui-textbox" type="text" id="onetime" style="width:50px;height:20px">
+		<input class="easyui-textbox" type="text" id="onetime" style="width:40px;height:20px">
 		
 		<span style="font-size:8px">2亮度</span>
 		<input class="easyui-textbox" type="text" id="twolight" style="width:50px;height:20px;padding:2px">
 		<span style="font-size:8px">2时间</span>
-		<input class="easyui-textbox" type="text" id="twotime" style="width:50px;height:20px;padding:2px">
+		<input class="easyui-textbox" type="text" id="twotime" style="width:40px;height:20px;padding:2px">
 		
 		<span style="font-size:8px">3亮度</span>
 		<input class="easyui-textbox" type="text" id="threelight" style="width:50px;height:20px;padding:2px">
 		<span style="font-size:8px">3时间</span>
-		<input class="easyui-textbox" type="text" id="threetime" style="width:50px;height:20px;padding:2px">
+		<input class="easyui-textbox" type="text" id="threetime" style="width:40px;height:20px;padding:2px">
 		
 		<span style="font-size:8px">4亮度</span>
 		<input class="easyui-textbox" type="text" id="fourlight" style="width:50px;height:20px;padding:2px">
 		<span style="font-size:8px">4时间</span>
-		<input class="easyui-textbox" type="text" id="fourtime" style="width:50px;height:20px;padding:2px">
+		<input class="easyui-textbox" type="text" id="fourtime" style="width:40px;height:20px;padding:2px">
 	</div>
 	<div style="margin-top:2px;padding:5px;">
 	</div>
-	<table id="dg" class="easyui-datagrid" style="width:99%;padding:5px"	data-options="
+	<table id="dg" class="easyui-datagrid" style="width:99.5%;padding:2px"	data-options="
 		singleSelect:true,
 		url:'light_datagrid.json',
 		method:'post',
@@ -92,7 +92,7 @@
 		</style>
 		<thead>
 			<tr>
-				<th field='index' width=60 align='center' styler="indexStyler">
+				<th field='index' width=60 align='center' styler="indexStyler" formatter="indexFomatter">
 				<span style="font-size:12px;font-weight: bolder">编号/故障</span>
 				</th>
 				<th data-options="field:'charging',width:40,
@@ -170,12 +170,7 @@
                             	return '开';
                             if(String(value) === '2')
                             	return '自动';
-                        },
-						editor:{type:'combobox',
-								options: {valueField:'ctypeValue',
-										textField:'ctypeName',
-										data:ctypeData}
-								}">
+                        }">
 				<span style="font-size:12px;font-weight: bolder">控制方式</span>
 				</th>
 				<th data-options="field:'autotype',width:60,
@@ -189,19 +184,13 @@
 							if(String(value) === '1'){
                             	return '时控';
                             }                            
-                        },
-						editor:{type:'combobox',
-								options: {valueField:'atypeValue',
-										textField:'atypeName',
-										data:atypeData}
-								}">
+                        }">
 				<span style="font-size:12px;font-weight: bolder">自动方式</span>
 				</th>
 				<th data-options="field:'ontime',width:70,
 						styler:function(value,row,index){
 							return 'background-color:#aaee00;';
-						},
-						editor:{type:'textbox'}">
+						}">
 				<span style="font-size:12px;font-weight: bolder">开灯时间</span>
 				</th>
 				<th data-options="field:'lcvoltage',width:60,
@@ -210,8 +199,7 @@
 						},
 						formatter:function(value,row){
                             return value + 'V';
-                        },
-						editor:{type:'numberbox',options:{min:0,max:22,precision:1}}">
+                        }">
 				<span style="font-size:12px;font-weight: bolder">光控电压</span>
 				</th>
 				<th data-options="field:'abright',width:60,
@@ -220,8 +208,7 @@
 						},
 						formatter:function(value,row){
                             return value + '%';
-                        },
-						editor:{type:'numberbox',options:{min:0,max:100}}">
+                        }">
 				<span style="font-size:12px;font-weight: bolder">1亮度</span>
 				</th>
 				<th data-options="field:'atime',width:50,
@@ -230,8 +217,7 @@
 						},
 						formatter:function(value,row){
                             return value + 'h';
-                        },
-						editor:{type:'numberbox',options:{min:0,max:10,precision:1}}">
+                        }">
 				<span style="font-size:12px;font-weight: bolder">1时间</span>
 				</th>
 				<th data-options="field:'bbright',width:60,
@@ -240,8 +226,7 @@
 						},
 						formatter:function(value,row){
                             return value + '%';
-                        },
-						editor:{type:'numberbox',options:{min:0,max:100}}">
+                        }">
 				<span style="font-size:12px;font-weight: bolder">2亮度</span>
 				</th>
 				<th data-options="field:'btime',width:50,
@@ -250,8 +235,7 @@
 						},
 						formatter:function(value,row){
                             return value + 'h';
-                        },
-						editor:{type:'numberbox',options:{min:0,max:10,precision:1}}">
+                        }">
 				<span style="font-size:12px;font-weight: bolder">2时间</span>
 				</th>
 				<th data-options="field:'cbright',width:60,
@@ -260,8 +244,7 @@
 						},
 						formatter:function(value,row){
                             return value + '%';
-                        },
-						editor:{type:'numberbox',options:{min:0,max:100}}">
+                        }">
 				<span style="font-size:12px;font-weight: bolder">3亮度</span>
 				</th>
 				<th data-options="field:'ctime',width:50,
@@ -270,8 +253,7 @@
 						},
 						formatter:function(value,row){
                             return value + 'h';
-                        },
-						editor:{type:'numberbox',options:{min:0,max:10,precision:1}}">
+                        }">
 				<span style="font-size:12px;font-weight: bolder">3时间</span>
 				</th>
 				<th data-options="field:'dbright',width:60,
@@ -280,8 +262,7 @@
 						},
 						formatter:function(value,row){
                             return value + '%';
-                        },
-						editor:{type:'numberbox',options:{min:0,max:100}}">
+                        }">
 				<span style="font-size:12px;font-weight: bolder">4亮度</span>
 				</th>
 				<th data-options="field:'dtime',width:50,
@@ -290,8 +271,7 @@
 						},
 						formatter:function(value,row){
                             return value + 'h';
-                        },
-						editor:{type:'numberbox',options:{min:0,max:10,precision:1}}">
+                        }">
 				<span style="font-size:12px;font-weight: bolder">4时间</span>
 				</th>
 				<th field='bSet' width=80 align='center' formatter="formatSetting">
@@ -352,7 +332,7 @@ function onClickCell(index, field){
 }
 function onRowSelected(index,row){
 	$('#currLight').textbox('setValue',row.index);
-	$('#currLight').textbox('setText',row.index+'');
+	$('#currLight').textbox('setText',row.index+1+'');
 }
 
 function onLoadSuccess(data){
@@ -455,31 +435,18 @@ function indexStyler(value,row,index){
 		return 'background-color:none;';
 };
 
+function indexFomatter(value, row){
+	return value+1;
+};
+
 function setChanging(idx){
 	$("#btnset")[idx].style.backgroundColor = "rgb(100,100,100)";
 };
 
-$('#modifyItem').click(function(){
-	//---------------v1.0---------------
-	//var row = $('#dg').datagrid('getSelected');	
-	//if(!row) return;
-	//var index = $('#dg').datagrid('getRowIndex',row);
-	//-----------------------------------
-	
-	//----------------v2.0--------------
-	var index=$('#currLight').textbox('getText');
-	if(index === '') return;
-	index = parseInt(index);
-	var old = $('#dg')[0].data.rows[index];	
-	var row = getNewData(old);
-	//-----------------------------------
-	
-	var changes = chooseChangeFileds(old, row);
-	if(jQuery.isEmptyObject(changes)) return;	
-	
-	$.post('updateLight',row,function(result, status){
+$('#clearAll').click(function(){
+	$.post('removeAllLights',{},function(result, status){
 		if(result === "success"){
-			location.reload();
+			$('#dg').datagrid('reload');
 		}
 		else {
 			alert('failed');
@@ -488,8 +455,9 @@ $('#modifyItem').click(function(){
 });
 
 $('#readItem').click(function(){
-	var index=$('#currLight').textbox('getText');
+	var index=$('#currLight').textbox('getValue')+'';
 	if(index === '') return;
+	index = parseInt(index);
 	var row=$("#dg")[0].data.rows[index];
 	$('#ctrltype').combobox('setValue',row.ctltype);
 	$('#autotype').combobox('setValue',row.autotype);
@@ -539,7 +507,36 @@ function getNewData(old){
 	row.dtime = $('#fourtime').textbox('getText');
 	row.dtime = parseInt(row.dtime.replace('h',''));
 	return row;
-}
+};
+
+$('#modifyItem').click(function(){
+	//---------------v1.0---------------
+	//var row = $('#dg').datagrid('getSelected');	
+	//if(!row) return;
+	//var index = $('#dg').datagrid('getRowIndex',row);
+	//-----------------------------------
+	
+	//----------------v2.0--------------
+	var index=$('#currLight').textbox('getValue')+'';
+	if(index === '') return;
+	index = parseInt(index);
+	var old = $('#dg')[0].data.rows[index];	
+	var row = getNewData(old);
+	//-----------------------------------
+	
+	var changes = chooseChangeFileds(old, row);
+	if(jQuery.isEmptyObject(changes)) return;	
+	
+	$.post('updateLight',row,function(result, status){
+		if(result === "success"){
+			//location.reload();
+			$('#dg').datagrid('reload');
+		}
+		else {
+			alert('failed');
+		}
+	});
+});
 
 $('#modifyAll').click(function(){
 	//---------------v1.0---------------
@@ -549,7 +546,7 @@ $('#modifyAll').click(function(){
 	//----------------------------------
 	
 	//----------------v2.0--------------
-	var index=$('#currLight').textbox('getText');
+	var index=$('#currLight').textbox('getValue')+'';
 	if(index === '') return;
 	index = parseInt(index);
 	var old = $('#dg')[0].data.rows[index];	
@@ -570,7 +567,8 @@ $('#modifyAll').click(function(){
 	}
 	$.post('updateAllLights',changes,function(result, status){
 		if(result === "success"){
-			location.reload();
+			//location.reload();
+			$('#dg').datagrid('reload');
 		}
 		else {
 			alert('操作失败！');
@@ -586,7 +584,7 @@ $('#modifySingle').click(function(){
 	//-----------------------------------
 	
 	//----------------v2.0--------------
-	var index=$('#currLight').textbox('getText');
+	var index=$('#currLight').textbox('getValue')+'';
 	if(index === '') return;
 	index = parseInt(index);
 	var old = $('#dg')[0].data.rows[index];	
@@ -607,7 +605,8 @@ $('#modifySingle').click(function(){
 	}
 	$.post('updateSingleLights',changes,function(result, status){
 		if(result === "success"){
-			location.reload();
+			//location.reload();
+			$('#dg').datagrid('reload');
 		}
 		else {
 			alert('failed');
@@ -623,7 +622,7 @@ $('#modifyDouble').click(function(){
 	//-----------------------------------
 	
 	//----------------v2.0--------------
-	var index=$('#currLight').textbox('getText');
+	var index=$('#currLight').textbox('getValue')+'';
 	if(index === '') return;
 	index = parseInt(index);
 	var old = $('#dg')[0].data.rows[index];	
@@ -644,7 +643,8 @@ $('#modifyDouble').click(function(){
 	}
 	$.post('updateDoubleLights',changes,function(result, status){
 		if(result === "success"){
-			location.reload();
+			//location.reload();
+			$('#dg').datagrid('reload');
 		}
 		else {
 			alert('failed');

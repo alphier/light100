@@ -174,6 +174,14 @@ exports.updateControllerName = function (ctl, callback){
 	});
 };
 
+exports.removeAllLights = function(userindex,usercode,ctlid, callback){
+	"use strict";
+	
+	db.lights.remove({uindex:userindex,ucode:usercode,cid:ctlid},function(result){
+		callback("success");
+	});
+};
+
 exports.updateLight = function (lt, callback){
 	"use strict";	
 	

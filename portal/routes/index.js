@@ -565,6 +565,12 @@ exports.getLights = function (req, res) {
 		cid = String(req.session.user.cid);
 	logger.info('getLights...index:', idx, ' code:', code, ' cid:', cid);
 	db.getLights({index:idx, code:code, cid:cid},function(result){
+		if(result)
+			logger.info('lights num is ',result.length);
+		else{
+			result = [];
+			logger.info('lights is ',result);
+		}
 		res.send(result);
 	});
 };
@@ -727,6 +733,24 @@ exports.doClearHistory = function (req, res){
 	var _id = req.session.user._id.toString();
 	logger.info('doClearHistory..._id:' + _id);
 	db.removeHistory(_id, function (data){
+		res.send(data);
+	});	
+};
+
+exports.doRemoveAllLights = function (req, res){
+	"use strict";
+	
+	if(!req.session.user){
+		res.send('session expired');
+		return;
+	}
+	
+	logger.info('doRemoveAllLights...user:',req.session.user);
+	var idx = parseInt(req.session.user.index),
+		code = parseInt(req.session.user.code),
+		cid = String(req.session.user.cid);
+	logger.info('doRemoveAllLights...ctlid:' + cid);
+	db.removeAllLights(idx,code,cid, function (data){
 		res.send(data);
 	});	
 };

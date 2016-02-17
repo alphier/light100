@@ -71,6 +71,7 @@ app.post('/updateLight', routes.doUpdateLight);
 app.post('/updateAllLights', routes.doUpdateAllLights);
 app.post('/updateSingleLights', routes.doUpdateSingleLights);
 app.post('/updateDoubleLights', routes.doUpdateDoubleLights);
+app.post('/removeAllLights',routes.doRemoveAllLights);
 
 app.get('/getTime', routes.getCurrentTime);
 
