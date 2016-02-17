@@ -97,6 +97,8 @@
 				</th>
 				<th data-options="field:'charging',width:40,
 						formatter:function(value,row){
+							if(row.state === 1)
+								return '';
 							if(value === 0)
 								return '停';
 							if(value === 1)
@@ -106,6 +108,8 @@
 				</th>
 				<th data-options="field:'onoff',width:40,
 						formatter:function(value,row){
+							if(row.state === 1)
+								return '';
 							if(value === 0)
 								return '关';
 							if(value === 1)
@@ -115,30 +119,44 @@
 				</th>
 				<th data-options="field:'cpower',width:60,
 						formatter:function(value,row){
-							return value + 'w';
+							if(row.state === 1)
+								return '';
+							else
+								return value + 'w';
                         }">
 				<span style="font-size:12px;font-weight: bolder">充电功率</span>
 				</th>
 				<th data-options="field:'lpower',width:60,
 						formatter:function(value,row){
-							return value + 'w';
+							if(row.state === 1)
+								return '';
+							else
+								return value + 'w';
                         }">
 				<span style="font-size:12px;font-weight: bolder">放电功率</span>
 				</th>
 				<th data-options="field:'battery',width:60,
 						formatter:function(value,row){
-							return value + '%';
+							if(row.state === 1)
+								return '';
+							else
+								return value + '%';
                         }">
 				<span style="font-size:12px;font-weight: bolder">电池电量</span>
 				</th>
 				<th data-options="field:'temp',width:40,
 						formatter:function(value,row){
-							return value + 'C°';
+							if(row.state === 1)
+								return '';
+							else
+								return value + 'C°';
                         }">
 				<span style="font-size:12px;font-weight: bolder">温度</span>
 				</th>
 				<th data-options="field:'batype',width:60,
 						formatter:function(value,row){
+							if(row.state === 1)
+								return '';
 							if(value === 0)
 								return '锂11V';
 							if(value === 1)
@@ -152,11 +170,20 @@
 				</th>
 				<th data-options="field:'capacity',width:40,
 						formatter:function(value,row){
-							return value + 'A';
+							if(row.state === 1)
+								return '';
+							else
+								return value + 'A';
                         }">
 				<span style="font-size:12px;font-weight: bolder">容量</span>
 				</th>
-				<th data-options="field:'pdate',width:75">
+				<th data-options="field:'pdate',width:75,
+						formatter:function(value,row){
+							if(row.state === 1)
+								return '';
+							else
+								return value;
+                        }">
 				<span style="font-size:12px;font-weight: bolder">生产日期</span>
 				</th>
 				<th data-options="field:'ctltype',width:60,
@@ -164,6 +191,8 @@
 							return 'background-color:#aaee00;';
 						},
 						formatter:function(value,row){
+							if(row.state === 1)
+								return '';
 							if(String(value) === '0')
 								return '关';
 							if(String(value) === '1')
@@ -178,19 +207,25 @@
 							return 'background-color:#aaee00;';
 						},
 						formatter:function(value,row){
-							if(String(value) === '0'){
+							if(row.state === 1)
+								return '';
+							if(String(value) === '0')
 								return '光控';
-							}
-							if(String(value) === '1'){
+							if(String(value) === '1')
                             	return '时控';
-                            }                            
                         }">
 				<span style="font-size:12px;font-weight: bolder">自动方式</span>
 				</th>
 				<th data-options="field:'ontime',width:70,
 						styler:function(value,row,index){
 							return 'background-color:#aaee00;';
-						}">
+						},
+						formatter:function(value,row){
+							if(row.state === 1)
+								return '';
+							else
+								return value;
+                        }">
 				<span style="font-size:12px;font-weight: bolder">开灯时间</span>
 				</th>
 				<th data-options="field:'lcvoltage',width:60,
@@ -198,7 +233,10 @@
 							return 'background-color:#aaee00;';
 						},
 						formatter:function(value,row){
-                            return value + 'V';
+							if(row.state === 1)
+								return '';
+							else
+								return value + 'V';
                         }">
 				<span style="font-size:12px;font-weight: bolder">光控电压</span>
 				</th>
@@ -207,7 +245,10 @@
 							return 'background-color:#aaee00;';
 						},
 						formatter:function(value,row){
-                            return value + '%';
+							if(row.state === 1)
+								return '';
+							else
+								return value + '%';
                         }">
 				<span style="font-size:12px;font-weight: bolder">1亮度</span>
 				</th>
@@ -216,7 +257,10 @@
 							return 'background-color:#aaee00;';
 						},
 						formatter:function(value,row){
-                            return value + 'h';
+							if(row.state === 1)
+								return '';
+							else
+								return value + 'h';
                         }">
 				<span style="font-size:12px;font-weight: bolder">1时间</span>
 				</th>
@@ -225,7 +269,10 @@
 							return 'background-color:#aaee00;';
 						},
 						formatter:function(value,row){
-                            return value + '%';
+							if(row.state === 1)
+								return '';
+							else
+								return value + '%';
                         }">
 				<span style="font-size:12px;font-weight: bolder">2亮度</span>
 				</th>
@@ -234,7 +281,10 @@
 							return 'background-color:#aaee00;';
 						},
 						formatter:function(value,row){
-                            return value + 'h';
+							if(row.state === 1)
+								return '';
+							else
+								return value + 'h';
                         }">
 				<span style="font-size:12px;font-weight: bolder">2时间</span>
 				</th>
@@ -243,7 +293,10 @@
 							return 'background-color:#aaee00;';
 						},
 						formatter:function(value,row){
-                            return value + '%';
+							if(row.state === 1)
+								return '';
+							else
+								return value + '%';
                         }">
 				<span style="font-size:12px;font-weight: bolder">3亮度</span>
 				</th>
@@ -252,7 +305,10 @@
 							return 'background-color:#aaee00;';
 						},
 						formatter:function(value,row){
-                            return value + 'h';
+							if(row.state === 1)
+								return '';
+							else
+								return value + 'h';
                         }">
 				<span style="font-size:12px;font-weight: bolder">3时间</span>
 				</th>
@@ -261,7 +317,10 @@
 							return 'background-color:#aaee00;';
 						},
 						formatter:function(value,row){
-                            return value + '%';
+							if(row.state === 1)
+								return '';
+							else
+								return value + '%';
                         }">
 				<span style="font-size:12px;font-weight: bolder">4亮度</span>
 				</th>
@@ -270,7 +329,10 @@
 							return 'background-color:#aaee00;';
 						},
 						formatter:function(value,row){
-                            return value + 'h';
+							if(row.state === 1)
+								return '';
+							else
+								return value + 'h';
                         }">
 				<span style="font-size:12px;font-weight: bolder">4时间</span>
 				</th>
@@ -459,6 +521,7 @@ $('#readItem').click(function(){
 	if(index === '') return;
 	index = parseInt(index);
 	var row=$("#dg")[0].data.rows[index];
+	if(row.state === 1) return;
 	$('#ctrltype').combobox('setValue',row.ctltype);
 	$('#autotype').combobox('setValue',row.autotype);
 	$('#ontime').textbox('setValue',row.ontime);
