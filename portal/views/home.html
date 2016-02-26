@@ -893,6 +893,7 @@ function reloadCtl(ctl){
 			var libtns = pa.getElementsByClassName("easyui-linkbutton");
 			libtns[3].className = "easyui-linkbutton l-btn l-btn-small";
 			libtns[3].href = "/light?cid=" + data.cid;
+			libtns[3].target = "_blank";
 			$("#"+ctl.pid).panel({title:ctl.name+":"+ctl.cid+"/"+data.lightCount});
 			var sps1 = libtns[0].getElementsByTagName("span");
 			sps1[0].style.marginTop = 0;
@@ -967,6 +968,7 @@ function reloadAll() {
 					var libtns = a[i].getElementsByClassName("easyui-linkbutton");
 					libtns[3].className = "easyui-linkbutton l-btn l-btn-small";
 					libtns[3].href = "/light?cid=" + data[i].cid;
+					libtns[3].target = "_blank";
 					if(data[i].chargeNum){
 						var sps1 = libtns[0].getElementsByTagName("span");
 						sps1[0].style.marginTop = 0;
