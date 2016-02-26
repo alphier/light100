@@ -234,40 +234,73 @@ dp.getLightData = function (data){
 	lt.charging = (state >> 2) & 1; //充放电
 	lt.onoff = (state >> 1) & 1;	//开关状态
 	lt.state = state & 1;			//是否故障
+	var nZeroNum = 0;
 	//光控时间
 	var h = String(data.readUInt8(7)),
 		m = String(data.readUInt8(8));
 	if(h.length === 1) h = '0' + h;
 	if(m.length === 1) m = '0' + m;
 	lt.ontime = h + ':' + m;
+	if(data.readUInt8(7) === 0)
+		nZeroNum ++;
+	if(data.readUInt8(8) === 0)
+		nZeroNum ++;
 	//光控电压
 	lt.lcvoltage = data.readUInt8(9)/10;
+	if(data.readUInt8(9) === 0)
+		nZeroNum ++;
 	//1亮度
 	lt.abright = data.readUInt8(10);
+	if(data.readUInt8(10) === 0)
+		nZeroNum ++;
 	//1时间
 	lt.atime = data.readUInt8(11)/10;
+	if(data.readUInt8(11) === 0)
+		nZeroNum ++;
 	//2亮度
 	lt.bbright = data.readUInt8(12);
+	if(data.readUInt8(12) === 0)
+		nZeroNum ++;
 	//2时间
 	lt.btime = data.readUInt8(13)/10;
+	if(data.readUInt8(13) === 0)
+		nZeroNum ++;
 	//3亮度
 	lt.cbright = data.readUInt8(14);
+	if(data.readUInt8(14) === 0)
+		nZeroNum ++;
 	//3时间
 	lt.ctime = data.readUInt8(15)/10;
+	if(data.readUInt8(15) === 0)
+		nZeroNum ++;
 	//4亮度
 	lt.dbright = data.readUInt8(16);
+	if(data.readUInt8(16) === 0)
+		nZeroNum ++;
 	//4时间
 	lt.dtime = data.readUInt8(17)/10;
+	if(data.readUInt8(17) === 0)
+		nZeroNum ++;
 	//电量
 	lt.battery = data.readUInt8(18);
+	if(data.readUInt8(18) === 0)
+		nZeroNum ++;
 	//温度
 	lt.temp = data.readUInt8(19);
+	if(data.readUInt8(19) === 0)
+		nZeroNum ++;
 	//容量
 	lt.capacity = data.readUInt8(20);
+	if(data.readUInt8(20) === 0)
+		nZeroNum ++;
 	//充电功率
 	lt.cpower = data.readUInt16BE(21)/10;
+	if(data.readUInt16BE(21) === 0)
+		nZeroNum ++;
 	//放电功率
 	lt.lpower = data.readUInt16BE(23)/10;
+	if(data.readUInt16BE(23) === 0)
+		nZeroNum ++;
 	//生产日期
 	var year = String(data.readUInt8(25)),
 		month = String(data.readUInt8(26)),
@@ -278,10 +311,18 @@ dp.getLightData = function (data){
 	if(pid.length == 2) pid = '00' + pid;
 	if(pid.length == 3) pid = '0' + pid;
 	lt.pdate = year + '/' + month + '/' + pid;
+	if(data.readUInt8(25) === 0)
+		nZeroNum ++;
+	if(data.readUInt8(26) === 0)
+		nZeroNum ++;
+	if(data.readUInt8(27) === 0)
+		nZeroNum ++;
 	
 	//补充字段
 	lt.voltage = 0;
 	lt.bSet = 0;
+	if(nZeroNum === 19)
+		lt.state = -1;
 	
 	return lt;
 };

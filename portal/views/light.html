@@ -97,7 +97,7 @@
 				</th>
 				<th data-options="field:'charging',width:40,
 						formatter:function(value,row){
-							if(row.state === 1)
+							if(row.state === -1)
 								return '';
 							if(value === 0)
 								return '停';
@@ -108,7 +108,7 @@
 				</th>
 				<th data-options="field:'onoff',width:40,
 						formatter:function(value,row){
-							if(row.state === 1)
+							if(row.state === -1)
 								return '';
 							if(value === 0)
 								return '关';
@@ -119,7 +119,7 @@
 				</th>
 				<th data-options="field:'cpower',width:60,
 						formatter:function(value,row){
-							if(row.state === 1)
+							if(row.state === -1)
 								return '';
 							else
 								return value + 'w';
@@ -128,7 +128,7 @@
 				</th>
 				<th data-options="field:'lpower',width:60,
 						formatter:function(value,row){
-							if(row.state === 1)
+							if(row.state === -1)
 								return '';
 							else
 								return value + 'w';
@@ -137,7 +137,7 @@
 				</th>
 				<th data-options="field:'battery',width:60,
 						formatter:function(value,row){
-							if(row.state === 1)
+							if(row.state === -1)
 								return '';
 							else
 								return value + '%';
@@ -146,7 +146,7 @@
 				</th>
 				<th data-options="field:'temp',width:40,
 						formatter:function(value,row){
-							if(row.state === 1)
+							if(row.state === -1)
 								return '';
 							else
 								return value + 'C°';
@@ -155,7 +155,7 @@
 				</th>
 				<th data-options="field:'batype',width:60,
 						formatter:function(value,row){
-							if(row.state === 1)
+							if(row.state === -1)
 								return '';
 							if(value === 0)
 								return '锂11V';
@@ -170,7 +170,7 @@
 				</th>
 				<th data-options="field:'capacity',width:40,
 						formatter:function(value,row){
-							if(row.state === 1)
+							if(row.state === -1)
 								return '';
 							else
 								return value + 'A';
@@ -179,7 +179,7 @@
 				</th>
 				<th data-options="field:'pdate',width:75,
 						formatter:function(value,row){
-							if(row.state === 1)
+							if(row.state === -1)
 								return '';
 							else
 								return value;
@@ -191,7 +191,7 @@
 							return 'background-color:#aaee00;';
 						},
 						formatter:function(value,row){
-							if(row.state === 1)
+							if(row.state === -1)
 								return '';
 							if(String(value) === '0')
 								return '关';
@@ -207,7 +207,7 @@
 							return 'background-color:#aaee00;';
 						},
 						formatter:function(value,row){
-							if(row.state === 1)
+							if(row.state === -1)
 								return '';
 							if(String(value) === '0')
 								return '光控';
@@ -221,7 +221,7 @@
 							return 'background-color:#aaee00;';
 						},
 						formatter:function(value,row){
-							if(row.state === 1)
+							if(row.state === -1)
 								return '';
 							else
 								return value;
@@ -233,7 +233,7 @@
 							return 'background-color:#aaee00;';
 						},
 						formatter:function(value,row){
-							if(row.state === 1)
+							if(row.state === -1)
 								return '';
 							else
 								return value + 'V';
@@ -245,7 +245,7 @@
 							return 'background-color:#aaee00;';
 						},
 						formatter:function(value,row){
-							if(row.state === 1)
+							if(row.state === -1)
 								return '';
 							else
 								return value + '%';
@@ -257,7 +257,7 @@
 							return 'background-color:#aaee00;';
 						},
 						formatter:function(value,row){
-							if(row.state === 1)
+							if(row.state === -1)
 								return '';
 							else
 								return value + 'h';
@@ -269,7 +269,7 @@
 							return 'background-color:#aaee00;';
 						},
 						formatter:function(value,row){
-							if(row.state === 1)
+							if(row.state === -1)
 								return '';
 							else
 								return value + '%';
@@ -281,7 +281,7 @@
 							return 'background-color:#aaee00;';
 						},
 						formatter:function(value,row){
-							if(row.state === 1)
+							if(row.state === -1)
 								return '';
 							else
 								return value + 'h';
@@ -293,7 +293,7 @@
 							return 'background-color:#aaee00;';
 						},
 						formatter:function(value,row){
-							if(row.state === 1)
+							if(row.state === -1)
 								return '';
 							else
 								return value + '%';
@@ -305,7 +305,7 @@
 							return 'background-color:#aaee00;';
 						},
 						formatter:function(value,row){
-							if(row.state === 1)
+							if(row.state === -1)
 								return '';
 							else
 								return value + 'h';
@@ -317,7 +317,7 @@
 							return 'background-color:#aaee00;';
 						},
 						formatter:function(value,row){
-							if(row.state === 1)
+							if(row.state === -1)
 								return '';
 							else
 								return value + '%';
@@ -329,7 +329,7 @@
 							return 'background-color:#aaee00;';
 						},
 						formatter:function(value,row){
-							if(row.state === 1)
+							if(row.state === -1)
 								return '';
 							else
 								return value + 'h';
@@ -491,7 +491,7 @@ function formatSetting(value,row){
 };
 
 function indexStyler(value,row,index){
-	if(row.state === 1)
+	if(row.state === 1 || row.state === -1)
 		return 'background-color:red;';
 	else
 		return 'background-color:none;';
