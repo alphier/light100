@@ -338,6 +338,25 @@ exports.doUpdateCtlName = function (req, res){
 	});
 };
 
+exports.doSaveName = function(req, res){
+	"use strict";
+	
+	if(!req.session.user){
+		res.send('session expired');
+		return;
+	}
+	
+	var ctl = {};
+	ctl.index = parseInt(req.session.user.index),
+	ctl.code = parseInt(req.session.user.code),
+	ctl.cid = String(req.session.user.cid);
+	var lidx = req.body.index,
+		lname = req.body.name;
+	logger.info('doSaveName...controller:',ctl,' light:',{id:lidx,name:lname});
+	db.updateLightName(ctl,lidx,lname, function(result){
+		res.send(result);
+	});
+};
 
 exports.doAddUser = function (req, res){
 	"use strict";	

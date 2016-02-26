@@ -114,6 +114,7 @@ exports.addController = function (ctl, callback) {
 exports.addLight = function (lt, callback) {
 	"use strict";
 	
+	lt.time = new Date();
 	db.lights.save({uindex:lt.uindex,
 					ucode:lt.ucode,
 					cid:lt.cid,
@@ -142,6 +143,7 @@ exports.addLight = function (lt, callback) {
 					dbright:lt.dbright,
 					dtime:lt.dtime,
 					bSet:lt.bSet,
+					time:lt.time
 					}, 
 	function(err, saved){
 		if(err){
@@ -185,6 +187,7 @@ exports.removeAllLights = function(userindex,usercode,ctlid, callback){
 exports.updateLight = function (lt, callback){
 	"use strict";	
 	
+	lt.time = new Date();
 	db.lights.update({_id: new BSON.ObjectID(lt.id)}, {$set:{ctltype:lt.ctltype,
 															autotype:lt.autotype,
 															ontime:lt.ontime,
@@ -197,7 +200,8 @@ exports.updateLight = function (lt, callback){
 															ctime:lt.ctime,
 															dbright:lt.dbright,
 															dtime:lt.dtime,
-															bSet:1}}, 
+															bSet:1,
+															time:lt.time}}, 
 	function(err, result){
 		if(err) 
 			callback("failed");
@@ -209,6 +213,7 @@ exports.updateLight = function (lt, callback){
 exports.updateLight1 = function (id, lt, callback){
 	"use strict";	
 	
+	lt.time = new Date();
 	db.lights.update({_id: new BSON.ObjectID(id)}, {$set:{uindex:lt.uindex,
 														ucode:lt.ucode,
 														cid:lt.cid,
@@ -236,7 +241,8 @@ exports.updateLight1 = function (id, lt, callback){
 														ctime:lt.ctime,
 														dbright:lt.dbright,
 														dtime:lt.dtime,
-														bSet:lt.bSet
+														bSet:lt.bSet,
+														time:lt.time
 														}}, 
 			function(err, result){
 				if(err) 
@@ -333,6 +339,20 @@ exports.updateDoubleLights = function (lt, callback){
 	}
 };
 
+function setAllZeroState(lts){
+	for(var index in lts){
+		var lt = lts[index];
+		if(lt.state !== -1 && lt.abright === 0 && lt.atime === 0 && 
+			lt.battery === 0 && lt.bbright === 0 && lt.btime === 0 &&  
+			lt.capacity === 0 && lt.cbright === 0 && lt.cpower === 0 &&
+			lt.ctime === 0 && lt.dbright === 0 && lt.dtime === 0 &&
+			lt.lcvoltage === 0 && lt.lpower === 0 && lt.ontime === '00:00' &&
+			lt.pdate === '00/00/0000'){
+			lts[index].state= -1;
+		}
+	}
+}
+
 exports.getLights = function (ctl, callback) {
 	"use strict";
 	
@@ -340,6 +360,7 @@ exports.getLights = function (ctl, callback) {
 		if(err || !ls || ls.length === 0){
 			callback(null);
 		} else {
+			setAllZeroState(ls);
 			callback(ls);
 		}	
 	});	
@@ -361,6 +382,18 @@ exports.updateLightSetting = function (ctl, ltid, callback) {
 	"use strict";
 	
 	db.lights.update({uindex:ctl.index, ucode:ctl.code, cid:ctl.cid, index:ltid}, {$set:{bSet:0}}, function(err, result){
+		if(err){
+			callback('failed');
+		} else {
+			callback('succeed');
+		}	
+	});	
+};
+
+exports.updateLightName = function (ctl, ltid, myName, callback) {
+	"use strict";
+	
+	db.lights.update({uindex:ctl.index, ucode:ctl.code, cid:ctl.cid, index:ltid}, {$set:{name:myName}}, function(err, result){
 		if(err){
 			callback('failed');
 		} else {

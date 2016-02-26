@@ -95,7 +95,23 @@
 				<th field='index' width=60 align='center' styler="indexStyler" formatter="indexFomatter">
 				<span style="font-size:12px;font-weight: bolder">编号/故障</span>
 				</th>
-				<th data-options="field:'charging',width:40,
+				<th field='name' width=60 align="center" editor="{type:'textbox'}">
+				<span style="font-size:12px;font-weight: bolder">名称</span>
+				</th>
+				<th data-options="field:'time',width:80,
+						formatter:function(value,row){
+							if(row.state === -1)
+								return '';
+							else{
+								var time = new Date(value),
+									tmp = time.toLocaleDateString().split('/');
+									datetime = tmp[1] + '-' + tmp[2] + ' ' + time.getHours() + ':' + time.getMinutes();
+								return datetime;
+							}
+                        }">
+				<span style="font-size:12px;align:center;font-weight:bolder">数据时间</span>
+				</th>
+				<th data-options="field:'charging',width:35,
 						formatter:function(value,row){
 							if(row.state === -1)
 								return '';
@@ -106,7 +122,7 @@
                         }">
 				<span style="font-size:12px;font-weight: bolder">充电</span>
 				</th>
-				<th data-options="field:'onoff',width:40,
+				<th data-options="field:'onoff',width:35,
 						formatter:function(value,row){
 							if(row.state === -1)
 								return '';
@@ -202,7 +218,7 @@
                         }">
 				<span style="font-size:12px;font-weight: bolder">控制方式</span>
 				</th>
-				<th data-options="field:'autotype',width:60,
+				<th data-options="field:'autotype',width:55,
 						styler:function(value,row,index){
 							return 'background-color:#aaee00;';
 						},
@@ -228,7 +244,7 @@
                         }">
 				<span style="font-size:12px;font-weight: bolder">开灯时间</span>
 				</th>
-				<th data-options="field:'lcvoltage',width:60,
+				<th data-options="field:'lcvoltage',width:55,
 						styler:function(value,row,index){
 							return 'background-color:#aaee00;';
 						},
@@ -240,7 +256,7 @@
                         }">
 				<span style="font-size:12px;font-weight: bolder">光控电压</span>
 				</th>
-				<th data-options="field:'abright',width:60,
+				<th data-options="field:'abright',width:50,
 						styler:function(value,row,index){
 							return 'background-color:#aaee00;';
 						},
@@ -264,7 +280,7 @@
                         }">
 				<span style="font-size:12px;font-weight: bolder">1时间</span>
 				</th>
-				<th data-options="field:'bbright',width:60,
+				<th data-options="field:'bbright',width:50,
 						styler:function(value,row,index){
 							return 'background-color:#aaee00;';
 						},
@@ -288,7 +304,7 @@
                         }">
 				<span style="font-size:12px;font-weight: bolder">2时间</span>
 				</th>
-				<th data-options="field:'cbright',width:60,
+				<th data-options="field:'cbright',width:50,
 						styler:function(value,row,index){
 							return 'background-color:#aaee00;';
 						},
@@ -312,7 +328,7 @@
                         }">
 				<span style="font-size:12px;font-weight: bolder">3时间</span>
 				</th>
-				<th data-options="field:'dbright',width:60,
+				<th data-options="field:'dbright',width:50,
 						styler:function(value,row,index){
 							return 'background-color:#aaee00;';
 						},
@@ -504,6 +520,21 @@ function indexFomatter(value, row){
 function setChanging(idx){
 	$("#btnset")[idx].style.backgroundColor = "rgb(100,100,100)";
 };
+
+$('#dg').datagrid({
+	onEndEdit: function(index,row){
+		alert('index:',index,' name:',row.name);
+		row.editing = false;
+		/*$.post('saveName',{index:index,name:row.name},function(result, status){
+			if(result === "success"){
+				alert('修改成功!');
+			}
+			else {
+				alert('修改失败!');
+			}
+		});*/
+	}
+});
 
 $('#clearAll').click(function(){
 	$.post('removeAllLights',{},function(result, status){
