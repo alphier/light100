@@ -342,6 +342,7 @@ exports.updateDoubleLights = function (lt, callback){
 function setAllZeroState(lts){
 	for(var index in lts){
 		var lt = lts[index];
+		if(!lts[index].hasOwnProperty('name')) lts[index].name = ''; 
 		if(lt.state !== -1 && lt.abright === 0 && lt.atime === 0 && 
 			lt.battery === 0 && lt.bbright === 0 && lt.btime === 0 &&  
 			lt.capacity === 0 && lt.cbright === 0 && lt.cpower === 0 &&
@@ -355,7 +356,6 @@ function setAllZeroState(lts){
 
 exports.getLights = function (ctl, callback) {
 	"use strict";
-	
 	db.lights.find({$query:{uindex:ctl.index, ucode:ctl.code, cid:ctl.cid},$orderby:{index:1}}, function(err, ls){
 		if(err || !ls || ls.length === 0){
 			callback(null);

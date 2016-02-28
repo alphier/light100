@@ -103,6 +103,7 @@
 							if(row.state === -1)
 								return '';
 							else{
+								if(!value) return '';
 								var time = new Date(value),
 									tmp = time.toLocaleDateString().split('/');
 									datetime = tmp[1] + '-' + tmp[2] + ' ' + time.getHours() + ':' + time.getMinutes();
@@ -523,8 +524,8 @@ function setChanging(idx){
 
 $('#dg').datagrid({
 	onEndEdit: function(index,row){
-		alert('index:',index,' name:',row.name);
-		row.editing = false;
+		//console.log('index:'+index+' name:'+row.name);
+		//row.editing = false;
 		/*$.post('saveName',{index:index,name:row.name},function(result, status){
 			if(result === "success"){
 				alert('修改成功!');
@@ -536,13 +537,29 @@ $('#dg').datagrid({
 	}
 });
 
+$('#dg').datagrid({
+	onAfterEdit: function(index,row,changes){
+		if(JSON.stringify(changes) === '{}') return;
+		console.log('onAfterEdit...index:'+index+' name:'+row.name+' changes:'+JSON.stringify(changes));
+		$.post('saveName',{index:index,name:row.name},function(result, status){
+			if(result === "succeed"){
+				$.messager.alert('提示','修改成功!');
+			}
+			else {
+				$.messager.alert('提示','修改失败!');
+			}
+		});
+		row.editing = false;
+	}
+});
+
 $('#clearAll').click(function(){
 	$.post('removeAllLights',{},function(result, status){
 		if(result === "success"){
 			$('#dg').datagrid('reload');
 		}
 		else {
-			alert('failed');
+			$.messager.alert('提示','清除失败');
 		}
 	});
 });
@@ -627,7 +644,7 @@ $('#modifyItem').click(function(){
 			$('#dg').datagrid('reload');
 		}
 		else {
-			alert('failed');
+			$.messager.alert('提示','更新失败');
 		}
 	});
 });
@@ -665,7 +682,7 @@ $('#modifyAll').click(function(){
 			$('#dg').datagrid('reload');
 		}
 		else {
-			alert('操作失败！');
+			$.messager.alert('提示','操作失败！');
 		}
 	});
 });
@@ -703,7 +720,7 @@ $('#modifySingle').click(function(){
 			$('#dg').datagrid('reload');
 		}
 		else {
-			alert('failed');
+			$.messager.alert('提示','更新失败');
 		}
 	});
 });
@@ -741,7 +758,7 @@ $('#modifyDouble').click(function(){
 			$('#dg').datagrid('reload');
 		}
 		else {
-			alert('failed');
+			$.messager.alert('提示','更新失败');
 		}
 	});
 });
