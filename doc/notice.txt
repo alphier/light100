@@ -1,0 +1,9 @@
+mongod --repair --dbpath C:\mongodb
+mongod --journal --dbpath C:\mongodb --logpath C:\mongodb\mongo.log --logappend &
+
+mongorestore -d light100 --drop C:\light100\db\light100
+
+查看有name字段的数据
+db.lights.find({name:{$exists:true}})
+
+mongodb必须是2.4.14版工程才能连接数据库
