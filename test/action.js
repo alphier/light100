@@ -13,7 +13,7 @@ function dtstr(){
 };	
 
 function connectInst(){
-	message = new Buffer(12);
+	message = new Buffer(18);
 	//指令：HARO - 0x48 0x41 0x52 0x4f
 	//指令类型 20
 	message.writeUInt8(0x14, 0);
@@ -35,6 +35,14 @@ function connectInst(){
 	message.writeUInt8(0x71, 9);
 	message.writeUInt8(0x62, 10);
 	message.writeUInt8(0x7f, 11);
+	//人流量
+	message.writeUInt16BE(4000, 12);
+	//车流量
+	message.writeUInt16BE(30000, 14);
+	//温度, 5℃
+	message.writeUInt8(110, 16);
+	//是否保存，是
+	message.writeUInt8(1, 17);
 	
 	return message;
 };
@@ -94,7 +102,7 @@ function putInst(s,lid){
 	message.writeUInt8(2, 26);
 	message.writeUInt16BE(21, 27);
 	//灯当前进度
-	message.writeUInt8(1, 29);
+	message.writeUInt8(3, 29);
 	
 	return message;
 };
@@ -153,6 +161,8 @@ function putInst0(s,lid){
 	message.writeUInt8(0, 25);
 	message.writeUInt8(0, 26);
 	message.writeUInt16BE(0, 27);
+	//灯当前进度
+	message.writeUInt8(1, 29);
 	
 	return message;
 };

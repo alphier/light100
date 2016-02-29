@@ -1,4 +1,4 @@
-var collections = ["users", "controllers", "lights"],
+var collections = ["users", "controllers", "lights", "usefulData", "maxData"],
 	databaseUrl = "light100",
 	BSON = require('mongodb').BSONPure,
 	db = require("mongojs").connect(databaseUrl, collections);
@@ -164,6 +164,29 @@ exports.updateControllerState = function (ctl,st, callback){
 		else
 			callback("success");
 	});
+};
+
+exports.saveUsefulData = function (data, callback){
+	"use strict";
+	
+	db.usefulData.save(data, function(err, result){
+		if(err) 
+			callback("failed");
+		else
+			callback("success");
+	});
+};
+
+exports.getCtlUsefulData = function (ctl, callback){
+	"use strict";
+	
+	db.usefulData.find({index:ctl.index, code:ctl.code, cid:ctl.cid}, function(err, result){
+		if(err || !result){
+			callback(null);
+		} else {
+			callback(result);
+		}
+	});	
 };
 
 exports.updateControllerName = function (ctl, callback){

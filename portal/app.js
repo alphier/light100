@@ -80,6 +80,8 @@ app.get('/admin', authAdmin);
 app.get('/admin', routes.admin);
 app.post('/user_datagrid.json', routes.getAllUsers);
 
+app.post('/exportUsefulData', routes.doExportUsefulData);
+
 app.listen(app.get('port'));
 console.log('Node listening on port %s', app.get('port'));
 

@@ -180,7 +180,7 @@ exports.communicate = function (spec) {
 			var idx = data[1],
 			code = data.readUInt16BE(2),
 			cid = data.readUInt32BE(4),
-			sec = data.readUInt32BE(8);				
+			sec = data.readUInt32BE(8);
 			if(dp.verifyCnt(cid,sec)){
 				var scid = new Buffer(4);
 				scid.writeUInt32BE(cid,0);
@@ -218,12 +218,30 @@ exports.communicate = function (spec) {
 											db.updateControllerState({index:idx,code:code,cid:scid},1,function(res){
 												db.getController({index:idx,code:code,cid:scid},function(nctl){
 													if(nctl){
+														nctl.people = data.readUInt16BE(12);
+														nctl.vehicle = data.readUInt16BE(14);
+														nctl.temperature = -50 + data.readUInt8(16)/2;
+														var bSave = data.readUInt8(17);
+														if(bSave === 1){
+															db.saveUsefulData({index:idx,code:code,cid:scid,
+																people:nctl.people,vehicle:nctl.vehicle,
+																temperature:nctl.temperature,time:new Date()},
+															function(result){
+																	if(result == 'success') 
+																		logger.info('saveUsefulData success!');
+																	else 
+																		logger.error('saveUsefulData failed!');
+															});
+														}
 														//var evt = new channelEvent({type:'controller-connect',data:nctl});
 														//dispatchEventListener(evt,nctl._id);
 														if(!hashMap.hasOwnProperty(nctl._id)){
 															logger.info('Connecting...adding controller to hashmap!!!',scid,' hashKey:', nctl._id);
 															hashMap[nctl._id] = nctl;
 															var evt = new channelEvent({type:'controller-connect',data:nctl});
+															dispatchEventListener(evt,nctl._id);
+														}else{
+															var evt = new channelEvent({type:'update-data',data:nctl});
 															dispatchEventListener(evt,nctl._id);
 														}
 														hashMap[nctl._id].timestamp = new Date();
