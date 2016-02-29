@@ -189,7 +189,7 @@ exports.communicate = function (spec) {
 				db.getController({index:idx,code:code,cid:scid},function(result){
 					if(!result){
 						logger.info('Connecting...Unknown controller!!!');
-						dp.replyCnn(server,1,0,data.ip,data.port,null,function(res){
+						dp.replyCnn(server,1,0,data.ip,data.port,null,null,function(res){
 							if(res === -1) {
 								logger.debug('Connecting!!!Sending error...');
 								callback('error');
@@ -206,34 +206,38 @@ exports.communicate = function (spec) {
 							var ccode = dp.newCnnCode();
 							//get new one, make sure no repeat
 							newCnnCode(scid, ccode, function(newCode){
-								dp.replyCnn(server,0,newCode,data.ip,data.port,setting,function(result){
-									if(result === -1) {
-										logger.debug('Connecting!!!Sending error...');
-										callback('error');
-									}else {
-										logger.debug('Connecting!!!Sending succeed');
-										db.updateControllerState({index:idx,code:code,cid:scid},1,function(res){
-											db.getController({index:idx,code:code,cid:scid},function(nctl){
-												if(nctl){
-													//var evt = new channelEvent({type:'controller-connect',data:nctl});
-													//dispatchEventListener(evt,nctl._id);
-													if(!hashMap.hasOwnProperty(nctl._id)){
-														logger.info('Connecting...adding controller to hashmap!!!',scid,' hashKey:', nctl._id);
-														hashMap[nctl._id] = nctl;
-														var evt = new channelEvent({type:'controller-connect',data:nctl});
-														dispatchEventListener(evt,nctl._id);
+								db.getOneSetLight({index:idx,code:code,cid:scid},function(_lt){
+									var ltid = 255;
+									if(_lt) ltid = _lt.index;
+									dp.replyCnn(server,0,newCode,data.ip,data.port,setting,ltid,function(result){
+										if(result === -1) {
+											logger.debug('Connecting!!!Sending error...');
+											callback('error');
+										}else {
+											logger.debug('Connecting!!!Sending succeed');
+											db.updateControllerState({index:idx,code:code,cid:scid},1,function(res){
+												db.getController({index:idx,code:code,cid:scid},function(nctl){
+													if(nctl){
+														//var evt = new channelEvent({type:'controller-connect',data:nctl});
+														//dispatchEventListener(evt,nctl._id);
+														if(!hashMap.hasOwnProperty(nctl._id)){
+															logger.info('Connecting...adding controller to hashmap!!!',scid,' hashKey:', nctl._id);
+															hashMap[nctl._id] = nctl;
+															var evt = new channelEvent({type:'controller-connect',data:nctl});
+															dispatchEventListener(evt,nctl._id);
+														}
+														hashMap[nctl._id].timestamp = new Date();
+														hashMap[nctl._id].cnnCode = newCode;
+														logger.info('Update ' + scid + ' to hashMap, newCode is ' + newCode);
+													} else {
+														logger.info('Connecting...getController failed!!!',scid);
 													}
-													hashMap[nctl._id].timestamp = new Date();
-													hashMap[nctl._id].cnnCode = newCode;
-													logger.info('Update ' + scid + ' to hashMap, newCode is ' + newCode);
-												} else {
-													logger.info('Connecting...getController failed!!!',scid);
-												}
-												callback('succeed');
+													callback('succeed');
+												});
 											});
-										});
-									}
-								});	
+										}
+									});	
+								});
                             });														
 						});								
 					}
@@ -241,7 +245,7 @@ exports.communicate = function (spec) {
 			}
 			else {
 				logger.info('Connecting...verfiy failed...idx:',idx,' code:',code,' cid:',cid,' sec:',sec);
-				dp.replyCnn(server,2,0,data.ip,data.port,null,function(res){
+				dp.replyCnn(server,2,0,data.ip,data.port,null,null,function(res){
 					if(res === -1) {
 						logger.debug('Connecting!!!Sending error...');
 						callback('error');
@@ -266,7 +270,7 @@ exports.communicate = function (spec) {
 				db.getLight({index:ctl.index,code:ctl.code,cid:ctl.cid},ltId,function(lt){
 					if(!lt){
 						logger.debug('Getting...Not found light ', ltId);
-						dp.replyGet(server,1,data.ip,data.port,null,ltId,function(bytes){
+						dp.replyGet(server,1,data.ip,data.port,null,ltId,null,function(bytes){
 							if(bytes === -1) {
 								logger.debug('Getting!!!Sending error...');
 								callback('error');
@@ -278,25 +282,29 @@ exports.communicate = function (spec) {
 					} else {
 						if(lt.bSet){
 							logger.debug('Getting...Light has setting ',ltId);
-							dp.replyGet(server,0,data.ip,data.port,cnn_code,lt,function(bytes){
-								if(bytes === -1) {
-									logger.debug('Getting!!!Sending error...');
-									callback('error');
-								}else {
-									logger.debug('Getting!!!Sending succeed');
-									db.updateLightSetting({index:ctl.index,code:ctl.code,cid:ctl.cid},ltId,function(result){
-										if(result === 'succeed'){
-											lt.bSet = 0;
-											var evt = new channelEvent({type:'light-getparams',data:lt});
-											dispatchEventListener(evt,lt._id);
-										}
-										callback('succeed');
-									});										
-								}
+							db.getNextOneSetLight({index:ctl.index,code:ctl.code,cid:ctl.cid},ltId,function(_lt){
+								var ltid = 255;
+								if(_lt) ltid = _lt.index;
+								dp.replyGet(server,0,data.ip,data.port,cnn_code,lt,ltid,function(bytes){
+									if(bytes === -1) {
+										logger.debug('Getting!!!Sending error...');
+										callback('error');
+									}else {
+										logger.debug('Getting!!!Sending succeed');
+										db.updateLightSetting({index:ctl.index,code:ctl.code,cid:ctl.cid},ltId,function(result){
+											if(result === 'succeed'){
+												lt.bSet = 0;
+												var evt = new channelEvent({type:'light-getparams',data:lt});
+												dispatchEventListener(evt,lt._id);
+											}
+											callback('succeed');
+										});
+									}
+								});
 							});
 						} else {
 							logger.debug('Getting...No setting of light ',ltId);
-							dp.replyGet(server,3,data.ip,data.port,null,ltId,function(bytes){
+							dp.replyGet(server,3,data.ip,data.port,null,ltId,null,function(bytes){
 								if(bytes === -1) {
 									logger.debug('Getting!!!Sending error...');
 									callback('error');
@@ -311,7 +319,7 @@ exports.communicate = function (spec) {
 			}
 			else {
 				logger.debug('Getting...No found controller of temp code ',cnn_code);
-				dp.replyGet(server,2,data.ip,data.port,null,null,function(bytes){
+				dp.replyGet(server,2,data.ip,data.port,null,null,null,function(bytes){
 					if(bytes === -1) {
 						logger.debug('Getting!!!Sending error...');
 						callback('error');

@@ -70,12 +70,12 @@ dp.newCnnCode = function(){
 	return num;
 };
 
-dp.replyCnn = function (conn, state, num, ip, port, hasSet, callback){
+dp.replyCnn = function (conn, state, num, ip, port, hasSet, ltid, callback){
 	var ab = {},
 		size = 3;
 	if(state === 0){
-		size = 11;
-		ab = new Buffer(11);
+		size = 12;
+		ab = new Buffer(12);
 		ab.writeUInt8(0x15,0);
 		ab.write('OK',1);
 		//var num = rand(1000,10000);
@@ -98,6 +98,7 @@ dp.replyCnn = function (conn, state, num, ip, port, hasSet, callback){
 		ab.writeUInt8(t.getHours(),8);
 		ab.writeUInt8(t.getMinutes(),9);
 		ab.writeUInt8(t.getSeconds(),10);
+		ab.writeUInt8(parseInt(ltid),11);
 	}
 	if(state === 1){
 		ab = new Buffer(3);
@@ -118,12 +119,12 @@ dp.replyCnn = function (conn, state, num, ip, port, hasSet, callback){
 	});
 };
 
-dp.replyGet = function (conn, state, ip, port, cnncode, light, callback){
+dp.replyGet = function (conn, state, ip, port, cnncode, light, nexLightId, callback){
 	var ab = {},
 		size = 3;
 	if(state === 0){
-		size = 18;
-		ab = new Buffer(18);
+		size = 19;
+		ab = new Buffer(19);
 		ab.writeUInt8(0x1f,0);
 		cnncode = String(cnncode);
 		var key = 'XUKE',
@@ -169,6 +170,8 @@ dp.replyGet = function (conn, state, ip, port, cnncode, light, callback){
 		ab.writeUInt8(parseInt(light.dbright),16);
 		//4时
 		ab.writeUInt8(parseInt(light.dtime*10),17);
+		//下一个灯id
+		ab.writeUInt8(parseInt(nexLightId),18);
 	}
 	if(state === 1){
 		ab = new Buffer(4);
@@ -315,8 +318,10 @@ dp.getLightData = function (data){
 		nZeroNum ++;
 	if(data.readUInt8(26) === 0)
 		nZeroNum ++;
-	if(data.readUInt8(27) === 0)
+	if(data.readUInt16BE(27) === 0)
 		nZeroNum ++;
+	//添加进度字段
+	lt.curTime = data.readUInt8(29);
 	
 	//补充字段
 	lt.voltage = 0;

@@ -143,7 +143,8 @@ exports.addLight = function (lt, callback) {
 					dbright:lt.dbright,
 					dtime:lt.dtime,
 					bSet:lt.bSet,
-					time:lt.time
+					time:lt.time,
+					curTime:lt.curTime
 					}, 
 	function(err, saved){
 		if(err){
@@ -201,7 +202,8 @@ exports.updateLight = function (lt, callback){
 															dbright:lt.dbright,
 															dtime:lt.dtime,
 															bSet:1,
-															time:lt.time}}, 
+															time:lt.time,
+															curTime:lt.curTime}}, 
 	function(err, result){
 		if(err) 
 			callback("failed");
@@ -242,7 +244,8 @@ exports.updateLight1 = function (id, lt, callback){
 														dbright:lt.dbright,
 														dtime:lt.dtime,
 														bSet:lt.bSet,
-														time:lt.time
+														time:lt.time,
+														curTime:lt.curTime
 														}}, 
 			function(err, result){
 				if(err) 
@@ -387,6 +390,30 @@ exports.updateLightSetting = function (ctl, ltid, callback) {
 		} else {
 			callback('succeed');
 		}	
+	});	
+};
+
+exports.getOneSetLight = function (ctl, callback){
+	"use strict";
+	
+	db.lights.findOne({uindex:ctl.index, ucode:ctl.code, cid:ctl.cid, bset:1}, function(err, lt){
+		if(err || !lt){
+			callback(null);
+		} else {
+			callback(lt);
+		}
+	});	
+};
+
+exports.getNextOneSetLight = function (ctl, ltid, callback){
+	"use strict";
+	
+	db.lights.findOne({uindex:ctl.index, ucode:ctl.code, cid:ctl.cid, bset:1, index:{$ne:ltid}}, function(err, lt){
+		if(err || !lt){
+			callback(null);
+		} else {
+			callback(lt);
+		}
 	});	
 };
 

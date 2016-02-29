@@ -1,6 +1,6 @@
 var PORT = 1000;
-//var HOST = 'localhost';		//115.28.23.23
-var HOST = '115.28.218.190';
+var HOST = 'localhost';		//115.28.23.23
+//var HOST = '115.28.218.190';
 
 var dgram = require('dgram'),
 	client = dgram.createSocket('udp4');
@@ -40,7 +40,7 @@ function connectInst(){
 };
 
 function putInst(s,lid){
-	var message = new Buffer(29),
+	var message = new Buffer(30),
 		k = 'INTO',
 		a = s.charCodeAt(0) ^ k.charCodeAt(0),
 		b = s.charCodeAt(1) ^ k.charCodeAt(1),
@@ -56,8 +56,8 @@ function putInst(s,lid){
 	message.writeUInt8(d, 4);
 	//灯编号 1
 	message.writeUInt8(lid, 5);
-	//状态字 1011 0101 自动 铅24V 光控 充电 关灯 故障
-	message.writeUInt8(183, 6);
+	//状态字 1011 0100 自动 铅24V 光控 充电 关灯 正常
+	message.writeUInt8(180, 6);
 	//光控时间 18:35
 	message.writeUInt8(18, 7);
 	message.writeUInt8(30, 8);
@@ -93,6 +93,8 @@ function putInst(s,lid){
 	message.writeUInt8(5, 25);
 	message.writeUInt8(2, 26);
 	message.writeUInt16BE(21, 27);
+	//灯当前进度
+	message.writeUInt8(1, 29);
 	
 	return message;
 };
@@ -224,13 +226,13 @@ client.on('message', function (msg, remote) {
 			sec_code = String(getCnnCode(sec_code,'XUKE')),	
 			console.log(dtstr() + ' receive connect reply...', sec_code);
 		
-		/*for(var i=0;i<5;i++){
+		for(var i=0;i<5;i++){
 			pMsg = putInst(sec_code,i);
 			client.send(pMsg, 0, pMsg.length, PORT, HOST, function(err, bytes) {
 				if (err) throw err;
 				console.log(dtstr() + 'Putting!!!' + HOST + ':' + PORT);
 			});
-		}*/
+		}
 		
 		for(var i=0;i<60;i++){
 			gMsg = getInst(sec_code,i);

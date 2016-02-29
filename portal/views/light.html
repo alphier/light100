@@ -259,7 +259,10 @@
 				</th>
 				<th data-options="field:'abright',width:50,
 						styler:function(value,row,index){
-							return 'background-color:#aaee00;';
+							if(row.curTime === 1)
+								return 'background-color:yellow;';
+							else
+								return 'background-color:#aaee00;';
 						},
 						formatter:function(value,row){
 							if(row.state === -1)
@@ -271,7 +274,10 @@
 				</th>
 				<th data-options="field:'atime',width:50,
 						styler:function(value,row,index){
-							return 'background-color:#aaee00;';
+							if(row.curTime === 1)
+								return 'background-color:yellow;';
+							else
+								return 'background-color:#aaee00;';
 						},
 						formatter:function(value,row){
 							if(row.state === -1)
@@ -283,7 +289,10 @@
 				</th>
 				<th data-options="field:'bbright',width:50,
 						styler:function(value,row,index){
-							return 'background-color:#aaee00;';
+							if(row.curTime === 2)
+								return 'background-color:yellow;';
+							else
+								return 'background-color:#aaee00;';
 						},
 						formatter:function(value,row){
 							if(row.state === -1)
@@ -295,7 +304,10 @@
 				</th>
 				<th data-options="field:'btime',width:50,
 						styler:function(value,row,index){
-							return 'background-color:#aaee00;';
+							if(row.curTime === 2)
+								return 'background-color:yellow;';
+							else
+								return 'background-color:#aaee00;';
 						},
 						formatter:function(value,row){
 							if(row.state === -1)
@@ -307,7 +319,10 @@
 				</th>
 				<th data-options="field:'cbright',width:50,
 						styler:function(value,row,index){
-							return 'background-color:#aaee00;';
+							if(row.curTime === 3)
+								return 'background-color:yellow;';
+							else
+								return 'background-color:#aaee00;';
 						},
 						formatter:function(value,row){
 							if(row.state === -1)
@@ -319,7 +334,10 @@
 				</th>
 				<th data-options="field:'ctime',width:50,
 						styler:function(value,row,index){
-							return 'background-color:#aaee00;';
+							if(row.curTime === 3)
+								return 'background-color:yellow;';
+							else
+								return 'background-color:#aaee00;';
 						},
 						formatter:function(value,row){
 							if(row.state === -1)
@@ -331,7 +349,10 @@
 				</th>
 				<th data-options="field:'dbright',width:50,
 						styler:function(value,row,index){
-							return 'background-color:#aaee00;';
+							if(row.curTime === 4)
+								return 'background-color:yellow;';
+							else
+								return 'background-color:#aaee00;';
 						},
 						formatter:function(value,row){
 							if(row.state === -1)
@@ -343,7 +364,10 @@
 				</th>
 				<th data-options="field:'dtime',width:50,
 						styler:function(value,row,index){
-							return 'background-color:#aaee00;';
+							if(row.curTime === 4)
+								return 'background-color:yellow;';
+							else
+								return 'background-color:#aaee00;';
 						},
 						formatter:function(value,row){
 							if(row.state === -1)
@@ -416,6 +440,104 @@ function onRowSelected(index,row){
 
 function onLoadSuccess(data){
 	$('#dg')[0].data = jQuery.extend(true, {}, data);
+	/*var panel = $(this).datagrid('getPanel');
+    var tr = panel.find('div.datagrid-body tr');
+    tr.each(function(){
+    	var ltid = $(this).children('td[field="index"]').text();
+    	ltid = parseInt(ltid);
+    	if(ltid == 7){
+    		var td = $(this).children('td[field="cbright"]');
+    		td.children("div").css({
+				"background-color": "yellow"
+			});
+			//实现break功能
+			return false;
+    	}
+    });*/   
+}
+
+function setProcess(lid,process){
+	if(process < 1 || process > 4) return;	
+	var panel = $('#dg').datagrid('getPanel');
+    var tr = panel.find('div.datagrid-body tr');
+    tr.each(function(){
+    	var ltid = $(this).children('td[field="index"]').text();
+    	ltid = parseInt(ltid);
+    	if(ltid == lid){
+    		//先重置进度
+    		var td10 = $(this).children('td[field="atime"]');
+    		td10.children("div").css({
+				"background-color": "#aaee00"
+			});
+			var td11 = $(this).children('td[field="abright"]');
+    		td11.children("div").css({
+				"background-color": "#aaee00"
+			});
+			
+			var td20 = $(this).children('td[field="btime"]');
+    		td20.children("div").css({
+				"background-color": "#aaee00"
+			});
+			var td21 = $(this).children('td[field="bbright"]');
+    		td21.children("div").css({
+				"background-color": "#aaee00"
+			});
+			
+			var td30 = $(this).children('td[field="ctime"]');
+    		td30.children("div").css({
+				"background-color": "#aaee00"
+			});
+			var td31 = $(this).children('td[field="cbright"]');
+    		td31.children("div").css({
+				"background-color": "#aaee00"
+			});
+			
+			var td40 = $(this).children('td[field="dtime"]');
+    		td40.children("div").css({
+				"background-color": "#aaee00"
+			});
+			var td41 = $(this).children('td[field="dbright"]');
+    		td41.children("div").css({
+				"background-color": "#aaee00"
+			});
+			
+			if(process === 1){
+	    		td10.children("div").css({
+					"background-color": "yellow"
+				});
+	    		td11.children("div").css({
+					"background-color": "yellow"
+				});
+			}
+			if(process === 2){
+	    		td20.children("div").css({
+					"background-color": "yellow"
+				});
+	    		td21.children("div").css({
+					"background-color": "yellow"
+				});
+			}
+			if(process === 3){
+	    		td30.children("div").css({
+					"background-color": "yellow"
+				});
+	    		td31.children("div").css({
+					"background-color": "yellow"
+				});
+			}
+			if(process === 4){
+	    		td40.children("div").css({
+					"background-color": "yellow"
+				});
+	    		td41.children("div").css({
+					"background-color": "yellow"
+				});
+			}
+			
+			//实现break功能
+			return false;
+    	}
+    });
 }
 
 function startupClock() { 
@@ -497,6 +619,8 @@ socket.on('onLightPutSet', function (argument) {
 	    	$('#dg').datagrid('appendRow',argument);
 	    }
     }
+    if(argument.curTime)
+    	setProcess(parseInt(argument.index),parseInt(argument.curTime));
 });
 
 loadSystemTime();
