@@ -210,11 +210,11 @@ var exportMaxDischargePower = function(ctl,callback){
 	});
 };
 
-
+/*
 exportMaxDischargePower({index:1,code:5616,cid:"5000"},function(result){
 	logger.debug('export result ', result);
 });
-
+*/
 
 io.on('connection', function(socket){
   logger.info('Incoming a connection...id',socket.id);
