@@ -110,6 +110,10 @@ var exportUsefulData = function(ctl,callback){
 			callback('failed');
 		else{
 			db.getCtlUsefulData(ctl,function(result){
+				if(!result){
+					callback('failed');
+					return;
+				}
 				for(var id in result){
 					var data = moment(result[id].time).format('YYYY-MM-DD HH:mm:ss') + ',' + 
 							result[id].people + ',' + result[id].vehicle + ',' + result[id].temperature + '\r\n';
@@ -120,11 +124,98 @@ var exportUsefulData = function(ctl,callback){
 		}
 	});
 };
-/*
-exportUsefulData({index:1,code:5616,cid:"5000"},function(result){
+
+var times = ['06:00','07:00','08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00'];
+var exportMaxChargePower = function(ctl,callback){
+	"use strict";
+	
+	var datetime = moment().format("YYYYMMDDHHmmss"),
+		fullpath = './public/data/maxChargePower_' + datetime + '.csv',
+		filename = '/data/maxChargePower_' + datetime + '.csv',
+		header = "日期,6时,7时,8时,9时,10时,11时,12时,13时,14时,15时,16时,17时,18时,19时\r\n",
+		gbkbuf = iconv.encode(header, 'GBK');
+	fs.writeFile(fullpath,gbkbuf,function(err){
+		if(err) 
+			callback('failed');
+		else{
+			db.getCtlLightsMaxPowers(ctl,function(result){
+				if(!result){
+					callback('failed');
+					return;
+				}
+				for(var id in result){
+					var power = result[id];
+					var data = "";
+					data += power.time+",";
+					for(var t in times){
+						if(power.hasOwnProperty(times[t])){
+							var field = times[t],
+								maxPower = power[field];
+							if(maxPower.cpower === -1)
+								maxPower.cpower = "";
+							data += maxPower.cpower+",";
+						}
+					}
+					data = data.substr(0,data.length-1);
+					data += "\r\n";
+					fs.appendFile(fullpath,data,function(err){
+						logger.debug("appendFile result is ", err);
+					});
+				}
+				callback(filename);
+			});
+		}
+	});
+};
+
+var exportMaxDischargePower = function(ctl,callback){
+	"use strict";
+	
+	var datetime = moment().format("YYYYMMDDHHmmss"),
+		fullpath = './public/data/maxDischargePower_' + datetime + '.csv',
+		filename = '/data/maxDischargePower_' + datetime + '.csv',
+		header = "日期,6时,7时,8时,9时,10时,11时,12时,13时,14时,15时,16时,17时,18时,19时\r\n",
+		gbkbuf = iconv.encode(header, 'GBK');
+	fs.writeFile(fullpath,gbkbuf,function(err){
+		if(err) 
+			callback('failed');
+		else{
+			db.getCtlLightsMaxPowers(ctl,function(result){
+				if(!result){
+					callback('failed');
+					return;
+				}
+				for(var id in result){
+					var power = result[id];
+					var data = "";
+					data += power.time+",";
+					for(var t in times){
+						if(power.hasOwnProperty(times[t])){
+							var field = times[t],
+								maxPower = power[field];
+							if(maxPower.dpower === -1)
+								maxPower.dpower = "";
+							data += maxPower.dpower+",";
+						}
+					}
+					data = data.substr(0,data.length-1);
+					data += "\r\n";
+					fs.appendFile(fullpath,data,function(err){
+						logger.debug("appendFile result is ", err);
+					});
+				}
+				callback(filename);
+			});
+		}
+	});
+};
+
+
+exportMaxDischargePower({index:1,code:5616,cid:"5000"},function(result){
 	logger.debug('export result ', result);
 });
-*/
+
+
 io.on('connection', function(socket){
   logger.info('Incoming a connection...id',socket.id);
   sockets.push(socket.id);
@@ -854,3 +945,139 @@ exports.admin = function(req, res){
 	
   	res.render('admin', { title: 'Adminstrator'});
 };
+
+//! 保存
+var userLoop = function (datetime,users,callback){
+	"use strict";
+	
+	var user = users.pop();
+	if(!user){
+		callback('success');
+		return;
+	}
+	
+	db.getAllControllers(user,function(ctls){
+		if(ctls && ctls.length > 0){
+			controllerLoop(datetime,ctls,function(result){
+				userLoop(datetime,users,callback);
+			});
+		}else{
+			controllerLoop(datetime,[],function(result){
+				userLoop(datetime,users,callback);
+			});
+		}
+	});
+};
+
+var controllerLoop = function (datetime,ctls,callback){
+	"use strict";
+	
+	var ctl = ctls.pop();
+	if(!ctl) {
+		callback('success');
+		return;
+	}
+	
+	db.addMaxPower({time:datetime,uindex:ctl.index,ucode:ctl.code,cid:ctl.cid},function(saved){
+		controllerLoop(datetime,ctls,callback);
+	});
+};
+
+var savedMap = {};
+var saveMaxPower = function(){
+	"use strict";
+
+	var date = moment().format("YYYY-MM-DD");
+	//凌晨0点开始添加一条当天的记录
+	if("00:00" === moment().format("HH:mm") && 
+		!savedMap.hasOwnProperty(date)){
+		db.getAllUsers(function(users){
+			if(!users || users.length === 0){
+				setTimeout(saveMaxPower,5000);
+				savedMap[date] = true;
+			}else{
+				userLoop(date,users,function(result){
+					setTimeout(saveMaxPower,5000);
+					savedMap[date] = true;
+				});
+			}
+		});
+	}else{
+		setTimeout(saveMaxPower,5000);
+	}
+};
+
+//! 更新
+var updateUserLoop = function (datetime,users,field,callback){
+	"use strict";
+	
+	var user = users.pop();
+	if(!user){
+		callback('success');
+		return;
+	}
+	
+	db.getAllControllers(user,function(ctls){
+		if(ctls && ctls.length > 0){
+			updateControllerLoop(datetime,ctls,field,function(result){
+				updateUserLoop(datetime,users,field,callback);
+			});
+		}else{
+			updateControllerLoop(datetime,[],field,function(result){
+				updateUserLoop(datetime,users,field,callback);
+			});
+		}
+	});
+};
+
+var updateControllerLoop = function(datetime,ctls,field,callback){
+	"use strict";
+	
+	var ctl = ctls.pop();
+	if(!ctl) {
+		callback('success');
+		return;
+	}
+	db.getMaxChargePower(ctl,function(maxCPower){
+		db.getMaxDischargePower(ctl,function(maxDPower){
+			if(!maxCPower) maxCPower = 0;
+			if(!maxDPower) maxDPower = 0;
+			var updates = {};
+			updates[field] = {cpower:maxCPower,dpower:maxDPower};
+			db.updateMaxPower(datetime,ctl,updates,function(result){
+				updateControllerLoop(datetime,ctls,field,callback);
+			});
+		});
+	});
+};
+
+var updateMap = {};
+var updateMaxPower = function(){
+	"use strict";
+	
+	var curTime = moment().format("HH:mm"),
+		date = moment().format("YYYY-MM-DD"),
+		datetime = date + ' ' + curTime;
+	if((curTime == '06:00' || curTime == '07:00' || curTime == '08:00' || curTime == '09:00' ||
+		curTime == '10:00' || curTime == '11:00' || curTime == '12:00' || curTime == '13:00' || 
+		curTime == '14:00' || curTime == '15:00' || curTime == '16:00' || curTime == '17:00' ||
+		curTime == '18:00' || curTime == '19:00') && !updateMap.hasOwnProperty(datetime)){
+		db.getAllUsers(function(users){
+			if(!users || users.length === 0){
+				setTimeout(updateMaxPower,5000);
+				udpateMap[datetime] = true;
+			}else{
+				updateUserLoop(date,users,curTime,function(result){
+					setTimeout(updateMaxPower,5000);
+					updateMap[datetime] = true;
+				});
+			}
+		});
+	}else{
+		setTimeout(updateMaxPower,5000);
+	}
+};
+
+saveMaxPower();
+updateMaxPower();
+

@@ -382,6 +382,7 @@ function setAllZeroState(lts){
 
 exports.getLights = function (ctl, callback) {
 	"use strict";
+	
 	db.lights.find({$query:{uindex:ctl.index, ucode:ctl.code, cid:ctl.cid},$orderby:{index:1}}, function(err, ls){
 		if(err || !ls || ls.length === 0){
 			callback(null);
@@ -389,6 +390,78 @@ exports.getLights = function (ctl, callback) {
 			setAllZeroState(ls);
 			callback(ls);
 		}	
+	});	
+};
+
+exports.getMaxChargePower = function(ctl,callback){
+	"use strict";
+	
+	db.lights.find({uindex:ctl.index, ucode:ctl.code, cid:ctl.cid}).sort({"cpower":-1}).limit(1).toArray(function(err, lts){
+		if(err || !lts || lts.length === 0){
+			callback(null);
+		}else{
+			var cpower = lts[0].cpower;
+			callback(cpower);
+		}
+	});
+};
+
+exports.getMaxDischargePower = function(ctl,callback){
+	"use strict";
+	
+	db.lights.find({uindex:ctl.index, ucode:ctl.code, cid:ctl.cid}).sort({"lpower":-1}).limit(1).toArray(function(err, lts){
+		if(err || !lts || lts.length === 0){
+			callback(null);
+		}else{
+			var lpower = lts[0].lpower;
+			callback(lpower);
+		}
+	});
+};
+
+exports.addMaxPower = function(data,callback){
+	"use strict";
+	
+	db.maxData.findOne({time:data.time,uindex:data.uindex,ucode:data.ucode,cid:data.cid},function(err,result){
+		if(err || !result){
+			data["06:00"] = {cpower:-1,dpower:-1};data["07:00"] = {cpower:-1,dpower:-1};
+			data["08:00"] = {cpower:-1,dpower:-1};data["09:00"] = {cpower:-1,dpower:-1};
+			data["10:00"] = {cpower:-1,dpower:-1};data["11:00"] = {cpower:-1,dpower:-1};
+			data["12:00"] = {cpower:-1,dpower:-1};data["13:00"] = {cpower:-1,dpower:-1};
+			data["14:00"] = {cpower:-1,dpower:-1};data["15:00"] = {cpower:-1,dpower:-1};
+			data["16:00"] = {cpower:-1,dpower:-1};data["17:00"] = {cpower:-1,dpower:-1};
+			data["18:00"] = {cpower:-1,dpower:-1};data["19:00"] = {cpower:-1,dpower:-1};
+			db.maxData.save(data, function(err, saved){
+				callback(saved);
+			});
+		} else {
+			callback('exist');
+		}
+	});
+	
+};
+
+exports.updateMaxPower = function(datetime,ctl,updates,callback){
+	"use strict";
+	
+	db.maxData.update({time:datetime,uindex:ctl.index,ucode:ctl.code,cid:ctl.cid},{$set:updates},function(err,result){
+		if(err){
+			callback('failed');
+		} else {
+			callback('succeed');
+		}
+	});
+};
+
+exports.getCtlLightsMaxPowers = function(ctl, callback){
+	"use strict";
+	
+	db.maxData.find({uindex:ctl.index, ucode:ctl.code, cid:ctl.cid}, function(err, powers){
+		if(err || !powers){
+			callback(null);
+		} else {
+			callback(powers);
+		}
 	});	
 };
 
@@ -400,7 +473,7 @@ exports.getLight = function (ctl, ltid, callback) {
 			callback(null);
 		} else {
 			callback(lt);
-		}	
+		}
 	});	
 };
 
