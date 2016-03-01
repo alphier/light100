@@ -3,6 +3,8 @@ var db = require('../lib/dataBase'),
 	server = require('../lib/communicate'),
 	log4js = require('log4js'),
 	config = require('../config'),
+	fs = require('fs'),
+	iconv = require('iconv-lite'),
 	io = require('socket.io')(8080),
 	sockets = [];
 
@@ -43,6 +45,8 @@ var sendMsgToRoom = function (type, arg) {
 };
 
 var recaculateCtlerInfo = function (idx, co, ci, callback){
+	"use strict";
+	
 	db.getController({index:idx, code:co, cid:ci},function(ct){
 		if(!ct){ 
 			callback('failed');
@@ -93,6 +97,34 @@ var recaculateCtlerInfo = function (idx, co, ci, callback){
 	});		
 };
 
+var exportUsefulData = function(ctl,callback){
+	"use strict";
+	
+	var datetime = moment().format("YYYYMMDDHHmmss"),
+		fullpath = './public/data/usefulData_' + datetime + '.csv',
+		filename = '/data/usefulData_' + datetime + '.csv',
+		header = "时间,人流量,车流量,温度\r\n",
+		gbkbuf = iconv.encode(header, 'GBK');
+	fs.writeFile(fullpath,gbkbuf,function(err){
+		if(err) 
+			callback('failed');
+		else{
+			db.getCtlUsefulData(ctl,function(result){
+				for(var id in result){
+					var data = moment(result[id].time).format('YYYY-MM-DD HH:mm:ss') + ',' + 
+							result[id].people + ',' + result[id].vehicle + ',' + result[id].temperature + '\r\n';
+					fs.appendFile(fullpath,data,function(err){});
+				}
+				callback(filename);
+			});
+		}
+	});
+};
+/*
+exportUsefulData({index:1,code:5616,cid:"5000"},function(result){
+	logger.debug('export result ', result);
+});
+*/
 io.on('connection', function(socket){
   logger.info('Incoming a connection...id',socket.id);
   sockets.push(socket.id);
@@ -114,6 +146,11 @@ udpServer.addEventListener("controller-registered", function (data, id){
 udpServer.addEventListener("controller-connect", function (data, id){
 	logger.info("controller " + id + " connect!!!" + JSON.stringify(data));
 	sendMsgToRoom('onCtlOnline',data);
+});
+
+udpServer.addEventListener("update-data", function (data, id){
+	logger.info("controller " + id + " update data!!!" + JSON.stringify(data));
+	sendMsgToRoom('onUpdateData',data);
 });
 
 udpServer.addEventListener("controller-disconnect", function (data, id){
@@ -354,6 +391,24 @@ exports.doSaveName = function(req, res){
 		lname = req.body.name;
 	logger.info('doSaveName...controller:',ctl,' light:',{id:lidx,name:lname});
 	db.updateLightName(ctl,lidx,lname, function(result){
+		res.send(result);
+	});
+};
+
+exports.doExportUsefulData = function (req, res){
+	"use strict";
+	
+	if(!req.session.user){
+		res.send('session expired');
+		return;
+	}
+	
+	var ctl = {};
+	ctl.index = parseInt(req.session.user.index),
+	ctl.code = parseInt(req.session.user.code),
+	ctl.cid = String(req.session.user.cid);
+	
+	exportUsefulData(ctl, function (result){
 		res.send(result);
 	});
 };

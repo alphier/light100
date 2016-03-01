@@ -39,8 +39,8 @@
 		</a>
 		<span style="font-size:14px;">当前时间：</span>
 		<input class="easyui-textbox" type="text" id="currTime" name="currTime" style="width:130px;height:20px;padding:5px" data-options="readonly:true">
-		<a id="quit" class="btn" href="/home">
-			<span style="font-size:16px;">退出</span>
+		<a id="exportdata" class="btn" href="#">
+			<span style="font-size:16px;">下载流量数据</span>
 		</a>		
 	</div>	
 	<div style="border-top:2px solid black;border-bottom:2px solid black;border-left:2px solid black;border-right:2px solid black;margin-top:2px;padding:2px;">详细信息：
@@ -684,6 +684,17 @@ $('#clearAll').click(function(){
 		}
 		else {
 			$.messager.alert('提示','清除失败');
+		}
+	});
+});
+
+$('#exportdata').click(function(){
+	$.post('exportUsefulData',{},function(result, status){
+		if(result !== "failed"){
+			window.open(result);
+		}
+		else {
+			$.messager.alert('提示','下载失败');
 		}
 	});
 });

@@ -1,5 +1,5 @@
 mongod --repair --dbpath C:\mongodb
-mongod --journal --dbpath C:\mongodb --logpath C:\mongodb\mongo.log --logappend &
+mongod --journal --dbpath C:\mongodb --logpath C:\mongodb\mongo.log --logappend
 
 mongorestore -d light100 --drop C:\light100\db\light100
 

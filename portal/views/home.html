@@ -855,6 +855,10 @@ socket.on('disconnect', function (argument) {
     console.log('!!!!!disconnected.');
 });
 
+socket.on('onUpdateData', function (argument) {
+    console.log('!!!!!update data.',argument);
+});
+
 socket.on('onCtlOnline', function (argument) {
     console.log('!!!!onCtlOnline.',argument);
     if(String(argument.index) === "<%= user.index %>" && 
