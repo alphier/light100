@@ -424,13 +424,13 @@ exports.addMaxPower = function(data,callback){
 	
 	db.maxData.findOne({time:data.time,uindex:data.uindex,ucode:data.ucode,cid:data.cid},function(err,result){
 		if(err || !result){
-			data["06:00"] = {cpower:-1,dpower:-1};data["07:00"] = {cpower:-1,dpower:-1};
-			data["08:00"] = {cpower:-1,dpower:-1};data["09:00"] = {cpower:-1,dpower:-1};
-			data["10:00"] = {cpower:-1,dpower:-1};data["11:00"] = {cpower:-1,dpower:-1};
-			data["12:00"] = {cpower:-1,dpower:-1};data["13:00"] = {cpower:-1,dpower:-1};
-			data["14:00"] = {cpower:-1,dpower:-1};data["15:00"] = {cpower:-1,dpower:-1};
-			data["16:00"] = {cpower:-1,dpower:-1};data["17:00"] = {cpower:-1,dpower:-1};
-			data["18:00"] = {cpower:-1,dpower:-1};data["19:00"] = {cpower:-1,dpower:-1};
+			data["06"] = {cpower:-1,dpower:-1};data["07"] = {cpower:-1,dpower:-1};
+			data["08"] = {cpower:-1,dpower:-1};data["09"] = {cpower:-1,dpower:-1};
+			data["10"] = {cpower:-1,dpower:-1};data["11"] = {cpower:-1,dpower:-1};
+			data["12"] = {cpower:-1,dpower:-1};data["13"] = {cpower:-1,dpower:-1};
+			data["14"] = {cpower:-1,dpower:-1};data["15"] = {cpower:-1,dpower:-1};
+			data["16"] = {cpower:-1,dpower:-1};data["17"] = {cpower:-1,dpower:-1};
+			data["18"] = {cpower:-1,dpower:-1};data["19"] = {cpower:-1,dpower:-1};
 			db.maxData.save(data, function(err, saved){
 				callback(saved);
 			});

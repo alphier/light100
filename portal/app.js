@@ -74,6 +74,15 @@ app.post('/updateDoubleLights', routes.doUpdateDoubleLights);
 app.post('/removeAllLights',routes.doRemoveAllLights);
 app.post('/saveName',routes.doSaveName);
 
+app.get('/traffic', authentication);
+app.get('/traffic', routes.traffic);
+app.post('/traffic.json', routes.getTraffic);
+
+app.get('/maxpower', authentication);
+app.get('/maxpower', routes.maxpower);
+app.post('/maxChargePower.json', routes.getMaxChargePower);
+app.post('/maxDischargePower.json', routes.getMaxDischargePower);
+
 app.get('/getTime', routes.getCurrentTime);
 
 app.get('/admin', authAdmin);
@@ -81,6 +90,8 @@ app.get('/admin', routes.admin);
 app.post('/user_datagrid.json', routes.getAllUsers);
 
 app.post('/exportUsefulData', routes.doExportUsefulData);
+app.post('/exportMaxChargePowerData', routes.doExportMaxChargePowerData);
+app.post('/exportMaxDischargePowerData', routes.doExportMaxDischargePowerData);
 
 app.listen(app.get('port'));
 console.log('Node listening on port %s', app.get('port'));

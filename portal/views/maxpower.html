@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>MaxPower</title>
+	<link rel="stylesheet" type="text/css" href="css/default/easyui.css">
+	<link rel="stylesheet" type="text/css" href="css/color.css">	
+	<link rel="stylesheet" type="text/css" href="css/icon.css">
+	<script type="text/javascript" src="lib/jquery.min.js"></script>
+	<script type="text/javascript" src="lib/jquery.easyui.min.js"></script>
+	<script type="text/javascript" src="lib/socket.io/socket.io.js"></script>
+	<script type="text/javascript" src="lib/sc_clock.js"></script>
+</head>
+<body>
+	<div style="margin-top:6px;padding:5px;">
+		用户名：<%= user.username %>
+		编号：<%= user.index %>
+		机器密码：<%= user.code %>
+		控制器编号：<%= user.cid %>
+		<a id="quit" class="btn" href="/light?cid=<%= user.cid %>">
+			<span style="font-size:16px;margin-left:10px">退出</span>
+		</a>		
+	</div>
+	<div style="margin-top:2px;padding:5px;">
+	<span id="tips" style="font-size:14px;font-weight: bolder">最大充电功率</span>
+		<a href="#" id="maxCPower" class="easyui-linkbutton" style="margin-left:10px;">
+			<span style="font-size:14px;">最大充电功率</span>
+		</a>
+		<a href="#" id="maxDPower" class="easyui-linkbutton">
+			<span style="font-size:14px;">最大放电功率</span>
+		</a>
+		<a id="exportdata" class="btn" href="#">
+			<span style="font-size:16px;">下载</span>
+		</a>
+	</div>
+	<table id="dg" class="easyui-datagrid" style="width:100%;padding:2px"data-options="
+		singleSelect:true,
+		url:'maxChargePower.json',
+		method:'post',
+		onLoadSuccess: onLoadSuccess">
+		<style>
+		  .datagrid-cell{
+			font-size:14px;
+		  }
+		</style>
+		<thead>
+			<tr>
+				<th data-options="field:'time',width:80,
+					formatter:function(value,row){
+						if(!value || value === -1) return '';
+						var time = new Date(value);
+						return time.toLocaleDateString();
+                	}">
+				<span style="font-size:12px;font-weight:bolder">时间</span>
+				</th>
+				<th data-options="field:'06',width:80,
+						formatter:function(value,row){
+							if(!value || value === -1) return '';
+							return value + 'W';
+                        }">
+				<span style="font-size:12px;font-weight: bolder">6时</span>
+				</th>
+				<th data-options="field:'07',width:80,
+						formatter:function(value,row){
+							if(!value || value === -1) return '';
+							return value + 'W';
+                        }">
+				<span style="font-size:12px;font-weight: bolder">7时</span>
+				</th>
+				<th data-options="field:'08',width:80,
+						formatter:function(value,row){
+							if(!value || value === -1) return '';
+							return value + 'W';
+                        }">
+				<span style="font-size:12px;font-weight: bolder">8时</span>
+				</th>
+				<th data-options="field:'09',width:80,
+						formatter:function(value,row){
+							if(!value || value === -1) return '';
+							return value + 'W';
+                        }">
+				<span style="font-size:12px;font-weight: bolder">9时</span>
+				</th>
+				<th data-options="field:'10',width:80,
+						formatter:function(value,row){
+							if(!value || value === -1) return '';
+							return value + 'W';
+                        }">
+				<span style="font-size:12px;font-weight: bolder">10时</span>
+				</th>
+				<th data-options="field:'11',width:80,
+						formatter:function(value,row){
+							if(!value || value === -1) return '';
+							return value + 'W';
+                        }">
+				<span style="font-size:12px;font-weight: bolder">11时</span>
+				</th>
+				<th data-options="field:'12',width:80,
+						formatter:function(value,row){
+							if(!value || value === -1) return '';
+							return value + 'W';
+                        }">
+				<span style="font-size:12px;font-weight: bolder">12时</span>
+				</th>
+				<th data-options="field:'13',width:80,
+						formatter:function(value,row){
+							if(!value || value === -1) return '';
+							return value + 'W';
+                        }">
+				<span style="font-size:12px;font-weight: bolder">13时</span>
+				</th>
+				<th data-options="field:'14',width:80,
+						formatter:function(value,row){
+							if(!value || value === -1) return '';
+							return value + 'W';
+                        }">
+				<span style="font-size:12px;font-weight: bolder">14时</span>
+				</th>
+				<th data-options="field:'15',width:80,
+						formatter:function(value,row){
+							if(!value || value === -1) return '';
+							return value + 'W';
+                        }">
+				<span style="font-size:12px;font-weight: bolder">15时</span>
+				</th>
+				<th data-options="field:'16',width:80,
+						formatter:function(value,row){
+							if(!value || value === -1) return '';
+							return value + 'W';
+                        }">
+				<span style="font-size:12px;font-weight: bolder">16时</span>
+				</th>
+				<th data-options="field:'17',width:80,
+						formatter:function(value,row){
+							if(!value || value === -1) return '';
+							return value + 'W';
+                        }">
+				<span style="font-size:12px;font-weight: bolder">17时</span>
+				</th>
+				<th data-options="field:'18',width:80,
+						formatter:function(value,row){
+							if(!value || value === -1) return '';
+							return value + 'W';
+                        }">
+				<span style="font-size:12px;font-weight: bolder">18时</span>
+				</th>
+				<th data-options="field:'19',width:80,
+						formatter:function(value,row){
+							if(!value || value === -1) return '';
+							return value + 'W';
+                        }">
+				<span style="font-size:12px;font-weight: bolder">19时</span>
+				</th>
+			</tr>
+		</thead>
+	</table>
+</body>
+<script type="text/javascript">
+
+function onLoadSuccess(data){
+	$('#dg')[0].data = jQuery.extend(true, {}, data);
+}
+
+$('#exportdata').click(function(){
+	if($('#tips').text() == "最大充电功率"){
+		$.post('exportMaxChargePowerData',{},function(result, status){
+			if(result !== "failed"){
+				window.open(result);
+			}
+			else {
+				$.messager.alert('提示','下载失败');
+			}
+		});
+	}
+	if($('#tips').text() == "最大放电功率"){
+		$.post('exportMaxDischargePowerData',{},function(result, status){
+			if(result !== "failed"){
+				window.open(result);
+			}
+			else {
+				$.messager.alert('提示','下载失败');
+			}
+		});
+	}
+});
+
+$('#maxCPower').click(function(){
+	$('#dg').datagrid({url:'maxChargePower.json'});
+	$('#tips').text('最大充电功率');
+	$('#dg').datagrid('reload');
+});
+
+$('#maxDPower').click(function(){
+	$('#dg').datagrid({url:'maxDischargePower.json'});
+	$('#tips').text('最大放电功率');
+	$('#dg').datagrid('reload');
+});
+
+</script>
+</html>

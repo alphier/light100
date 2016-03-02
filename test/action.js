@@ -88,7 +88,7 @@ function putInst(s,lid){
 	//4时间 3.5h
 	message.writeUInt8(35, 17);
 	//电量 78%
-	message.writeUInt8(58, 18);
+	message.writeUInt8(77, 18);
 	//温度 62C°
 	message.writeUInt8(62, 19);
 	//容量 89A
@@ -102,7 +102,7 @@ function putInst(s,lid){
 	message.writeUInt8(2, 26);
 	message.writeUInt16BE(21, 27);
 	//灯当前进度
-	message.writeUInt8(3, 29);
+	message.writeUInt8(1, 29);
 	
 	return message;
 };

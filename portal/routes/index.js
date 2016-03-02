@@ -116,7 +116,7 @@ var exportUsefulData = function(ctl,callback){
 				}
 				for(var id in result){
 					var data = moment(result[id].time).format('YYYY-MM-DD HH:mm:ss') + ',' + 
-							result[id].people + ',' + result[id].vehicle + ',' + result[id].temperature + '\r\n';
+							result[id].people + ',' + result[id].vehicle + ',' + result[id].temperature + '℃' + '\r\n';
 					fs.appendFile(fullpath,data,function(err){});
 				}
 				callback(filename);
@@ -125,7 +125,7 @@ var exportUsefulData = function(ctl,callback){
 	});
 };
 
-var times = ['06:00','07:00','08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00'];
+var times = ['06','07','08','09','10','11','12','13','14','15','16','17','18','19'];
 var exportMaxChargePower = function(ctl,callback){
 	"use strict";
 	
@@ -158,9 +158,7 @@ var exportMaxChargePower = function(ctl,callback){
 					}
 					data = data.substr(0,data.length-1);
 					data += "\r\n";
-					fs.appendFile(fullpath,data,function(err){
-						logger.debug("appendFile result is ", err);
-					});
+					fs.appendFile(fullpath,data,function(err){});
 				}
 				callback(filename);
 			});
@@ -209,12 +207,6 @@ var exportMaxDischargePower = function(ctl,callback){
 		}
 	});
 };
-
-/*
-exportMaxDischargePower({index:1,code:5616,cid:"5000"},function(result){
-	logger.debug('export result ', result);
-});
-*/
 
 io.on('connection', function(socket){
   logger.info('Incoming a connection...id',socket.id);
@@ -504,6 +496,42 @@ exports.doExportUsefulData = function (req, res){
 	});
 };
 
+exports.doExportMaxChargePowerData = function (req, res){
+	"use strict";
+	
+	if(!req.session.user){
+		res.send('session expired');
+		return;
+	}
+	
+	var ctl = {};
+	ctl.index = parseInt(req.session.user.index),
+	ctl.code = parseInt(req.session.user.code),
+	ctl.cid = String(req.session.user.cid);
+	
+	exportMaxChargePower(ctl, function (result){
+		res.send(result);
+	});
+};
+
+exports.doExportMaxDischargePowerData = function (req, res){
+	"use strict";
+	
+	if(!req.session.user){
+		res.send('session expired');
+		return;
+	}
+	
+	var ctl = {};
+	ctl.index = parseInt(req.session.user.index),
+	ctl.code = parseInt(req.session.user.code),
+	ctl.cid = String(req.session.user.cid);
+	
+	exportMaxDischargePower(ctl, function (result){
+		res.send(result);
+	});
+};
+
 exports.doAddUser = function (req, res){
 	"use strict";	
 
@@ -756,8 +784,74 @@ exports.getLights1 = function (req, res) {
 	});
 };
 
+exports.getTraffic = function (req, res){
+	"use strict";
+	
+	if(!req.session.user){
+		res.send('session expired');
+		return;
+	}
+	var idx = parseInt(req.session.user.index),
+		code = parseInt(req.session.user.code),
+		cid = String(req.session.user.cid);
+	
+	db.getCtlUsefulData({index:idx, code:code, cid:cid},function(result){
+		res.send(result);
+	});
+};
+
+exports.getMaxChargePower = function (req, res){
+	"use strict";
+	
+	if(!req.session.user){
+		res.send('session expired');
+		return;
+	}
+	var idx = parseInt(req.session.user.index),
+		code = parseInt(req.session.user.code),
+		cid = String(req.session.user.cid);
+	
+	db.getCtlLightsMaxPowers({index:idx, code:code, cid:cid},function(result){
+		if(result){
+			for(var i in result){
+				for(var t in times){
+					if(result[i].hasOwnProperty(times[t])){
+						result[i][times[t]] = result[i][times[t]].cpower;
+					}
+				}
+			}
+		}
+		res.send(result);
+	});
+};
+
+exports.getMaxDischargePower = function (req, res){
+	"use strict";
+	
+	if(!req.session.user){
+		res.send('session expired');
+		return;
+	}
+	var idx = parseInt(req.session.user.index),
+		code = parseInt(req.session.user.code),
+		cid = String(req.session.user.cid);
+	
+	db.getCtlLightsMaxPowers({index:idx, code:code, cid:cid},function(result){
+		if(result){
+			for(var i in result){
+				for(var t in times){
+					if(result[i].hasOwnProperty(times[t])){
+						result[i][times[t]] = result[i][times[t]].dpower;
+					}
+				}
+			}
+		}
+		res.send(result);
+	});
+};
+
 exports.doUpdateLight = function (req, res) {
-"use strict";
+	"use strict";
 	
 	if(!req.session.user){
 		res.send('session expired');
@@ -940,6 +1034,18 @@ exports.light = function(req, res){
   	res.render('light', { title: 'Light'});
 };
 
+exports.traffic = function(req, res){
+	"use strict";
+	
+  	res.render('traffic', { title: 'Traffic'});
+};
+
+exports.maxpower = function(req, res){
+	"use strict";
+	
+  	res.render('maxpower', { title: 'MaxPower'});
+};
+
 exports.admin = function(req, res){
 	"use strict";
 	
@@ -1067,7 +1173,8 @@ var updateMaxPower = function(){
 				setTimeout(updateMaxPower,5000);
 				udpateMap[datetime] = true;
 			}else{
-				updateUserLoop(date,users,curTime,function(result){
+				var fieldName = curTime.replace(":00","");
+				updateUserLoop(date,users,fieldName,function(result){
 					setTimeout(updateMaxPower,5000);
 					updateMap[datetime] = true;
 				});
