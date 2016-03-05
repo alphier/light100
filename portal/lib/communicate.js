@@ -5,7 +5,7 @@ exports.communicate = function (spec) {
 		db = require('./dataBase'),
 		dp = require('./dgram_protocal'),
 		server = dgram.createSocket('udp4'),
-		DIS_TIME = 30 * 60 * 1000,	//断线时长设置为30分钟
+		DIS_TIME = 60 * 1000,	//断线时长设置为30分钟
 		INTERVAL_TIME = 5000,
 		that = {},
 		eventListeners = {},
@@ -40,7 +40,7 @@ exports.communicate = function (spec) {
 			
 			//清理长时间未收到心跳的设备
 			for(var index in hashMap){
-				if(new Date() - hashMap[index].timestamp > DIS_TIME){
+				if(new Date() - hashMap[index].cnnTime > DIS_TIME){
 					db.updateControllerState({index:hashMap[index].index,code:hashMap[index].code,cid:hashMap[index].cid},0,function(res){});
 					var evt = new channelEvent({type:'controller-disconnect'});
 					dispatchEventListener(evt,index);
@@ -53,7 +53,8 @@ exports.communicate = function (spec) {
 			"use strict";
 
 			for(var id in hashMap){
-				if(hashMap[id].cnnCode === cnnCode){
+				if(hashMap[id].hasOwnProperty('cnnCode') && 
+					hashMap[id].cnnCode === cnnCode){
 					logger.info('@@@@@@Connecting... controller ' + cid + ' has the same cnnCode ' + cnnCode + ' with controller ' + hashMap[id].cid);
 					return true;
 				}
@@ -65,7 +66,7 @@ exports.communicate = function (spec) {
 
 			if(isCnnCodeExist(cid, cnnCode)){
 				var code = dp.newCnnCode();
-				console.log('@@@@@@newCnnCode is ' + code);
+				logger.info('@@@@@@newCnnCode is ' + code);
 				newCnnCode(cid, code, callback);
 			}
 			else{
@@ -97,6 +98,19 @@ exports.communicate = function (spec) {
 				}
 			}
 			return null;
+		},
+		initialHashMap = function(){
+			"use strict";
+			
+			hashMap = {};
+			db.getAllCtlers(function(ctls){
+				if(ctls){
+					for(var n in ctls){
+						var ctl = ctls[n];
+						hashMap[ctl._id] = ctl;
+					}
+				}
+			});
 		},
 		procRegister = function(data, callback){
 			"use strict";
@@ -178,9 +192,12 @@ exports.communicate = function (spec) {
 			"use strict";
 			
 			var idx = data[1],
-			code = data.readUInt16BE(2),
-			cid = data.readUInt32BE(4),
-			sec = data.readUInt32BE(8);
+				code = data.readUInt16BE(2),
+				cid = data.readUInt32BE(4),
+				sec = data.readUInt32BE(8),
+				pt = data.readUInt16BE(12),
+				vt = data.readUInt16BE(14),
+				tp = -50 + data.readUInt8(16)/2;
 			if(dp.verifyCnt(cid,sec)){
 				var scid = new Buffer(4);
 				scid.writeUInt32BE(cid,0);
@@ -209,14 +226,59 @@ exports.communicate = function (spec) {
 								db.getOneSetLight({index:idx,code:code,cid:scid},function(_lt){
 									var ltid = 255;
 									if(_lt) ltid = _lt.index;
-									dp.replyCnn(server,0,newCode,data.ip,data.port,setting,ltid,function(result){
-										if(result === -1) {
-											logger.debug('Connecting!!!Sending error...');
+									dp.replyCnn(server,0,newCode,data.ip,data.port,setting,ltid,function(rs){
+										if(rs === -1) {
+											logger.debug('Connecting!!!Reply error...');
 											callback('error');
 										}else {
-											logger.debug('Connecting!!!Sending succeed');
+											logger.debug('Connecting!!!Reply succeed');
+											if(hashMap.hasOwnProperty(result._id)){
+												hashMap[result._id].cnnTime = new Date();
+												hashMap[result._id].cnnCode = newCode;
+												hashMap[result._id].people = pt;
+												hashMap[result._id].vehicle = vt;
+												hashMap[result._id].temperature = tp;
+												if(hashMap[result._id].state !== 1){
+													//当hashMap中有且状态为未连接时
+													hashMap[result._id].state = 1;
+													var evt = new channelEvent({type:'controller-connect',data:hashMap[result._id]});
+													dispatchEventListener(evt,result._id);
+												}else{
+													//当hashMap中有且状态为连接时
+													var evt = new channelEvent({type:'update-data',data:hashMap[result._id]});
+													dispatchEventListener(evt,result._id);
+												}
+											}else{
+												//当hashMap中没有时
+												result.cnnTime = new Date();
+												result.cnnCode = newCode;
+												result.people = pt;
+												result.vehicle = vt;
+												result.temperature = tp;
+												result.state = 1;
+												hashMap[result._id] = result;
+												var evt = new channelEvent({type:'controller-connect',data:result});
+												dispatchEventListener(evt,result._id);
+											}
+											var bSave = data.readUInt8(17);
+											if(bSave === 1){
+												db.saveUsefulData({index:idx,code:code,cid:scid,
+													people:pt,vehicle:vt,temperature:tp,time:new Date()},
+												function(saveResult){
+														if(saveResult == 'success') 
+															logger.info('saveUsefulData success!');
+														else 
+															logger.error('saveUsefulData failed!');
+												});
+											}
 											db.updateControllerState({index:idx,code:code,cid:scid},1,function(res){
-												db.getController({index:idx,code:code,cid:scid},function(nctl){
+												if(res === 'success'){
+													logger.info('connecting...update controller state!',JSON.stringify({index:idx,code:code,cid:scid}));
+												}else{
+													logger.error('connecting...update controller error!',JSON.stringify({index:idx,code:code,cid:scid}));
+												}
+												callback(res);
+												/*db.getController({index:idx,code:code,cid:scid},function(nctl){
 													if(nctl){
 														nctl.people = data.readUInt16BE(12);
 														nctl.vehicle = data.readUInt16BE(14);
@@ -226,15 +288,13 @@ exports.communicate = function (spec) {
 															db.saveUsefulData({index:idx,code:code,cid:scid,
 																people:nctl.people,vehicle:nctl.vehicle,
 																temperature:nctl.temperature,time:new Date()},
-															function(result){
-																	if(result == 'success') 
+															function(saveResult){
+																	if(saveResult == 'success') 
 																		logger.info('saveUsefulData success!');
 																	else 
 																		logger.error('saveUsefulData failed!');
 															});
 														}
-														//var evt = new channelEvent({type:'controller-connect',data:nctl});
-														//dispatchEventListener(evt,nctl._id);
 														if(!hashMap.hasOwnProperty(nctl._id)){
 															logger.info('Connecting...adding controller to hashmap!!!',scid,' hashKey:', nctl._id);
 															hashMap[nctl._id] = nctl;
@@ -251,16 +311,16 @@ exports.communicate = function (spec) {
 														logger.info('Connecting...getController failed!!!',scid);
 													}
 													callback('succeed');
-												});
-											});
-										}
-									});	
-								});
-                            });														
-						});								
-					}
-				});						
-			}
+												});*/
+											});//updateControllerState
+										}//reply succeed
+									});	//replyCnn
+								});//getOneSetLight
+                            });	//newCnnCode													
+						});	//getSettingLight					
+					}//getController succeed
+				});	//getController				
+			}//dp.verifyCnt
 			else {
 				logger.info('Connecting...verfiy failed...idx:',idx,' code:',code,' cid:',cid,' sec:',sec);
 				dp.replyCnn(server,2,0,data.ip,data.port,null,null,function(res){
@@ -284,7 +344,7 @@ exports.communicate = function (spec) {
 			if(ctl_idx){
 				logger.debug('Getting...Found controller!!!');
 				var ctl = hashMap[ctl_idx];
-				hashMap[ctl_idx].timestamp = new Date();
+				hashMap[ctl_idx].cnnTime = new Date();
 				db.getLight({index:ctl.index,code:ctl.code,cid:ctl.cid},ltId,function(lt){
 					if(!lt){
 						logger.debug('Getting...Not found light ', ltId);
@@ -357,7 +417,7 @@ exports.communicate = function (spec) {
 			var ctl_idx = findCtlByCnnCode(cnn_code);
 			if(ctl_idx){
 				var ctl = hashMap[ctl_idx];				
-				hashMap[ctl_idx].timestamp = new Date();
+				hashMap[ctl_idx].cnnTime = new Date();
 				lt.uindex = ctl.index;
 				lt.ucode = ctl.code;
 				lt.cid = ctl.cid;
@@ -563,6 +623,8 @@ exports.communicate = function (spec) {
 		});
 		
 		server.bind(1000);
+		
+		initialHashMap();
 		
 		setInterval(function(){
 			handleInstruction();

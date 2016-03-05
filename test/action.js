@@ -234,7 +234,7 @@ client.on('message', function (msg, remote) {
 		
 		var sec_code = data.readUInt32BE(3);
 			sec_code = String(getCnnCode(sec_code,'XUKE')),	
-			console.log(dtstr() + ' receive connect reply...', sec_code);
+			console.log(dtstr() + ' receive connect reply...', sec_code, ' buffer:',msg);
 		
 		for(var i=0;i<5;i++){
 			pMsg = putInst(sec_code,i);
@@ -244,7 +244,7 @@ client.on('message', function (msg, remote) {
 			});
 		}
 		
-		for(var i=0;i<60;i++){
+		for(var i=0;i<5;i++){
 			gMsg = getInst(sec_code,i);
 			client.send(gMsg, 0, gMsg.length, PORT, HOST, function(err, bytes) {
 				if (err) throw err;
@@ -267,7 +267,7 @@ client.on('message', function (msg, remote) {
 			console.log(dtstr() + ' light has no setting!!!');
 			return;
 		}
-		console.log(dtstr() + ' receive getting reply...', ' buffer:',buffer);
+		console.log(dtstr() + ' receive getting reply...', ' msg:',msg);
 		break;
 	case 41:
 		console.log(dtstr() + ' receive putting reply...', ' buffer:',buffer);

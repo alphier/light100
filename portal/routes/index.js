@@ -88,7 +88,10 @@ var recaculateCtlerInfo = function (idx, co, ci, callback){
 					else {
 						bs = "no-broken";
 					}
-					callback({index:ct.index,code:ct.code,cid:ct.cid,state:ct.state,name:ct.name,
+					var cTime = -1;
+					if(ct.hasOwnProperty('cnnTime'))
+						cTime = ct.cnnTime;
+					callback({index:ct.index,code:ct.code,cid:ct.cid,state:ct.state,name:ct.name,cnnTime:cTime,
 						lightCount:result.length,chargeState:cs,chargeNum:c,lightState:os,lightNum:o,
 						brokenState:bs,brokenNum:b});
 				}
@@ -294,7 +297,10 @@ function doGetCtlersInfos(ctlers, infos, callback){
 				else {
 					bs = "no-broken";
 				}
-				infos.push({index:ctl.index,code:ctl.code,cid:ctl.cid,name:ctl.name,state:ctl.state,
+				var cTime = -1;
+				if(ctl.hasOwnProperty('cnnTime'))
+					cTime = ctl.cnnTime;
+				infos.push({index:ctl.index,code:ctl.code,cid:ctl.cid,name:ctl.name,state:ctl.state,cnnTime:cTime,
 							lightCount:result.length,chargeState:cs,chargeNum:c,lightState:os,lightNum:o,
 							brokenState:bs,brokenNum:b});
 				doGetCtlersInfos(ctlers,infos,callback);
@@ -1053,28 +1059,6 @@ exports.admin = function(req, res){
 };
 
 //! 保存
-var userLoop = function (datetime,users,callback){
-	"use strict";
-	
-	var user = users.pop();
-	if(!user){
-		callback('success');
-		return;
-	}
-	
-	db.getAllControllers(user,function(ctls){
-		if(ctls && ctls.length > 0){
-			controllerLoop(datetime,ctls,function(result){
-				userLoop(datetime,users,callback);
-			});
-		}else{
-			controllerLoop(datetime,[],function(result){
-				userLoop(datetime,users,callback);
-			});
-		}
-	});
-};
-
 var controllerLoop = function (datetime,ctls,callback){
 	"use strict";
 	
@@ -1095,14 +1079,15 @@ var saveMaxPower = function(){
 
 	var date = moment().format("YYYY-MM-DD");
 	//凌晨0点开始添加一条当天的记录
-	if("00:00" === moment().format("HH:mm") && 
-		!savedMap.hasOwnProperty(date)){
-		db.getAllUsers(function(users){
-			if(!users || users.length === 0){
-				setTimeout(saveMaxPower,5000);
-				savedMap[date] = true;
+	if("00:00" === moment().format("HH:mm") && !savedMap.hasOwnProperty(date)){
+		db.getAllCtlers(function(ctls){
+			if(ctls && ctls.length > 0){
+				controllerLoop(date,ctls,function(result){
+					setTimeout(saveMaxPower,5000);
+					savedMap[date] = true;
+				});
 			}else{
-				userLoop(date,users,function(result){
+				controllerLoop(date,[],function(result){
 					setTimeout(saveMaxPower,5000);
 					savedMap[date] = true;
 				});
@@ -1114,28 +1099,6 @@ var saveMaxPower = function(){
 };
 
 //! 更新
-var updateUserLoop = function (datetime,users,field,callback){
-	"use strict";
-	
-	var user = users.pop();
-	if(!user){
-		callback('success');
-		return;
-	}
-	
-	db.getAllControllers(user,function(ctls){
-		if(ctls && ctls.length > 0){
-			updateControllerLoop(datetime,ctls,field,function(result){
-				updateUserLoop(datetime,users,field,callback);
-			});
-		}else{
-			updateControllerLoop(datetime,[],field,function(result){
-				updateUserLoop(datetime,users,field,callback);
-			});
-		}
-	});
-};
-
 var updateControllerLoop = function(datetime,ctls,field,callback){
 	"use strict";
 	
@@ -1146,8 +1109,8 @@ var updateControllerLoop = function(datetime,ctls,field,callback){
 	}
 	db.getMaxChargePower(ctl,function(maxCPower){
 		db.getMaxDischargePower(ctl,function(maxDPower){
-			if(!maxCPower) maxCPower = 0;
-			if(!maxDPower) maxDPower = 0;
+			if(!maxCPower) maxCPower = -1;
+			if(!maxDPower) maxDPower = -1;
 			var updates = {};
 			updates[field] = {cpower:maxCPower,dpower:maxDPower};
 			db.updateMaxPower(datetime,ctl,updates,function(result){
@@ -1168,13 +1131,16 @@ var updateMaxPower = function(){
 		curTime == '10:00' || curTime == '11:00' || curTime == '12:00' || curTime == '13:00' || 
 		curTime == '14:00' || curTime == '15:00' || curTime == '16:00' || curTime == '17:00' ||
 		curTime == '18:00' || curTime == '19:00') && !updateMap.hasOwnProperty(datetime)){
-		db.getAllUsers(function(users){
-			if(!users || users.length === 0){
-				setTimeout(updateMaxPower,5000);
-				udpateMap[datetime] = true;
-			}else{
+		
+		db.getAllCtlers(function(ctls){
+			if(ctls && ctls.length > 0){
 				var fieldName = curTime.replace(":00","");
-				updateUserLoop(date,users,fieldName,function(result){
+				updateControllerLoop(date,ctls,fieldName,function(result){
+					setTimeout(updateMaxPower,5000);
+					updateMap[datetime] = true;
+				});
+			}else{
+				updateControllerLoop(date,[],fieldName,function(result){
 					setTimeout(updateMaxPower,5000);
 					updateMap[datetime] = true;
 				});
@@ -1185,6 +1151,47 @@ var updateMaxPower = function(){
 	}
 };
 
+var ctlers = [];
+var getAllCtlersMaxChargePower = function(){
+	"use strict";
+	
+	ctlers = [];
+	db.getAllCtlers(function(ctls){
+		if(ctls){
+			getCtlMaxChargePower(ctls,function(result){
+				sendMsgToRoom('onMaxCtlPowers',ctlers);
+				setTimeout(getAllCtlersMaxChargePower,15000);
+			});
+		}else{
+			getCtlMaxChargePower([],function(result){
+				setTimeout(getAllCtlersMaxChargePower,15000);
+			});
+		}
+	});
+};
+
+var getCtlMaxChargePower = function(ctls,callback){
+	var ctl = ctls.pop();
+	if(!ctl){
+		callback('success');
+		return;
+	}
+	db.getMaxChargePower(ctl,function(maxCPower){
+		db.getMaxDischargePower(ctl,function(maxDPower){
+			var mcp = -1,mdp = -1;
+			if(maxCPower) mcp = maxCPower;
+			if(maxDPower) mdp = maxDPower;
+			ctlers.push({index:ctl.index,code:ctl.code,cid:ctl.cid,cpower:mcp,dpower:mdp});
+			getCtlMaxChargePower(ctls,callback);
+		});
+	});
+};
+
+//00点生成当天数据
 saveMaxPower();
+
+//整点更新最大功率数据
 updateMaxPower();
 
+//每隔15s更新最大功率数据，发送到client端
+getAllCtlersMaxChargePower();

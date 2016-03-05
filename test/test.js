@@ -1,5 +1,6 @@
 var b = new Buffer(2);
-b.write('NA',0);
+b.write('NO',0);
+console.log('buffer:',b);
 
 //mongod --repair --dbpath /var/root/mongo
 //mongod --journal --dbpath /var/root/mongo -logpath /var/root/mongo/mongo.log --logappends

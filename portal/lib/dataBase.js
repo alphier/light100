@@ -78,11 +78,23 @@ exports.getSettingLights = function (ctl,callback) {
 exports.getAllControllers = function (user, callback) {
 	"use strict";
 	
-	db.controllers.find({$query:{index:user.index, code:user.code},$orderby:{cid:1}}, function(err, users){
-		if(err || !users || users.length === 0){
+	db.controllers.find({$query:{index:user.index, code:user.code},$orderby:{cid:1}}, function(err, ctls){
+		if(err || !ctls || ctls.length === 0){
 			callback(null);
 		} else {
-			callback(users);
+			callback(ctls);
+		}	
+	});	
+};
+
+exports.getAllCtlers = function (callback) {
+	"use strict";
+	
+	db.controllers.find({$query:{},$orderby:{cid:1}}, function(err, ctls){
+		if(err || !ctls || ctls.length === 0){
+			callback(null);
+		} else {
+			callback(ctls);
 		}	
 	});	
 };
@@ -158,7 +170,11 @@ exports.addLight = function (lt, callback) {
 exports.updateControllerState = function (ctl,st, callback){
 	"use strict";
 	
-	db.controllers.update({index:ctl.index, code:ctl.code, cid:ctl.cid}, {$set:{state:st}}, function(err, result){
+	var updates = {};
+	if(st === 0) updates["disTime"] = new Date();
+	if(st === 1) updates["cnnTime"] = new Date();
+	updates["state"] = st;
+	db.controllers.update({index:ctl.index, code:ctl.code, cid:ctl.cid}, {$set:updates}, function(err, result){
 		if(err) 
 			callback("failed");
 		else
