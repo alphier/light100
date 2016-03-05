@@ -469,6 +469,18 @@ exports.updateMaxPower = function(datetime,ctl,updates,callback){
 	});
 };
 
+exports.updateCtlUpdateTime = function(ctl,time,callback){
+	"use strict";
+	
+	db.controllers.update({index:ctl.index,code:ctl.code,cid:ctl.cid},{$set:{updateTime:time}},function(err,result){
+		if(err){
+			callback('failed');
+		} else {
+			callback('succeed');
+		}
+	});
+};
+
 exports.getCtlLightsMaxPowers = function(ctl, callback){
 	"use strict";
 	
@@ -508,7 +520,7 @@ exports.updateLightSetting = function (ctl, ltid, callback) {
 exports.getOneSetLight = function (ctl, callback){
 	"use strict";
 	
-	db.lights.findOne({uindex:ctl.index, ucode:ctl.code, cid:ctl.cid, bset:1}, function(err, lt){
+	db.lights.findOne({uindex:ctl.index, ucode:ctl.code, cid:ctl.cid, bSet:1}, function(err, lt){
 		if(err || !lt){
 			callback(null);
 		} else {
@@ -520,7 +532,7 @@ exports.getOneSetLight = function (ctl, callback){
 exports.getNextOneSetLight = function (ctl, ltid, callback){
 	"use strict";
 	
-	db.lights.findOne({uindex:ctl.index, ucode:ctl.code, cid:ctl.cid, bset:1, index:{$ne:ltid}}, function(err, lt){
+	db.lights.findOne({uindex:ctl.index, ucode:ctl.code, cid:ctl.cid, bSet:1, index:{$ne:ltid}}, function(err, lt){
 		if(err || !lt){
 			callback(null);
 		} else {

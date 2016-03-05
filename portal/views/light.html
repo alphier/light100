@@ -37,7 +37,7 @@
 		<a href="#" id="clearAll" class="easyui-linkbutton">
 			<span style="font-size:14px;">一键清除</span>
 		</a>
-		<span style="font-size:14px;">当前时间：</span>
+		<span style="font-size:14px;">已更新时长：</span>
 		<input class="easyui-textbox" type="text" id="currTime" name="currTime" style="width:130px;height:20px;padding:5px" data-options="readonly:true">
 		<a href="/traffic" id="exportdata" class="btn" href="#">
 			<span style="font-size:16px;">流量数据</span>
@@ -164,7 +164,7 @@
                         }">
 				<span style="font-size:12px;font-weight: bolder">电池电量</span>
 				</th>
-				<th data-options="field:'temp',width:40,
+				<th data-options="field:'temp',width:50,
 						formatter:function(value,row){
 							if(row.state === -1)
 								return '';
@@ -197,7 +197,7 @@
                         }">
 				<span style="font-size:12px;font-weight: bolder">容量</span>
 				</th>
-				<th data-options="field:'pdate',width:75,
+				<th data-options="field:'pdate',width:80,
 						formatter:function(value,row){
 							if(row.state === -1)
 								return '';
@@ -236,7 +236,7 @@
                         }">
 				<span style="font-size:12px;font-weight: bolder">自动方式</span>
 				</th>
-				<th data-options="field:'ontime',width:70,
+				<th data-options="field:'ontime',width:55,
 						styler:function(value,row,index){
 							return 'background-color:#aaee00;';
 						},
@@ -260,7 +260,7 @@
                         }">
 				<span style="font-size:12px;font-weight: bolder">光控电压</span>
 				</th>
-				<th data-options="field:'abright',width:50,
+				<th data-options="field:'abright',width:40,
 						styler:function(value,row,index){
 							if(row.curTime === 1)
 								return 'background-color:yellow;';
@@ -275,7 +275,7 @@
                         }">
 				<span style="font-size:12px;font-weight: bolder">1亮度</span>
 				</th>
-				<th data-options="field:'atime',width:50,
+				<th data-options="field:'atime',width:40,
 						styler:function(value,row,index){
 							if(row.curTime === 1)
 								return 'background-color:yellow;';
@@ -290,7 +290,7 @@
                         }">
 				<span style="font-size:12px;font-weight: bolder">1时间</span>
 				</th>
-				<th data-options="field:'bbright',width:50,
+				<th data-options="field:'bbright',width:40,
 						styler:function(value,row,index){
 							if(row.curTime === 2)
 								return 'background-color:yellow;';
@@ -305,7 +305,7 @@
                         }">
 				<span style="font-size:12px;font-weight: bolder">2亮度</span>
 				</th>
-				<th data-options="field:'btime',width:50,
+				<th data-options="field:'btime',width:40,
 						styler:function(value,row,index){
 							if(row.curTime === 2)
 								return 'background-color:yellow;';
@@ -320,7 +320,7 @@
                         }">
 				<span style="font-size:12px;font-weight: bolder">2时间</span>
 				</th>
-				<th data-options="field:'cbright',width:50,
+				<th data-options="field:'cbright',width:40,
 						styler:function(value,row,index){
 							if(row.curTime === 3)
 								return 'background-color:yellow;';
@@ -335,7 +335,7 @@
                         }">
 				<span style="font-size:12px;font-weight: bolder">3亮度</span>
 				</th>
-				<th data-options="field:'ctime',width:50,
+				<th data-options="field:'ctime',width:40,
 						styler:function(value,row,index){
 							if(row.curTime === 3)
 								return 'background-color:yellow;';
@@ -350,7 +350,7 @@
                         }">
 				<span style="font-size:12px;font-weight: bolder">3时间</span>
 				</th>
-				<th data-options="field:'dbright',width:50,
+				<th data-options="field:'dbright',width:40,
 						styler:function(value,row,index){
 							if(row.curTime === 4)
 								return 'background-color:yellow;';
@@ -365,7 +365,7 @@
                         }">
 				<span style="font-size:12px;font-weight: bolder">4亮度</span>
 				</th>
-				<th data-options="field:'dtime',width:50,
+				<th data-options="field:'dtime',width:40,
 						styler:function(value,row,index){
 							if(row.curTime === 4)
 								return 'background-color:yellow;';
@@ -380,7 +380,7 @@
                         }">
 				<span style="font-size:12px;font-weight: bolder">4时间</span>
 				</th>
-				<th field='bSet' width=80 align='center' formatter="formatSetting">
+				<th field='bSet' width=100 align='center' formatter="formatSetting">
 				<span style="font-size:12px;font-weight: bolder">操作</span>
 				</th>
 			</tr>
@@ -563,14 +563,31 @@ function chooseChangeFileds(Old, New){
 	return na;
 };
 
-function loadSystemTime() { 
+var	updateTime = "N/A",
+	lastTime = 0;
+function setUpdateTime(){
+	var elapsed = "";
+	if(updateTime === "N/A"){
+		elapsed = updateTime;
+	}else{
+		var lastSeconds = parseInt((new Date() - updateTime)/1000),
+			days = Math.floor(lastSeconds / 1440 / 60),
+			hours = Math.floor((lastSeconds - days * 1440 * 60) / 3600),
+			minutes = Math.floor((lastSeconds - days * 1440 * 60 - hours * 3600) / 60),
+			seconds = (lastSeconds - days * 1440 * 60 - hours * 3600 - minutes *60);
+		elapsed = days + ' 天 ' + hours + ' 时 ' + minutes + ' 分 ' + seconds + ' 秒';
+	}
+	if(new Date() - lastTime > 15*1000){
+		$.get('/getCtlUpdateTime?'+new Date(), {}, function(data){ 
+			if(data && data !== 'failed')
+				updateTime = new Date(data);
+		});
+		lastTime = new Date();
+	}
+	$("#currTime").textbox('setText',elapsed);
+	setTimeout("setUpdateTime()", 1000);
+}
 
-	$.get('/getTime?'+new Date(), {}, function(data){ 
-		if (window.scClock) 
-			window.scClock.updateTime(data);
-	}); 
-	setTimeout("loadSystemTime()", 60000*15); 
-} 
 var l = window.location.href.split('/'),
 	url = 'http://' + l[2];
 var socket = io.connect(url+':8080');
@@ -593,7 +610,7 @@ socket.on('onLightGetSet', function (argument) {
 	    	if(rows[i].index === argument.index){
 	    		$('#dg').datagrid('updateRow',{
 					index: i,
-					row: {bSet: ''}
+					row: argument
 				});
 	    		break;
 	    	}
@@ -626,8 +643,10 @@ socket.on('onLightPutSet', function (argument) {
     	setProcess(parseInt(argument.index),parseInt(argument.curTime));
 });
 
-loadSystemTime();
-startupClock();	
+window.onload = function(){
+	
+	setUpdateTime();
+}
 
 function formatSetting(value,row){
 	if(value === 1)
@@ -708,7 +727,8 @@ $('#readItem').click(function(){
 	var index=$('#currLight').textbox('getValue')+'';
 	if(index === '') return;
 	index = parseInt(index);
-	var row=$("#dg")[0].data.rows[index];
+	var rows = $('#dg').datagrid('getRows');
+	var row = rows[index];
 	if(row.state === 1) return;
 	$('#ctrltype').combobox('setValue',row.ctltype);
 	$('#autotype').combobox('setValue',row.autotype);

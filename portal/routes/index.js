@@ -735,6 +735,23 @@ exports.getCurrentTime = function (req, res) {
 	res.send(datetime);
 };
 
+exports.doGetLastestCtlUpdateTime = function (req, res) {
+	"use strict";
+	
+	if(!req.session.user){
+		res.send('session expired');
+		return;
+	}
+	logger.info("doGetLastestCtlUpdateTime...");
+	var ctl = {};
+	ctl.index = parseInt(req.session.user.index),
+	ctl.code = parseInt(req.session.user.code),
+	ctl.cid = String(req.session.user.cid);
+	udpServer.getLastesCtlUpdateTime(ctl,function(time){
+		res.send(time);
+	});
+};
+
 exports.getCtlerLightsInfo = function (req, res){
 	"use strict";
 	

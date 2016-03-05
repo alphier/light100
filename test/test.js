@@ -1,5 +1,5 @@
 var b = new Buffer(2);
-b.write('NO',0);
+b.write('CB',0);
 console.log('buffer:',b);
 
 //mongod --repair --dbpath /var/root/mongo

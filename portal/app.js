@@ -84,6 +84,7 @@ app.post('/maxChargePower.json', routes.getMaxChargePower);
 app.post('/maxDischargePower.json', routes.getMaxDischargePower);
 
 app.get('/getTime', routes.getCurrentTime);
+app.get('/getCtlUpdateTime', routes.doGetLastestCtlUpdateTime);
 
 app.get('/admin', authAdmin);
 app.get('/admin', routes.admin);

@@ -12,7 +12,7 @@ exports.communicate = function (spec) {
 		hashMap = {},
 		msgQueue = [],
 		logger = spec.logger,
-		exlog = spec.exLogger,		
+		exlog = spec.exLogger,
 		channelEvent  = function (spec) {
 			"use strict";
 			
@@ -40,11 +40,13 @@ exports.communicate = function (spec) {
 			
 			//清理长时间未收到心跳的设备
 			for(var index in hashMap){
-				if(new Date() - hashMap[index].cnnTime > DIS_TIME){
+				if(hashMap[index].state === 1 &&
+					new Date() - hashMap[index].cnnTime > DIS_TIME){
 					db.updateControllerState({index:hashMap[index].index,code:hashMap[index].code,cid:hashMap[index].cid},0,function(res){});
 					var evt = new channelEvent({type:'controller-disconnect'});
 					dispatchEventListener(evt,index);
-					delete hashMap[index];
+					//delete hashMap[index];
+					hashMap[index].state = 0;
 					break;
 				}
 			}
@@ -338,13 +340,15 @@ exports.communicate = function (spec) {
 			"use strict";
 			
 			var sec_code = data.readUInt32BE(1),
-			ltId = data.readUInt8(5),
-			cnn_code = dp.getCnnCode(sec_code);
-			var ctl_idx = findCtlByCnnCode(cnn_code);
+				ltId = data.readUInt8(5),
+				cnn_code = dp.getCnnCode(sec_code),
+				ctl_idx = findCtlByCnnCode(cnn_code);
 			if(ctl_idx){
 				logger.debug('Getting...Found controller!!!');
-				var ctl = hashMap[ctl_idx];
-				hashMap[ctl_idx].cnnTime = new Date();
+				var ctl = hashMap[ctl_idx],
+					curTime = new Date();
+				hashMap[ctl_idx].cnnTime = curTime;
+				hashMap[ctl_idx].updateTime = curTime;
 				db.getLight({index:ctl.index,code:ctl.code,cid:ctl.cid},ltId,function(lt){
 					if(!lt){
 						logger.debug('Getting...Not found light ', ltId);
@@ -358,11 +362,13 @@ exports.communicate = function (spec) {
 							}
 						});
 					} else {
+						db.updateCtlUpdateTime(ctl,curTime,function(upResult){});
 						if(lt.bSet){
 							logger.debug('Getting...Light has setting ',ltId);
 							db.getNextOneSetLight({index:ctl.index,code:ctl.code,cid:ctl.cid},ltId,function(_lt){
 								var ltid = 255;
-								if(_lt) ltid = _lt.index;
+								if(_lt) 
+									ltid = _lt.index;
 								dp.replyGet(server,0,data.ip,data.port,cnn_code,lt,ltid,function(bytes){
 									if(bytes === -1) {
 										logger.debug('Getting!!!Sending error...');
@@ -427,24 +433,33 @@ exports.communicate = function (spec) {
 						//如果是更新状态，则不设置
 						if(qlt.bSet === 1){
 							logger.info('light ', lt.index, ' is setting status, cannot be udpated!');
-							callback('error');
+							dp.replyPut(server,2,data.ip,data.port,lt.index,function(bytes){
+								if(bytes === -1) {
+									logger.debug('Putting!!!Sending error...');
+									callback('error');
+								}else {
+									logger.debug('Putting!!!Sending succeed');
+									callback('succeed');
+								}
+							});
+						}else{
+							logger.debug('Putting...Found light updating...index',lt.index,' query result:{', qlt._id.toString(),',',qlt.uindex,',',qlt.ucode,',',qlt.cid,'}');
+							db.updateLight1(qlt._id.toString(), lt, function(result){
+								if(result === 'success'){
+									dp.replyPut(server,0,data.ip,data.port,lt.index,function(bytes){
+										if(bytes === -1) {
+											logger.debug('Putting!!!Sending error...');
+											callback('error');
+										}else {
+											logger.debug('Putting!!!Sending succeed');
+											callback('succeed');
+											var evt = new channelEvent({type:'light-putparams',data:lt});
+											dispatchEventListener(evt,qlt._id.toString());
+										}
+									});
+								}
+							});
 						}
-						logger.debug('Putting...Found light updating...index',lt.index,' query result:{', qlt._id.toString(),',',qlt.uindex,',',qlt.ucode,',',qlt.cid,'}');
-						db.updateLight1(qlt._id.toString(), lt, function(result){
-							if(result === 'success'){
-								dp.replyPut(server,0,data.ip,data.port,lt.index,function(bytes){
-									if(bytes === -1) {
-										logger.debug('Putting!!!Sending error...');
-										callback('error');
-									}else {
-										logger.debug('Putting!!!Sending succeed');
-										callback('succeed');
-										var evt = new channelEvent({type:'light-putparams',data:lt});
-										dispatchEventListener(evt,qlt._id.toString());
-									}
-								});
-							}
-						});
 					}else{
 						logger.debug('Putting...Not found light adding...',lt.index);
 						db.addLight(lt, function(result){
@@ -589,6 +604,23 @@ exports.communicate = function (spec) {
 			return hashMap[deviceId];
 		}
 		return null;
+	};
+	
+	that.getLastesCtlUpdateTime = function(ctl,callback){
+		"use strict";
+		
+		for(var c in hashMap){
+			if(hashMap[c].index === ctl.index &&
+				hashMap[c].code === ctl.code &&
+				hashMap[c].cid === ctl.cid){
+				if(hashMap[c].hasOwnProperty('updateTime'))
+					callback(hashMap[c].updateTime);
+				else
+					callback('failed');
+				return;
+			}
+		}
+		callback('failed');
 	};
 		
 	that.start = function () {

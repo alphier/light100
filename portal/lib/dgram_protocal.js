@@ -216,6 +216,11 @@ dp.replyPut = function (conn, state, ip, port, ltid, callback){
 		ab.writeUInt8(0x1f,0);
 		ab.write('ER',1);
 	}
+	if(state === 2){
+		ab = new Buffer(3);
+		ab.writeUInt8(0x1f,0);
+		ab.write('CB',1);
+	}
 	conn.send(ab, 0, size, port, ip, function (err, bytes){	
 		if(err) {
 			if(callback) callback(-1);

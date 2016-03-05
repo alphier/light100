@@ -234,23 +234,26 @@ client.on('message', function (msg, remote) {
 		
 		var sec_code = data.readUInt32BE(3);
 			sec_code = String(getCnnCode(sec_code,'XUKE')),	
-			console.log(dtstr() + ' receive connect reply...', sec_code, ' buffer:',msg);
+			setLid = data.readUInt8(11);
+			console.log(dtstr() + ' receive connect reply...', sec_code, ' buffer:',msg,' lid:',setLid);
 		
-		for(var i=0;i<5;i++){
-			pMsg = putInst(sec_code,i);
-			client.send(pMsg, 0, pMsg.length, PORT, HOST, function(err, bytes) {
-				if (err) throw err;
-				console.log(dtstr() + 'Putting!!!' + HOST + ':' + PORT);
-			});
-		}
-		
-		for(var i=0;i<5;i++){
-			gMsg = getInst(sec_code,i);
+		//get instruction
+		if(setLid !== 255){
+			gMsg = getInst(sec_code,setLid);
 			client.send(gMsg, 0, gMsg.length, PORT, HOST, function(err, bytes) {
 				if (err) throw err;
 				console.log(dtstr() + 'Getting!!!' + HOST + ':' + PORT);
 			});
 		}
+		
+		//put instruction
+		/*for(var i=0;i<5;i++){
+			pMsg = putInst(sec_code,i);
+			client.send(pMsg, 0, pMsg.length, PORT, HOST, function(err, bytes) {
+				if (err) throw err;
+				console.log(dtstr() + 'Putting!!!' + HOST + ':' + PORT);
+			});
+		}*/
 		break;
 	case 31:
 		if(data[1] === 0x4e && data[2] === 0x41){
@@ -267,7 +270,29 @@ client.on('message', function (msg, remote) {
 			console.log(dtstr() + ' light has no setting!!!');
 			return;
 		}
+		if(data[1] === 0x4f && data[2] === 0x4b){
+			console.log(dtstr() + ' receive putting reply!!!',msg);
+			return;
+		}
+		if(data[1] === 0x45 && data[2] === 0x52){
+			console.log(dtstr() + ' receive putting reply!!!Controller not found:',msg);
+			return;
+		}
+		if(data[1] === 0x43 && data[2] === 0x42){
+			console.log(dtstr() + ' receive putting reply!!!Light has changed',msg);
+			return;
+		}
 		console.log(dtstr() + ' receive getting reply...', ' msg:',msg);
+		var sec_code = data.readUInt32BE(1);
+			sec_code = String(getCnnCode(sec_code,'XUKE')),	
+			nextLid = data.readUInt8(18);
+		if(nextLid !== 255){
+			gMsg = getInst(sec_code,nextLid);
+			client.send(gMsg, 0, gMsg.length, PORT, HOST, function(err, bytes) {
+				if (err) throw err;
+				console.log(dtstr() + 'Getting!!!' + HOST + ':' + PORT);
+			});
+		}
 		break;
 	case 41:
 		console.log(dtstr() + ' receive putting reply...', ' buffer:',buffer);
