@@ -119,7 +119,7 @@ var exportUsefulData = function(ctl,callback){
 				}
 				for(var id in result){
 					var data = moment(result[id].time).format('YYYY-MM-DD HH:mm:ss') + ',' + 
-							result[id].people + ',' + result[id].vehicle + ',' + result[id].temperature + '℃' + '\r\n';
+							result[id].people + ',' + result[id].vehicle + ',' + result[id].temperature + '\r\n';
 					fs.appendFile(fullpath,data,function(err){});
 				}
 				callback(filename);
