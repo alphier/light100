@@ -1196,8 +1196,8 @@ var getCtlMaxChargePower = function(ctls,callback){
 	db.getMaxChargePower(ctl,function(maxCPower){
 		db.getMaxDischargePower(ctl,function(maxDPower){
 			var mcp = -1,mdp = -1;
-			if(maxCPower) mcp = maxCPower;
-			if(maxDPower) mdp = maxDPower;
+			if(maxCPower !== null) mcp = maxCPower;
+			if(maxDPower !== null) mdp = maxDPower;
 			ctlers.push({index:ctl.index,code:ctl.code,cid:ctl.cid,cpower:mcp,dpower:mdp});
 			getCtlMaxChargePower(ctls,callback);
 		});
