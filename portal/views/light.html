@@ -6,6 +6,7 @@
 	<link rel="stylesheet" type="text/css" href="css/default/easyui.css">
 	<link rel="stylesheet" type="text/css" href="css/color.css">	
 	<link rel="stylesheet" type="text/css" href="css/icon.css">
+	<link rel="stylesheet" type="text/css" href="css/main.css">
 	<script type="text/javascript" src="lib/jquery.min.js"></script>
 	<script type="text/javascript" src="lib/jquery.easyui.min.js"></script>
 	<script type="text/javascript" src="lib/socket.io/socket.io.js"></script>
@@ -46,7 +47,7 @@
 			<span style="font-size:14px;margin-left:10px">充放功率</span>
 		</a>		
 	</div>	
-	<div style="margin-top:2px;">
+	<div id="settings" style="margin-top:2px;">
 		<!--<a href="/traffic" id="exportdata" class="btn" href="#">
 			<span style="font-size:14px;">流量/温度</span>
 		</a>
@@ -56,36 +57,36 @@
 		<span style="margin-left:495px"></span>
 		<span style="font-size:14pt;font-weight:bold;">设置项：</span>
 		<!--<span style="color:rgb(38,121,150);font-size:10pt;font-weight:bold;">控制方式</span>-->
-		<input id="ctrltype" class="easyui-combobox" style="width:55px;margin-left:100px;" value=3 data-options="valueField:'ctypeValue',textField:'ctypeName',data:ctypeData">
+		<input id="ctrltype" class="easyui-combobox" style="width:59px;margin-left:100px;" value=3 data-options="valueField:'ctypeValue',textField:'ctypeName',data:ctypeData">
 		<!--<span style="color:rgb(38,121,150);font-size:10pt;font-weight:bold;">自动方式</span>-->
-		<input id="autotype" class="easyui-combobox" style="width:55px;" value=2 data-options="valueField:'atypeValue',textField:'atypeName',data:atypeData">
+		<input id="autotype" class="easyui-combobox" style="width:59px;" value=2 data-options="valueField:'atypeValue',textField:'atypeName',data:atypeData">
 		<!--<span style="color:rgb(38,121,150);font-size:10pt;font-weight:bold;padding:1px;">开灯时间</span>-->
-		<input class="easyui-textbox" type="text" id="ontime" style="width:50px;height:20px">
+		<input class="easyui-textbox" type="text" id="ontime" style="width:59px;height:20px">
 		<!--<span style="color:rgb(38,121,150);font-size:10pt;font-weight:bold;">光控电压</span>-->
-		<input class="easyui-textbox" type="text" id="voltage" style="width:50px;height:20px" data-options="
+		<input class="easyui-textbox" type="text" id="voltage" style="width:59px;height:20px" data-options="
 						formatter:function(value,row){
                             return value + 'v';}
 						">
 		
 		<!--<span style="color:rgb(38,121,150);font-size:10pt;font-weight:bold;">1亮度</span>-->
-		<input class="easyui-textbox" type="text" id="onelight" style="width:42px;height:20px">
+		<input class="easyui-textbox" type="text" id="onelight" style="width:48px;height:20px">
 		<!--<span style="color:rgb(38,121,150);font-size:10pt;font-weight:bold;">1时间</span>-->
-		<input class="easyui-textbox" type="text" id="onetime" style="width:42px;height:20px">
+		<input class="easyui-textbox" type="text" id="onetime" style="width:48px;height:20px">
 		
 		<!--<span style="color:rgb(38,121,150);font-size:10pt;font-weight:bold;">2亮度</span>-->
-		<input class="easyui-textbox" type="text" id="twolight" style="width:42px;height:20px;padding:2px">
+		<input class="easyui-textbox" type="text" id="twolight" style="width:48px;height:20px;padding:2px">
 		<!--<span style="color:rgb(38,121,150);font-size:10pt;font-weight:bold;">2时间</span>-->
-		<input class="easyui-textbox" type="text" id="twotime" style="width:42px;height:20px;padding:2px">
+		<input class="easyui-textbox" type="text" id="twotime" style="width:48px;height:20px;padding:2px">
 		
 		<!--<span style="color:rgb(38,121,150);font-size:10pt;font-weight:bold;">3亮度</span>-->
-		<input class="easyui-textbox" type="text" id="threelight" style="width:42px;height:20px;padding:2px">
+		<input class="easyui-textbox" type="text" id="threelight" style="width:48px;height:20px;padding:2px">
 		<!--<span style="color:rgb(38,121,150);font-size:10pt;font-weight:bold;">3时间</span>-->
-		<input class="easyui-textbox" type="text" id="threetime" style="width:42px;height:20px;padding:2px">
+		<input class="easyui-textbox" type="text" id="threetime" style="width:48px;height:20px;padding:2px">
 		
 		<!--<span style="color:rgb(38,121,150);font-size:10pt;font-weight:bold;">4亮度</span>-->
-		<input class="easyui-textbox" type="text" id="fourlight" style="width:42px;height:20px;padding:2px">
+		<input class="easyui-textbox" type="text" id="fourlight" style="width:48px;height:20px;padding:2px">
 		<!--<span style="color:rgb(38,121,150);font-size:10pt;font-weight:bold;">4时间</span>-->
-		<input class="easyui-textbox" type="text" id="fourtime" style="width:42px;height:20px;padding:2px">
+		<input class="easyui-textbox" type="text" id="fourtime" style="width:48px;height:20px;padding:2px">
 	</div>
 	<div style="margin-top:2px;padding:2px;">
 	</div>
