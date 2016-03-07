@@ -1145,10 +1145,13 @@ var updateMaxPower = function(){
 	var curTime = moment().format("HH:mm"),
 		date = moment().format("YYYY-MM-DD"),
 		datetime = date + ' ' + curTime;
-	if((curTime == '06:00' || curTime == '07:00' || curTime == '08:00' || curTime == '09:00' ||
-		curTime == '10:00' || curTime == '11:00' || curTime == '12:00' || curTime == '13:00' || 
-		curTime == '14:00' || curTime == '15:00' || curTime == '16:00' || curTime == '17:00' ||
-		curTime == '18:00' || curTime == '19:00') && !updateMap.hasOwnProperty(datetime)){
+	if((curTime == '00:00' || curTime == '01:00' || curTime == '02:00' || curTime == '03:00' || 
+		curTime == '04:00' || curTime == '05:00' || curTime == '06:00' || curTime == '07:00' || 
+		curTime == '08:00' || curTime == '09:00' || curTime == '10:00' || curTime == '11:00' || 
+		curTime == '12:00' || curTime == '13:00' || curTime == '14:00' || curTime == '15:00' || 
+		curTime == '16:00' || curTime == '17:00' || curTime == '18:00' || curTime == '19:00' ||
+		curTime == '20:00' || curTime == '21:00' || curTime == '22:00' || curTime == '23:00') && 
+		!updateMap.hasOwnProperty(datetime)){
 		
 		db.getAllCtlers(function(ctls){
 			if(ctls && ctls.length > 0){
