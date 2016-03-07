@@ -255,7 +255,7 @@ client.on('message', function (msg, remote) {
 				if (err) throw err;
 				console.log(dtstr() + 'Getting!!!' + HOST + ':' + PORT);
 			});
-		}
+		}*/
 		
 		
 		//put instruction
@@ -266,7 +266,6 @@ client.on('message', function (msg, remote) {
 				console.log(dtstr() + 'Putting!!!' + HOST + ':' + PORT);
 			});
 		}
-		*/
 		
 		break;
 	case 31:
