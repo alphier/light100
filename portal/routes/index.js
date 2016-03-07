@@ -128,7 +128,7 @@ var exportUsefulData = function(ctl,callback){
 	});
 };
 
-var times = ['06','07','08','09','10','11','12','13','14','15','16','17','18','19'];
+var chargeTimes = ['06','07','08','09','10','11','12','13','14','15','16','17','18','19'];
 var exportMaxChargePower = function(ctl,callback){
 	"use strict";
 	
@@ -150,9 +150,9 @@ var exportMaxChargePower = function(ctl,callback){
 					var power = result[id];
 					var data = "";
 					data += power.time+",";
-					for(var t in times){
-						if(power.hasOwnProperty(times[t])){
-							var field = times[t],
+					for(var t in chargeTimes){
+						if(power.hasOwnProperty(chargeTimes[t])){
+							var field = chargeTimes[t],
 								maxPower = power[field];
 							if(maxPower.cpower === -1)
 								maxPower.cpower = "";
@@ -169,6 +169,7 @@ var exportMaxChargePower = function(ctl,callback){
 	});
 };
 
+var dischargeTimes = ['00','01','02','03','04','05','06','07','08','09','10','11','12','13','14','15','16','17','18','19','20','21','22','23'];
 var exportMaxDischargePower = function(ctl,callback){
 	"use strict";
 	
@@ -190,9 +191,9 @@ var exportMaxDischargePower = function(ctl,callback){
 					var power = result[id];
 					var data = "";
 					data += power.time+",";
-					for(var t in times){
-						if(power.hasOwnProperty(times[t])){
-							var field = times[t],
+					for(var t in dischargeTimes){
+						if(power.hasOwnProperty(dischargeTimes[t])){
+							var field = dischargeTimes[t],
 								maxPower = power[field];
 							if(maxPower.dpower === -1)
 								maxPower.dpower = "";
@@ -837,9 +838,9 @@ exports.getMaxChargePower = function (req, res){
 	db.getCtlLightsMaxPowers({index:idx, code:code, cid:cid},function(result){
 		if(result){
 			for(var i in result){
-				for(var t in times){
-					if(result[i].hasOwnProperty(times[t])){
-						result[i][times[t]] = result[i][times[t]].cpower;
+				for(var t in chargeTimes){
+					if(result[i].hasOwnProperty(chargeTimes[t])){
+						result[i][chargeTimes[t]] = result[i][chargeTimes[t]].cpower;
 					}
 				}
 			}
@@ -862,9 +863,9 @@ exports.getMaxDischargePower = function (req, res){
 	db.getCtlLightsMaxPowers({index:idx, code:code, cid:cid},function(result){
 		if(result){
 			for(var i in result){
-				for(var t in times){
-					if(result[i].hasOwnProperty(times[t])){
-						result[i][times[t]] = result[i][times[t]].dpower;
+				for(var t in dischargeTimes){
+					if(result[i].hasOwnProperty(dischargeTimes[t])){
+						result[i][dischargeTimes[t]] = result[i][dischargeTimes[t]].dpower;
 					}
 				}
 			}

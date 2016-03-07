@@ -440,6 +440,9 @@ exports.addMaxPower = function(data,callback){
 	
 	db.maxData.findOne({time:data.time,uindex:data.uindex,ucode:data.ucode,cid:data.cid},function(err,result){
 		if(err || !result){
+			data["00"] = {cpower:-1,dpower:-1};data["01"] = {cpower:-1,dpower:-1};
+			data["02"] = {cpower:-1,dpower:-1};data["03"] = {cpower:-1,dpower:-1};
+			data["04"] = {cpower:-1,dpower:-1};data["05"] = {cpower:-1,dpower:-1};
 			data["06"] = {cpower:-1,dpower:-1};data["07"] = {cpower:-1,dpower:-1};
 			data["08"] = {cpower:-1,dpower:-1};data["09"] = {cpower:-1,dpower:-1};
 			data["10"] = {cpower:-1,dpower:-1};data["11"] = {cpower:-1,dpower:-1};
@@ -447,6 +450,8 @@ exports.addMaxPower = function(data,callback){
 			data["14"] = {cpower:-1,dpower:-1};data["15"] = {cpower:-1,dpower:-1};
 			data["16"] = {cpower:-1,dpower:-1};data["17"] = {cpower:-1,dpower:-1};
 			data["18"] = {cpower:-1,dpower:-1};data["19"] = {cpower:-1,dpower:-1};
+			data["20"] = {cpower:-1,dpower:-1};data["21"] = {cpower:-1,dpower:-1};
+			data["22"] = {cpower:-1,dpower:-1};data["23"] = {cpower:-1,dpower:-1};
 			db.maxData.save(data, function(err, saved){
 				callback(saved);
 			});

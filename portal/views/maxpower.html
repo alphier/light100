@@ -45,117 +45,61 @@
 		</style>
 		<thead>
 			<tr>
-				<th data-options="field:'time',width:80,
-					formatter:function(value,row){
-						if(value === null || value === -1) return '';
-						var time = new Date(value);
-						return time.toLocaleDateString();
-                	}">
-				<span style="font-size:12px;font-weight:bolder">时间</span>
+				<th data-options="field:'time',width:100">
+				<span style="font-weight:bolder">时间</span>
 				</th>
-				<th data-options="field:'06',width:80,
-						formatter:function(value,row){
-							if(value === null || value === -1) return '';
-							return value + 'W';
-                        }">
-				<span style="font-size:12px;font-weight: bolder">6时</span>
+				<th data-options="field:'06',width:80,formatter:powerFormatter">
+				<span style="font-weight: bolder">6时</span>
 				</th>
-				<th data-options="field:'07',width:80,
-						formatter:function(value,row){
-							if(value === null || value === -1) return '';
-							return value + 'W';
-                        }">
-				<span style="font-size:12px;font-weight: bolder">7时</span>
+				<th data-options="field:'07',width:80,formatter:powerFormatter">
+				<span style="font-weight: bolder">7时</span>
 				</th>
-				<th data-options="field:'08',width:80,
-						formatter:function(value,row){
-							if(value === null || value === -1) return '';
-							return value + 'W';
-                        }">
-				<span style="font-size:12px;font-weight: bolder">8时</span>
+				<th data-options="field:'08',width:80,formatter:powerFormatter">
+				<span style="font-weight: bolder">8时</span>
 				</th>
-				<th data-options="field:'09',width:80,
-						formatter:function(value,row){
-							if(value === null || value === -1) return '';
-							return value + 'W';
-                        }">
-				<span style="font-size:12px;font-weight: bolder">9时</span>
+				<th data-options="field:'09',width:80,formatter:powerFormatter">
+				<span style="font-weight: bolder">9时</span>
 				</th>
-				<th data-options="field:'10',width:80,
-						formatter:function(value,row){
-							if(value === null || value === -1) return '';
-							return value + 'W';
-                        }">
-				<span style="font-size:12px;font-weight: bolder">10时</span>
+				<th data-options="field:'10',width:80,formatter:powerFormatter">
+				<span style="font-weight: bolder">10时</span>
 				</th>
-				<th data-options="field:'11',width:80,
-						formatter:function(value,row){
-							if(value === null || value === -1) return '';
-							return value + 'W';
-                        }">
-				<span style="font-size:12px;font-weight: bolder">11时</span>
+				<th data-options="field:'11',width:80,formatter:powerFormatter">
+				<span style="font-weight: bolder">11时</span>
 				</th>
-				<th data-options="field:'12',width:80,
-						formatter:function(value,row){
-							if(value === null || value === -1) return '';
-							return value + 'W';
-                        }">
-				<span style="font-size:12px;font-weight: bolder">12时</span>
+				<th data-options="field:'12',width:80,formatter:powerFormatter">
+				<span style="font-weight: bolder">12时</span>
 				</th>
-				<th data-options="field:'13',width:80,
-						formatter:function(value,row){
-							if(value === null || value === -1) return '';
-							return value + 'W';
-                        }">
-				<span style="font-size:12px;font-weight: bolder">13时</span>
+				<th data-options="field:'13',width:80,formatter:powerFormatter">
+				<span style="font-weight: bolder">13时</span>
 				</th>
-				<th data-options="field:'14',width:80,
-						formatter:function(value,row){
-							if(value === null || value === -1) return '';
-							return value + 'W';
-                        }">
-				<span style="font-size:12px;font-weight: bolder">14时</span>
+				<th data-options="field:'14',width:80,formatter:powerFormatter">
+				<span style="font-weight: bolder">14时</span>
 				</th>
-				<th data-options="field:'15',width:80,
-						formatter:function(value,row){
-							if(value === null || value === -1) return '';
-							return value + 'W';
-                        }">
-				<span style="font-size:12px;font-weight: bolder">15时</span>
+				<th data-options="field:'15',width:80,formatter:powerFormatter">
+				<span style="font-weight: bolder">15时</span>
 				</th>
-				<th data-options="field:'16',width:80,
-						formatter:function(value,row){
-							if(value === null || value === -1) return '';
-							return value + 'W';
-                        }">
-				<span style="font-size:12px;font-weight: bolder">16时</span>
+				<th data-options="field:'16',width:80,formatter:powerFormatter">
+				<span style="font-weight: bolder">16时</span>
 				</th>
-				<th data-options="field:'17',width:80,
-						formatter:function(value,row){
-							if(value === null || value === -1) return '';
-							return value + 'W';
-                        }">
-				<span style="font-size:12px;font-weight: bolder">17时</span>
+				<th data-options="field:'17',width:80,formatter:powerFormatter">
+				<span style="font-weight: bolder">17时</span>
 				</th>
-				<th data-options="field:'18',width:80,
-						formatter:function(value,row){
-							if(value === null || value === -1) return '';
-							return value + 'W';
-                        }">
-				<span style="font-size:12px;font-weight: bolder">18时</span>
+				<th data-options="field:'18',width:80,formatter:powerFormatter">
+				<span style="font-weight: bolder">18时</span>
 				</th>
-				<th data-options="field:'19',width:80,
-						formatter:function(value,row){
-							if(value === null || value === -1) return '';
-							return value + 'W';
-                        }">
-				<span style="font-size:12px;font-weight: bolder">19时</span>
+				<th data-options="field:'19',width:80,formatter:powerFormatter">
+				<span style="font-weight: bolder">19时</span>
 				</th>
 			</tr>
 		</thead>
 	</table>
 </body>
 <script type="text/javascript">
+
+function powerFormatter(value,row){
+	if(value === null || value === undefined || value === -1) return '';
+	return value + 'W';
+}
 
 function onLoadSuccess(data){
 	$('#dg')[0].data = jQuery.extend(true, {}, data);
@@ -185,13 +129,63 @@ $('#exportdata').click(function(){
 });
 
 $('#maxCPower').click(function(){
-	$('#dg').datagrid({url:'maxChargePower.json'});
+	$('#dg').datagrid({
+	    url:'maxChargePower.json',
+	    columns:[[
+	        {field:'time',title:'<span style="font-weight:bolder">时间</span>',width:100},
+	        {field:'06',title:'<span style="font-weight:bolder">6时</span>',width:80,formatter:powerFormatter},
+	        {field:'07',title:'<span style="font-weight:bolder">7时</span>',width:80,formatter:powerFormatter},
+	        {field:'08',title:'<span style="font-weight:bolder">8时</span>',width:80,formatter:powerFormatter},
+	        {field:'09',title:'<span style="font-weight:bolder">9时</span>',width:80,formatter:powerFormatter},
+	        {field:'10',title:'<span style="font-weight:bolder">10时</span>',width:80,formatter:powerFormatter},
+	        {field:'11',title:'<span style="font-weight:bolder">11时</span>',width:80,formatter:powerFormatter},
+	        {field:'12',title:'<span style="font-weight:bolder">12时</span>',width:80,formatter:powerFormatter},
+	        {field:'13',title:'<span style="font-weight:bolder">13时</span>',width:80,formatter:powerFormatter},
+	        {field:'14',title:'<span style="font-weight:bolder">14时</span>',width:80,formatter:powerFormatter},
+	        {field:'15',title:'<span style="font-weight:bolder">15时</span>',width:80,formatter:powerFormatter},
+	        {field:'16',title:'<span style="font-weight:bolder">16时</span>',width:80,formatter:powerFormatter},
+	        {field:'17',title:'<span style="font-weight:bolder">17时</span>',width:80,formatter:powerFormatter},
+	        {field:'18',title:'<span style="font-weight:bolder">18时</span>',width:80,formatter:powerFormatter},
+	        {field:'19',title:'<span style="font-weight:bolder">19时</span>',width:80,formatter:powerFormatter},
+	    ]]
+	});
+	//$('#dg').datagrid({url:'maxChargePower.json'});
 	$('#tips').text('充电功率');
 	$('#dg').datagrid('reload');
 });
 
 $('#maxDPower').click(function(){
-	$('#dg').datagrid({url:'maxDischargePower.json'});
+	$('#dg').datagrid({
+	    url:'maxChargePower.json',
+	    columns:[[
+	        {field:'time',title:'<span style="font-weight:bolder">时间</span>',width:100},
+	        {field:'00',title:'<span style="font-weight:bolder">0时</span>',width:50,formatter:powerFormatter},
+	        {field:'01',title:'<span style="font-weight:bolder">1时</span>',width:50,formatter:powerFormatter},
+	        {field:'02',title:'<span style="font-weight:bolder">2时</span>',width:50,formatter:powerFormatter},
+	        {field:'03',title:'<span style="font-weight:bolder">3时</span>',width:50,formatter:powerFormatter},
+	        {field:'04',title:'<span style="font-weight:bolder">4时</span>',width:50,formatter:powerFormatter},
+	        {field:'05',title:'<span style="font-weight:bolder">5时</span>',width:50,formatter:powerFormatter},
+	        {field:'06',title:'<span style="font-weight:bolder">6时</span>',width:50,formatter:powerFormatter},
+	        {field:'07',title:'<span style="font-weight:bolder">7时</span>',width:50,formatter:powerFormatter},
+	        {field:'08',title:'<span style="font-weight:bolder">8时</span>',width:50,formatter:powerFormatter},
+	        {field:'09',title:'<span style="font-weight:bolder">9时</span>',width:50,formatter:powerFormatter},
+	        {field:'10',title:'<span style="font-weight:bolder">10时</span>',width:50,formatter:powerFormatter},
+	        {field:'11',title:'<span style="font-weight:bolder">11时</span>',width:50,formatter:powerFormatter},
+	        {field:'12',title:'<span style="font-weight:bolder">12时</span>',width:50,formatter:powerFormatter},
+	        {field:'13',title:'<span style="font-weight:bolder">13时</span>',width:50,formatter:powerFormatter},
+	        {field:'14',title:'<span style="font-weight:bolder">14时</span>',width:50,formatter:powerFormatter},
+	        {field:'15',title:'<span style="font-weight:bolder">15时</span>',width:50,formatter:powerFormatter},
+	        {field:'16',title:'<span style="font-weight:bolder">16时</span>',width:50,formatter:powerFormatter},
+	        {field:'17',title:'<span style="font-weight:bolder">17时</span>',width:50,formatter:powerFormatter},
+	        {field:'18',title:'<span style="font-weight:bolder">18时</span>',width:50,formatter:powerFormatter},
+	        {field:'19',title:'<span style="font-weight:bolder">19时</span>',width:50,formatter:powerFormatter},
+	        {field:'20',title:'<span style="font-weight:bolder">20时</span>',width:50,formatter:powerFormatter},
+	        {field:'21',title:'<span style="font-weight:bolder">21时</span>',width:50,formatter:powerFormatter},
+	        {field:'22',title:'<span style="font-weight:bolder">22时</span>',width:50,formatter:powerFormatter},
+	        {field:'23',title:'<span style="font-weight:bolder">23时</span>',width:50,formatter:powerFormatter}
+	    ]]
+	});
+	//$('#dg').datagrid({url:'maxDischargePower.json'});
 	$('#tips').text('放电功率');
 	$('#dg').datagrid('reload');
 });
