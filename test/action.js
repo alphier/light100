@@ -247,13 +247,13 @@ client.on('message', function (msg, remote) {
 		}
 		
 		//put instruction
-		/*for(var i=0;i<5;i++){
+		for(var i=0;i<5;i++){
 			pMsg = putInst(sec_code,i);
 			client.send(pMsg, 0, pMsg.length, PORT, HOST, function(err, bytes) {
 				if (err) throw err;
 				console.log(dtstr() + 'Putting!!!' + HOST + ':' + PORT);
 			});
-		}*/
+		}
 		break;
 	case 31:
 		if(data[1] === 0x4e && data[2] === 0x41){
