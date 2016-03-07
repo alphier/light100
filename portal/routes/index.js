@@ -1126,8 +1126,8 @@ var updateControllerLoop = function(datetime,ctls,field,callback){
 	}
 	db.getMaxChargePower(ctl,function(maxCPower){
 		db.getMaxDischargePower(ctl,function(maxDPower){
-			if(!maxCPower) maxCPower = -1;
-			if(!maxDPower) maxDPower = -1;
+			if(maxCPower === null) maxCPower = -1;
+			if(maxDPower === null) maxDPower = -1;
 			var updates = {};
 			updates[field] = {cpower:maxCPower,dpower:maxDPower};
 			db.updateMaxPower(datetime,ctl,updates,function(result){
