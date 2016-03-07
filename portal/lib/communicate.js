@@ -273,6 +273,7 @@ exports.communicate = function (spec) {
 															logger.error('saveUsefulData failed!');
 												});
 											}
+											db.updateCtlUpdateTime({index:idx,code:code,cid:scid},0,function(upResult){});
 											db.updateControllerState({index:idx,code:code,cid:scid},1,function(res){
 												if(res === 'success'){
 													logger.info('connecting...update controller state!',JSON.stringify({index:idx,code:code,cid:scid}));
@@ -349,6 +350,12 @@ exports.communicate = function (spec) {
 					curTime = new Date();
 				hashMap[ctl_idx].cnnTime = curTime;
 				hashMap[ctl_idx].updateTime = curTime;
+				if(hashMap[ctl_idx].state !== 1){
+					//当hashMap中有且状态为未连接时
+					hashMap[result._id].state = 1;
+					var evt = new channelEvent({type:'controller-connect',data:hashMap[ctl_idx]});
+					dispatchEventListener(evt,ctl_idx);
+				}
 				db.getLight({index:ctl.index,code:ctl.code,cid:ctl.cid},ltId,function(lt){
 					if(!lt){
 						logger.debug('Getting...Not found light ', ltId);
@@ -424,6 +431,13 @@ exports.communicate = function (spec) {
 			if(ctl_idx){
 				var ctl = hashMap[ctl_idx];				
 				hashMap[ctl_idx].cnnTime = new Date();
+				db.updateControllerState({index:hashMap[ctl_idx].index,code:hashMap[ctl_idx].code,cid:hashMap[ctl_idx].cid},1,function(res){});
+				if(hashMap[ctl_idx].state !== 1){
+					//当hashMap中有且状态为未连接时
+					hashMap[result._id].state = 1;
+					var evt = new channelEvent({type:'controller-connect',data:hashMap[ctl_idx]});
+					dispatchEventListener(evt,ctl_idx);
+				}
 				lt.uindex = ctl.index;
 				lt.ucode = ctl.code;
 				lt.cid = ctl.cid;
