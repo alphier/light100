@@ -17,7 +17,7 @@
 		编号：<%= user.index %>
 		机器密码：<%= user.code %>
 		控制器编号：<%= user.cid %>
-		<span style="font-size:14px;margin-left:70px">灯编号：</span>
+		<span style="font-size:14px;margin-left:20px">灯编号：</span>
 		<input class="easyui-textbox" type="text" id="currLight" style="width:40px;height:20px;padding:5px">
 		<a href="#" id="readItem" class="easyui-linkbutton">
 			<span style="font-size:14px;">读取</span>
@@ -35,49 +35,57 @@
 			<span style="font-size:14px;">双数更改</span>
 		</a>
 		<a href="#" id="clearAll" class="easyui-linkbutton">
-			<span style="font-size:14px;">一键清除</span>
+			<span style="font-size:14px;">清除数据</span>
 		</a>
-		<span style="font-size:14px;">已更新时长：</span>
+		<span style="font-size:14px;">更新时长：</span>
 		<input class="easyui-textbox" type="text" id="currTime" name="currTime" style="width:130px;height:20px;padding:5px" data-options="readonly:true">
 		<a href="/traffic" id="exportdata" class="btn" href="#">
-			<span style="font-size:16px;">流量数据</span>
+			<span style="font-size:14px;">流量/温度</span>
 		</a>
 		<a href="/maxpower" id="maxpower" class="btn" href="#">
-			<span style="font-size:16px;margin-left:10px">最大功率</span>
+			<span style="font-size:14px;margin-left:10px">充放功率</span>
 		</a>		
 	</div>	
-	<div style="border-top:2px solid black;border-bottom:2px solid black;border-left:2px solid black;border-right:2px solid black;margin-top:2px;padding:2px;">详细信息：
-		<span style="font-size:8px">控制方式</span>
-		<input id="ctrltype" class="easyui-combobox" style="width:60px;" value=3 data-options="valueField:'ctypeValue',textField:'ctypeName',data:ctypeData">
-		<span style="font-size:8px">自动方式</span>
-		<input id="autotype" class="easyui-combobox" style="width:60px;" value=2 data-options="valueField:'atypeValue',textField:'atypeName',data:atypeData">
-		<span style="font-size:8px">开灯时间</span>
-		<input class="easyui-textbox" type="text" id="ontime" style="width:60px;height:20px">
-		<span style="font-size:8px">光控电压</span>
-		<input class="easyui-textbox" type="text" id="voltage" style="width:40px;height:20px" data-options="
+	<div style="margin-top:2px;padding:2px;">
+		<!--<a href="/traffic" id="exportdata" class="btn" href="#">
+			<span style="font-size:14px;">流量/温度</span>
+		</a>
+		<a href="/maxpower" id="maxpower" class="btn" href="#">
+			<span style="font-size:14px;margin-left:10px">充放功率</span>
+		</a>-->
+		<span style="margin-left:495px"></span>
+		<span style="font-size:14pt;font-weight:bold;">设置项：</span>
+		<!--<span style="color:rgb(38,121,150);font-size:10pt;font-weight:bold;">控制方式</span>-->
+		<input id="ctrltype" class="easyui-combobox" style="width:55px;margin-left:100px;" value=3 data-options="valueField:'ctypeValue',textField:'ctypeName',data:ctypeData">
+		<!--<span style="color:rgb(38,121,150);font-size:10pt;font-weight:bold;">自动方式</span>-->
+		<input id="autotype" class="easyui-combobox" style="width:55px;" value=2 data-options="valueField:'atypeValue',textField:'atypeName',data:atypeData">
+		<!--<span style="color:rgb(38,121,150);font-size:10pt;font-weight:bold;padding:1px;">开灯时间</span>-->
+		<input class="easyui-textbox" type="text" id="ontime" style="width:50px;height:20px">
+		<!--<span style="color:rgb(38,121,150);font-size:10pt;font-weight:bold;">光控电压</span>-->
+		<input class="easyui-textbox" type="text" id="voltage" style="width:50px;height:20px" data-options="
 						formatter:function(value,row){
                             return value + 'v';}
 						">
 		
-		<span style="font-size:8px">1亮度</span>
-		<input class="easyui-textbox" type="text" id="onelight" style="width:50px;height:20px">
-		<span style="font-size:8px">1时间</span>
-		<input class="easyui-textbox" type="text" id="onetime" style="width:40px;height:20px">
+		<!--<span style="color:rgb(38,121,150);font-size:10pt;font-weight:bold;">1亮度</span>-->
+		<input class="easyui-textbox" type="text" id="onelight" style="width:42px;height:20px">
+		<!--<span style="color:rgb(38,121,150);font-size:10pt;font-weight:bold;">1时间</span>-->
+		<input class="easyui-textbox" type="text" id="onetime" style="width:42px;height:20px">
 		
-		<span style="font-size:8px">2亮度</span>
-		<input class="easyui-textbox" type="text" id="twolight" style="width:50px;height:20px;padding:2px">
-		<span style="font-size:8px">2时间</span>
-		<input class="easyui-textbox" type="text" id="twotime" style="width:40px;height:20px;padding:2px">
+		<!--<span style="color:rgb(38,121,150);font-size:10pt;font-weight:bold;">2亮度</span>-->
+		<input class="easyui-textbox" type="text" id="twolight" style="width:42px;height:20px;padding:2px">
+		<!--<span style="color:rgb(38,121,150);font-size:10pt;font-weight:bold;">2时间</span>-->
+		<input class="easyui-textbox" type="text" id="twotime" style="width:42px;height:20px;padding:2px">
 		
-		<span style="font-size:8px">3亮度</span>
-		<input class="easyui-textbox" type="text" id="threelight" style="width:50px;height:20px;padding:2px">
-		<span style="font-size:8px">3时间</span>
-		<input class="easyui-textbox" type="text" id="threetime" style="width:40px;height:20px;padding:2px">
+		<!--<span style="color:rgb(38,121,150);font-size:10pt;font-weight:bold;">3亮度</span>-->
+		<input class="easyui-textbox" type="text" id="threelight" style="width:42px;height:20px;padding:2px">
+		<!--<span style="color:rgb(38,121,150);font-size:10pt;font-weight:bold;">3时间</span>-->
+		<input class="easyui-textbox" type="text" id="threetime" style="width:42px;height:20px;padding:2px">
 		
-		<span style="font-size:8px">4亮度</span>
-		<input class="easyui-textbox" type="text" id="fourlight" style="width:50px;height:20px;padding:2px">
-		<span style="font-size:8px">4时间</span>
-		<input class="easyui-textbox" type="text" id="fourtime" style="width:40px;height:20px;padding:2px">
+		<!--<span style="color:rgb(38,121,150);font-size:10pt;font-weight:bold;">4亮度</span>-->
+		<input class="easyui-textbox" type="text" id="fourlight" style="width:42px;height:20px;padding:2px">
+		<!--<span style="color:rgb(38,121,150);font-size:10pt;font-weight:bold;">4时间</span>-->
+		<input class="easyui-textbox" type="text" id="fourtime" style="width:42px;height:20px;padding:2px">
 	</div>
 	<div style="margin-top:2px;padding:5px;">
 	</div>
@@ -95,12 +103,13 @@
 		</style>
 		<thead>
 			<tr>
-				<th field='index' width=60 align='center' styler="indexStyler" formatter="indexFomatter">
-				<span style="font-size:12px;font-weight: bolder">编号/故障</span>
-				</th>
 				<th field='name' width=60 align="center" editor="{type:'textbox'}">
 				<span style="font-size:12px;font-weight: bolder">名称</span>
 				</th>
+				<th field='index' width=40 align='center' styler="indexStyler" formatter="indexFomatter">
+				<span style="font-size:12px;font-weight: bolder">编号</span>
+				</th>
+				<!-- 去掉该列
 				<th data-options="field:'time',width:80,
 						formatter:function(value,row){
 							if(row.state === -1)
@@ -115,6 +124,7 @@
                         }">
 				<span style="font-size:12px;align:center;font-weight:bolder">数据时间</span>
 				</th>
+				-->
 				<th data-options="field:'charging',width:35,
 						formatter:function(value,row){
 							if(row.state === -1)
@@ -131,11 +141,11 @@
 							if(row.state === -1)
 								return '';
 							if(value === 0)
-								return '关';
+								return '灭';
 							if(value === 1)
-                            	return '开';
+                            	return '亮';
                         }">
-				<span style="font-size:12px;font-weight: bolder">开关 </span>
+				<span style="font-size:12px;font-weight: bolder">亮灯 </span>
 				</th>
 				<th data-options="field:'cpower',width:60,
 						formatter:function(value,row){
@@ -222,7 +232,7 @@
                         }">
 				<span style="font-size:12px;font-weight: bolder">控制方式</span>
 				</th>
-				<th data-options="field:'autotype',width:55,
+				<th data-options="field:'autotype',width:60,
 						styler:function(value,row,index){
 							return 'background-color:#aaee00;';
 						},
@@ -236,7 +246,7 @@
                         }">
 				<span style="font-size:12px;font-weight: bolder">自动方式</span>
 				</th>
-				<th data-options="field:'ontime',width:55,
+				<th data-options="field:'ontime',width:60,
 						styler:function(value,row,index){
 							return 'background-color:#aaee00;';
 						},
@@ -248,7 +258,7 @@
                         }">
 				<span style="font-size:12px;font-weight: bolder">开灯时间</span>
 				</th>
-				<th data-options="field:'lcvoltage',width:55,
+				<th data-options="field:'lcvoltage',width:60,
 						styler:function(value,row,index){
 							return 'background-color:#aaee00;';
 						},
@@ -260,7 +270,7 @@
                         }">
 				<span style="font-size:12px;font-weight: bolder">光控电压</span>
 				</th>
-				<th data-options="field:'abright',width:40,
+				<th data-options="field:'abright',width:50,
 						styler:function(value,row,index){
 							if(row.curTime === 1)
 								return 'background-color:yellow;';
@@ -275,7 +285,7 @@
                         }">
 				<span style="font-size:12px;font-weight: bolder">1亮度</span>
 				</th>
-				<th data-options="field:'atime',width:40,
+				<th data-options="field:'atime',width:50,
 						styler:function(value,row,index){
 							if(row.curTime === 1)
 								return 'background-color:yellow;';
@@ -290,7 +300,7 @@
                         }">
 				<span style="font-size:12px;font-weight: bolder">1时间</span>
 				</th>
-				<th data-options="field:'bbright',width:40,
+				<th data-options="field:'bbright',width:50,
 						styler:function(value,row,index){
 							if(row.curTime === 2)
 								return 'background-color:yellow;';
@@ -305,7 +315,7 @@
                         }">
 				<span style="font-size:12px;font-weight: bolder">2亮度</span>
 				</th>
-				<th data-options="field:'btime',width:40,
+				<th data-options="field:'btime',width:50,
 						styler:function(value,row,index){
 							if(row.curTime === 2)
 								return 'background-color:yellow;';
@@ -320,7 +330,7 @@
                         }">
 				<span style="font-size:12px;font-weight: bolder">2时间</span>
 				</th>
-				<th data-options="field:'cbright',width:40,
+				<th data-options="field:'cbright',width:50,
 						styler:function(value,row,index){
 							if(row.curTime === 3)
 								return 'background-color:yellow;';
@@ -335,7 +345,7 @@
                         }">
 				<span style="font-size:12px;font-weight: bolder">3亮度</span>
 				</th>
-				<th data-options="field:'ctime',width:40,
+				<th data-options="field:'ctime',width:50,
 						styler:function(value,row,index){
 							if(row.curTime === 3)
 								return 'background-color:yellow;';
@@ -350,7 +360,7 @@
                         }">
 				<span style="font-size:12px;font-weight: bolder">3时间</span>
 				</th>
-				<th data-options="field:'dbright',width:40,
+				<th data-options="field:'dbright',width:50,
 						styler:function(value,row,index){
 							if(row.curTime === 4)
 								return 'background-color:yellow;';
@@ -365,7 +375,7 @@
                         }">
 				<span style="font-size:12px;font-weight: bolder">4亮度</span>
 				</th>
-				<th data-options="field:'dtime',width:40,
+				<th data-options="field:'dtime',width:50,
 						styler:function(value,row,index){
 							if(row.curTime === 4)
 								return 'background-color:yellow;';

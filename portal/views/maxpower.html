@@ -22,12 +22,12 @@
 		</a>		
 	</div>
 	<div style="margin-top:2px;padding:5px;">
-	<span id="tips" style="font-size:14px;font-weight: bolder">最大充电功率</span>
+	<span id="tips" style="font-size:14px;font-weight: bolder">充电功率</span>
 		<a href="#" id="maxCPower" class="easyui-linkbutton" style="margin-left:10px;">
-			<span style="font-size:14px;">最大充电功率</span>
+			<span style="font-size:14px;">充电功率</span>
 		</a>
 		<a href="#" id="maxDPower" class="easyui-linkbutton">
-			<span style="font-size:14px;">最大放电功率</span>
+			<span style="font-size:14px;">放电功率</span>
 		</a>
 		<a id="exportdata" class="btn" href="#">
 			<span style="font-size:16px;">下载</span>
@@ -162,7 +162,7 @@ function onLoadSuccess(data){
 }
 
 $('#exportdata').click(function(){
-	if($('#tips').text() == "最大充电功率"){
+	if($('#tips').text() == "充电功率"){
 		$.post('exportMaxChargePowerData',{},function(result, status){
 			if(result !== "failed"){
 				window.open(result);
@@ -172,7 +172,7 @@ $('#exportdata').click(function(){
 			}
 		});
 	}
-	if($('#tips').text() == "最大放电功率"){
+	if($('#tips').text() == "放电功率"){
 		$.post('exportMaxDischargePowerData',{},function(result, status){
 			if(result !== "failed"){
 				window.open(result);
@@ -186,13 +186,13 @@ $('#exportdata').click(function(){
 
 $('#maxCPower').click(function(){
 	$('#dg').datagrid({url:'maxChargePower.json'});
-	$('#tips').text('最大充电功率');
+	$('#tips').text('充电功率');
 	$('#dg').datagrid('reload');
 });
 
 $('#maxDPower').click(function(){
 	$('#dg').datagrid({url:'maxDischargePower.json'});
-	$('#tips').text('最大放电功率');
+	$('#tips').text('放电功率');
 	$('#dg').datagrid('reload');
 });
 
