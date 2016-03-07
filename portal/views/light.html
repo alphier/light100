@@ -765,28 +765,29 @@ $('#readItem').click(function(){
 
 function getNewData(old){
 	//clone object
-	var row = jQuery.extend({}, old);
+	//var row = jQuery.extend({}, old);
+	var row = {uindex:old.uindex,ucode:old.ucode,cid:old.cid}; 
 	row.ctltype = parseInt($('#ctrltype').combobox('getValue'));
 	row.autotype = parseInt($('#autotype').combobox('getValue'));
 	row.ontime = $('#ontime').textbox('getText');
 	row.lcvoltage = $('#voltage').textbox('getText');
-	row.lcvoltage = parseInt(row.lcvoltage.replace('v',''));
+	row.lcvoltage = parseFloat(row.lcvoltage.replace('v',''));
 	row.abright = $('#onelight').textbox('getText');
 	row.abright = parseInt(row.abright.replace('%',''));
 	row.atime = $('#onetime').textbox('getText');
-	row.atime = parseInt(row.atime.replace('h',''));
+	row.atime = parseFloat(row.atime.replace('h',''));
 	row.bbright = $('#twolight').textbox('getText');
 	row.bbright = parseInt(row.bbright.replace('%',''));
 	row.btime = $('#twotime').textbox('getText');
-	row.btime = parseInt(row.btime.replace('h',''));
+	row.btime = parseFloat(row.btime.replace('h',''));
 	row.cbright = $('#threelight').textbox('getText');
 	row.cbright = parseInt(row.cbright.replace('%',''));
 	row.ctime = $('#threetime').textbox('getText');
-	row.ctime = parseInt(row.ctime.replace('h',''));
+	row.ctime = parseFloat(row.ctime.replace('h',''));
 	row.dbright = $('#fourlight').textbox('getText');
 	row.dbright = parseInt(row.dbright.replace('%',''));
 	row.dtime = $('#fourtime').textbox('getText');
-	row.dtime = parseInt(row.dtime.replace('h',''));
+	row.dtime = parseFloat(row.dtime.replace('h',''));
 	return row;
 };
 
@@ -801,7 +802,8 @@ $('#modifyItem').click(function(){
 	var index=$('#currLight').textbox('getValue')+'';
 	if(index === '') return;
 	index = parseInt(index);
-	var old = $('#dg')[0].data.rows[index];	
+	var rows = $('#dg').datagrid('getRows');
+	var old = rows[index];
 	var row = getNewData(old);
 	//-----------------------------------
 	
@@ -830,23 +832,12 @@ $('#modifyAll').click(function(){
 	var index=$('#currLight').textbox('getValue')+'';
 	if(index === '') return;
 	index = parseInt(index);
-	var old = $('#dg')[0].data.rows[index];	
+	var rows = $('#dg').datagrid('getRows');
+	var old = rows[index];
 	var row = getNewData(old);
 	//-----------------------------------
 	
-	var changes = chooseChangeFileds(old, row);
-	if(jQuery.isEmptyObject(changes)) return;	
-	
-	if(!changes.hasOwnProperty('uindex')){
-		changes['uindex'] = row.uindex;
-	}
-	if(!changes.hasOwnProperty('ucode')){
-		changes['ucode'] = row.ucode;
-	}
-	if(!changes.hasOwnProperty('cid')){
-		changes['cid'] = row.cid;
-	}
-	$.post('updateAllLights',changes,function(result, status){
+	$.post('updateAllLights',row,function(result, status){
 		if(result === "success"){
 			//location.reload();
 			$('#dg').datagrid('reload');
@@ -868,23 +859,12 @@ $('#modifySingle').click(function(){
 	var index=$('#currLight').textbox('getValue')+'';
 	if(index === '') return;
 	index = parseInt(index);
-	var old = $('#dg')[0].data.rows[index];	
+	var rows = $('#dg').datagrid('getRows');
+	var old = rows[index];
 	var row = getNewData(old);
 	//-----------------------------------
 	
-	var changes = chooseChangeFileds(old, row);
-	if(jQuery.isEmptyObject(changes)) return;
-	
-	if(!changes.hasOwnProperty('uindex')){
-		changes['uindex'] = row.uindex;
-	}
-	if(!changes.hasOwnProperty('ucode')){
-		changes['ucode'] = row.ucode;
-	}
-	if(!changes.hasOwnProperty('cid')){
-		changes['cid'] = row.cid;
-	}
-	$.post('updateSingleLights',changes,function(result, status){
+	$.post('updateSingleLights',row,function(result, status){
 		if(result === "success"){
 			//location.reload();
 			$('#dg').datagrid('reload');
@@ -906,23 +886,12 @@ $('#modifyDouble').click(function(){
 	var index=$('#currLight').textbox('getValue')+'';
 	if(index === '') return;
 	index = parseInt(index);
-	var old = $('#dg')[0].data.rows[index];	
+	var rows = $('#dg').datagrid('getRows');
+	var old = rows[index];
 	var row = getNewData(old);
 	//-----------------------------------
 	
-	var changes = chooseChangeFileds(old, row);
-	if(jQuery.isEmptyObject(changes)) return;
-	
-	if(!changes.hasOwnProperty('uindex')){
-		changes['uindex'] = row.uindex;
-	}
-	if(!changes.hasOwnProperty('ucode')){
-		changes['ucode'] = row.ucode;
-	}
-	if(!changes.hasOwnProperty('cid')){
-		changes['cid'] = row.cid;
-	}
-	$.post('updateDoubleLights',changes,function(result, status){
+	$.post('updateDoubleLights',row,function(result, status){
 		if(result === "success"){
 			//location.reload();
 			$('#dg').datagrid('reload');
