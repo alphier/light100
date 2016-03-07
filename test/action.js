@@ -13,7 +13,7 @@ function dtstr(){
 };	
 
 function connectInst(){
-	message = new Buffer(18);
+	message = new Buffer(12);
 	//指令：HARO - 0x48 0x41 0x52 0x4f
 	//指令类型 20
 	message.writeUInt8(0x14, 0);
@@ -35,6 +35,7 @@ function connectInst(){
 	message.writeUInt8(0x71, 9);
 	message.writeUInt8(0x62, 10);
 	message.writeUInt8(0x7f, 11);
+	/*
 	//人流量
 	message.writeUInt16BE(4000, 12);
 	//车流量
@@ -43,12 +44,13 @@ function connectInst(){
 	message.writeUInt8(110, 16);
 	//是否保存，是
 	message.writeUInt8(1, 17);
+	*/
 	
 	return message;
 };
 
 function putInst(s,lid){
-	var message = new Buffer(30),
+	var message = new Buffer(29),
 		k = 'INTO',
 		a = s.charCodeAt(0) ^ k.charCodeAt(0),
 		b = s.charCodeAt(1) ^ k.charCodeAt(1),
@@ -102,7 +104,7 @@ function putInst(s,lid){
 	message.writeUInt8(2, 26);
 	message.writeUInt16BE(21, 27);
 	//灯当前进度
-	message.writeUInt8(1, 29);
+	//message.writeUInt8(1, 29);
 	
 	return message;
 };
@@ -236,6 +238,15 @@ client.on('message', function (msg, remote) {
 			sec_code = String(getCnnCode(sec_code,'XUKE')),	
 			setLid = data.readUInt8(11);
 			console.log(dtstr() + ' receive connect reply...', sec_code, ' buffer:',msg,' lid:',setLid);
+		/*	
+		//get instruction old version
+		for(var i=0;i<5;i++){
+			pMsg = getInst(sec_code,i);
+			client.send(pMsg, 0, pMsg.length, PORT, HOST, function(err, bytes) {
+				if (err) throw err;
+				console.log(dtstr() + 'Getting!!!' + HOST + ':' + PORT);
+			});
+		}
 		
 		//get instruction
 		if(setLid !== 255){
@@ -246,6 +257,7 @@ client.on('message', function (msg, remote) {
 			});
 		}
 		
+		
 		//put instruction
 		for(var i=0;i<5;i++){
 			pMsg = putInst(sec_code,i);
@@ -254,6 +266,8 @@ client.on('message', function (msg, remote) {
 				console.log(dtstr() + 'Putting!!!' + HOST + ':' + PORT);
 			});
 		}
+		*/
+		
 		break;
 	case 31:
 		if(data[1] === 0x4e && data[2] === 0x41){
