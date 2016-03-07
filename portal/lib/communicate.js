@@ -5,7 +5,7 @@ exports.communicate = function (spec) {
 		db = require('./dataBase'),
 		dp = require('./dgram_protocal'),
 		server = dgram.createSocket('udp4'),
-		DIS_TIME = 60 * 1000,	//断线时长设置为30分钟
+		DIS_TIME = 20 * 60 * 1000,	//断线时长设置为30分钟
 		INTERVAL_TIME = 5000,
 		that = {},
 		eventListeners = {},
@@ -193,13 +193,18 @@ exports.communicate = function (spec) {
 		procConnect = function(data, callback){
 			"use strict";
 			
-			var idx = data[1],
+			var len = data.length,
+				idx = data[1],
 				code = data.readUInt16BE(2),
 				cid = data.readUInt32BE(4),
 				sec = data.readUInt32BE(8),
+				pt = -1,vt = -1,tp = -1;
+			if(len > 12){
+				//v2.0版协议
 				pt = data.readUInt16BE(12),
 				vt = data.readUInt16BE(14),
 				tp = -50 + data.readUInt8(16)/2;
+			}
 			if(dp.verifyCnt(cid,sec)){
 				var scid = new Buffer(4);
 				scid.writeUInt32BE(cid,0);
@@ -262,16 +267,19 @@ exports.communicate = function (spec) {
 												var evt = new channelEvent({type:'controller-connect',data:result});
 												dispatchEventListener(evt,result._id);
 											}
-											var bSave = data.readUInt8(17);
-											if(bSave === 1){
-												db.saveUsefulData({index:idx,code:code,cid:scid,
-													people:pt,vehicle:vt,temperature:tp,time:new Date()},
-												function(saveResult){
-														if(saveResult == 'success') 
-															logger.info('saveUsefulData success!');
-														else 
-															logger.error('saveUsefulData failed!');
-												});
+											if(len > 12){
+												//v2.0版协议
+												var bSave = data.readUInt8(17);
+												if(bSave === 1){
+													db.saveUsefulData({index:idx,code:code,cid:scid,
+														people:pt,vehicle:vt,temperature:tp,time:new Date()},
+													function(saveResult){
+															if(saveResult == 'success') 
+																logger.info('saveUsefulData success!');
+															else 
+																logger.error('saveUsefulData failed!');
+													});
+												}
 											}
 											db.updateCtlUpdateTime({index:idx,code:code,cid:scid},0,function(upResult){});
 											db.updateControllerState({index:idx,code:code,cid:scid},1,function(res){

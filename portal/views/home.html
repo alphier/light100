@@ -1247,7 +1247,9 @@ socket.on('onUpdateData', function (argument) {
    	    	if($("#p-"+i)[0].data && $("#p-"+i)[0].data.cid === argument.cid){
    				$("#p-"+i)[0].data.state = 1;
    				var strTraffic = "人流/车流/温度:";
-   				if(argument.people && argument.vehicle && argument.temperature)
+   				if(argument.people !== undefined && argument.people !== -1 && 
+   					argument.vehicle !== undefined && argument.vehicle !== -1 && 
+   					argument.temperature !== undefined && argument.temperature !== -1)
    					strTraffic += argument.people + '/' + argument.vehicle + '/' + argument.temperature + '℃';
    				$("#t-"+i).text(strTraffic);
    				//reloadCtl($("#p-"+i)[0].data);

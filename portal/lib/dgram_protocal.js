@@ -326,7 +326,9 @@ dp.getLightData = function (data){
 	if(data.readUInt16BE(27) === 0)
 		nZeroNum ++;
 	//添加进度字段
-	lt.curTime = data.readUInt8(29);
+	lt.curTime = 0;
+	if(data.length > 29)
+		lt.curTime = data.readUInt8(29);
 	
 	//补充字段
 	lt.voltage = 0;
