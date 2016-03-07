@@ -729,7 +729,6 @@ $('#readItem').click(function(){
 	index = parseInt(index);
 	var rows = $('#dg').datagrid('getRows');
 	var row = rows[index];
-	if(row.state === 1) return;
 	$('#ctrltype').combobox('setValue',row.ctltype);
 	$('#autotype').combobox('setValue',row.autotype);
 	$('#ontime').textbox('setValue',row.ontime);
