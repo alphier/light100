@@ -176,7 +176,7 @@ var exportMaxDischargePower = function(ctl,callback){
 	var datetime = moment().format("YYYYMMDDHHmmss"),
 		fullpath = './public/data/maxDischargePower_' + datetime + '.csv',
 		filename = '/data/maxDischargePower_' + datetime + '.csv',
-		header = "日期,6时,7时,8时,9时,10时,11时,12时,13时,14时,15时,16时,17时,18时,19时\r\n",
+		header = "日期,0时,1时,2时,3时,4时,5时,6时,7时,8时,9时,10时,11时,12时,13时,14时,15时,16时,17时,18时,19时,20时,21时,22时,23时\r\n",
 		gbkbuf = iconv.encode(header, 'GBK');
 	fs.writeFile(fullpath,gbkbuf,function(err){
 		if(err) 
