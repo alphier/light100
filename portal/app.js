@@ -74,6 +74,9 @@ app.post('/updateDoubleLights', routes.doUpdateDoubleLights);
 app.post('/removeAllLights',routes.doRemoveAllLights);
 app.post('/saveName',routes.doSaveName);
 
+app.get('/test', authentication);
+app.get('/test', routes.test);
+
 app.get('/traffic', authentication);
 app.get('/traffic', routes.traffic);
 app.post('/traffic.json', routes.getTraffic);

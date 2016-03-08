@@ -1064,6 +1064,12 @@ exports.traffic = function(req, res){
   	res.render('traffic', { title: 'Traffic'});
 };
 
+exports.test = function(req, res){
+	"use strict";
+	
+  	res.render('test', { title: 'Test'});
+};
+
 exports.maxpower = function(req, res){
 	"use strict";
 	
