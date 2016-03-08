@@ -24,7 +24,7 @@
 		<style>.panel-title{font-size:16px}</style>	
 		<table id="table" style="width: 100%;">
 			<tbody>			
-			<td id="td-0" style="horizon-align: left; width: 200px; padding:12px">
+			<td style="horizon-align: left; width: 200px; padding:12px">
 				<div class="easyui-panel c2" id="p-0" title="未使用" style="height:190px;padding:5px;" data-options="footer:'#footer-0', closed:false, tools:[{
 							iconCls:'icon-edit',
 							handler:function(){							
@@ -1218,8 +1218,10 @@ socket.on('onMaxCtlPowers', function (argument) {
 	    if(String(ctl.index) === "<%= user.index %>" && 
 	        String(ctl.code) === "<%= user.code %>"){
 	       	var a=document.getElementById("table").getElementsByTagName("td");
-	       	for(var i in a){
+	       	for(var i in a){	       		
+	       		if(!$("#p-"+i)[0]) continue;
 	       	  	if($("#p-"+i)[0].hasOwnProperty('data') && $("#p-"+i)[0].data.cid === ctl.cid){
+	       	  		console.debug('debug data!!!!' + JSON.stringify($("#p-"+i)[0].data));
 	       	  		if($("#p-"+i)[0].data.state === 1){
 		       			var strMaxPower = "充放功率(充/放):",
 		       				maxCPower = 'NA',maxDPower = 'NA';
@@ -1244,6 +1246,7 @@ socket.on('onUpdateData', function (argument) {
        	String(argument.code) === "<%= user.code %>"){
    	    var a=document.getElementById("table").getElementsByTagName("td");
    	    for(var i in a){
+   	    	if(!$("#p-"+i)[0]) continue;
    	    	if($("#p-"+i)[0].data && $("#p-"+i)[0].data.cid === argument.cid){
    				$("#p-"+i)[0].data.state = 1;
    				var strTraffic = "人流/车流/温度:";
@@ -1265,6 +1268,7 @@ socket.on('onCtlOnline', function (argument) {
     	String(argument.code) === "<%= user.code %>"){
 	    var a=document.getElementById("table").getElementsByTagName("td");
 	    for(var i in a){
+	    	if(!$("#p-"+i)[0]) continue;
 	    	if($("#p-"+i)[0].data && $("#p-"+i)[0].data.cid === argument.cid){
 				$("#p-"+i)[0].data.state = 1;
 				var strTraffic = "人流/车流/温度:";
@@ -1284,6 +1288,7 @@ socket.on('onCtlOffline', function (argument) {
     	String(argument.code) === "<%= user.code %>"){
 	    var a=document.getElementById("table").getElementsByTagName("td");
 	    for(var i in a){
+	    	if(!$("#p-"+i)[0]) continue;
 	    	if($("#p-"+i)[0].hasOwnProperty('data') && $("#p-"+i)[0].data.cid === argument.cid){
 				$("#p-"+i)[0].data.state = 0;
 				$("#t-"+i).text("人流/车流/温度:");
@@ -1322,6 +1327,10 @@ function reloadCtl(ctl){
 						tmp = time.toLocaleDateString().split('/'),
 						h = String(time.getHours()),
 						m = String(time.getMinutes());
+					if(tmp.length === 1){
+						//处理浏览器兼容问题，有的浏览器时间格式是用'-'分割。有的是'/'分割
+						tmp = time.toLocaleDateString().split('-');
+					}
 					if(tmp[1].length === 1) tmp[1] = '0' + tmp[1];
 					if(tmp[2].length === 1) tmp[2] = '0' + tmp[2];
 					if(h.length === 1) h = '0' + h;
@@ -1357,6 +1366,10 @@ function reloadCtl(ctl){
 						tmp = time.toLocaleDateString().split('/'),
 						h = String(time.getHours()),
 						m = String(time.getMinutes());
+					if(tmp.length === 1){
+						//处理浏览器兼容问题，有的浏览器时间格式是用'-'分割。有的是'/'分割
+						tmp = time.toLocaleDateString().split('-');
+					}
 					if(tmp[1].length === 1) tmp[1] = '0' + tmp[1];
 					if(tmp[2].length === 1) tmp[2] = '0' + tmp[2];
 					if(h.length === 1) h = '0' + h;
@@ -1441,6 +1454,10 @@ function reloadAll() {
 								tmp = time.toLocaleDateString().split('/'),
 								h = String(time.getHours()),
 								m = String(time.getMinutes());
+							if(tmp.length === 1){
+								//处理浏览器兼容问题，有的浏览器时间格式是用'-'分割。有的是'/'分割
+								tmp = time.toLocaleDateString().split('-');
+							}
 							if(tmp[1].length === 1) tmp[1] = '0' + tmp[1];
 							if(tmp[2].length === 1) tmp[2] = '0' + tmp[2];
 							if(h.length === 1) h = '0' + h;
@@ -1477,6 +1494,10 @@ function reloadAll() {
 								tmp = time.toLocaleDateString().split('/'),
 								h = String(time.getHours()),
 								m = String(time.getMinutes());
+							if(tmp.length === 1){
+								//处理浏览器兼容问题，有的浏览器时间格式是用'-'分割。有的是'/'分割
+								tmp = time.toLocaleDateString().split('-');
+							}
 							if(tmp[1].length === 1) tmp[1] = '0' + tmp[1];
 							if(tmp[2].length === 1) tmp[2] = '0' + tmp[2];
 							if(h.length === 1) h = '0' + h;

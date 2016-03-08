@@ -223,13 +223,60 @@ exports.communicate = function (spec) {
 							}
 						});	
 					}else {
-						db.getSettingLights({index:idx,code:code,cid:scid},function(lts){
-							var setting;
-							if(lts)	setting = true;
-							else setting = false;
-							var ccode = dp.newCnnCode();
-							//get new one, make sure no repeat
-							newCnnCode(scid, ccode, function(newCode){
+						//将下载更新时间置0
+						db.updateCtlUpdateTime({index:idx,code:code,cid:scid},0,function(upResult){});
+						//将控制器状态更新为连接态,并更新连接时间
+						db.updateControllerState({index:idx,code:code,cid:scid},1,function(res){});
+						//生成安全码
+						var ccode = dp.newCnnCode();
+						//递归生成唯一安全码
+						newCnnCode(scid, ccode, function(newCode){
+							if(hashMap.hasOwnProperty(result._id)){
+								hashMap[result._id].cnnTime = new Date();
+								hashMap[result._id].cnnCode = newCode;
+								hashMap[result._id].people = pt;
+								hashMap[result._id].vehicle = vt;
+								hashMap[result._id].temperature = tp;
+								if(hashMap[result._id].state !== 1){
+									//当hashMap中有且状态为未连接时
+									hashMap[result._id].state = 1;
+									var evt = new channelEvent({type:'controller-connect',data:hashMap[result._id]});
+									dispatchEventListener(evt,result._id);
+								}else{
+									//当hashMap中有且状态为连接时
+									var evt = new channelEvent({type:'update-data',data:hashMap[result._id]});
+									dispatchEventListener(evt,result._id);
+								}
+							}else{
+								//当hashMap中没有时
+								result.cnnTime = new Date();
+								result.cnnCode = newCode;
+								result.people = pt;
+								result.vehicle = vt;
+								result.temperature = tp;
+								result.state = 1;
+								hashMap[result._id] = result;
+								var evt = new channelEvent({type:'controller-connect',data:result});
+								dispatchEventListener(evt,result._id);
+							}
+							if(len > 12){
+								//v2.0版协议
+								var bSave = data.readUInt8(17);
+								if(bSave === 1){
+									db.saveUsefulData({index:idx,code:code,cid:scid,
+										people:pt,vehicle:vt,temperature:tp,time:new Date()},
+									function(saveResult){
+											if(saveResult == 'success') 
+												logger.info('saveUsefulData success!');
+											else 
+												logger.error('saveUsefulData failed!');
+									});
+								}
+							}
+							db.getSettingLights({index:idx,code:code,cid:scid},function(lts){
+								var setting;
+								if(lts)	setting = true;
+								else setting = false;
 								db.getOneSetLight({index:idx,code:code,cid:scid},function(_lt){
 									var ltid = 255;
 									if(_lt) ltid = _lt.index;
@@ -239,99 +286,15 @@ exports.communicate = function (spec) {
 											callback('error');
 										}else {
 											logger.debug('Connecting!!!Reply succeed');
-											if(hashMap.hasOwnProperty(result._id)){
-												hashMap[result._id].cnnTime = new Date();
-												hashMap[result._id].cnnCode = newCode;
-												hashMap[result._id].people = pt;
-												hashMap[result._id].vehicle = vt;
-												hashMap[result._id].temperature = tp;
-												if(hashMap[result._id].state !== 1){
-													//当hashMap中有且状态为未连接时
-													hashMap[result._id].state = 1;
-													var evt = new channelEvent({type:'controller-connect',data:hashMap[result._id]});
-													dispatchEventListener(evt,result._id);
-												}else{
-													//当hashMap中有且状态为连接时
-													var evt = new channelEvent({type:'update-data',data:hashMap[result._id]});
-													dispatchEventListener(evt,result._id);
-												}
-											}else{
-												//当hashMap中没有时
-												result.cnnTime = new Date();
-												result.cnnCode = newCode;
-												result.people = pt;
-												result.vehicle = vt;
-												result.temperature = tp;
-												result.state = 1;
-												hashMap[result._id] = result;
-												var evt = new channelEvent({type:'controller-connect',data:result});
-												dispatchEventListener(evt,result._id);
-											}
-											if(len > 12){
-												//v2.0版协议
-												var bSave = data.readUInt8(17);
-												if(bSave === 1){
-													db.saveUsefulData({index:idx,code:code,cid:scid,
-														people:pt,vehicle:vt,temperature:tp,time:new Date()},
-													function(saveResult){
-															if(saveResult == 'success') 
-																logger.info('saveUsefulData success!');
-															else 
-																logger.error('saveUsefulData failed!');
-													});
-												}
-											}
-											db.updateCtlUpdateTime({index:idx,code:code,cid:scid},0,function(upResult){});
-											db.updateControllerState({index:idx,code:code,cid:scid},1,function(res){
-												if(res === 'success'){
-													logger.info('connecting...update controller state!',JSON.stringify({index:idx,code:code,cid:scid}));
-												}else{
-													logger.error('connecting...update controller error!',JSON.stringify({index:idx,code:code,cid:scid}));
-												}
-												callback(res);
-												/*db.getController({index:idx,code:code,cid:scid},function(nctl){
-													if(nctl){
-														nctl.people = data.readUInt16BE(12);
-														nctl.vehicle = data.readUInt16BE(14);
-														nctl.temperature = -50 + data.readUInt8(16)/2;
-														var bSave = data.readUInt8(17);
-														if(bSave === 1){
-															db.saveUsefulData({index:idx,code:code,cid:scid,
-																people:nctl.people,vehicle:nctl.vehicle,
-																temperature:nctl.temperature,time:new Date()},
-															function(saveResult){
-																	if(saveResult == 'success') 
-																		logger.info('saveUsefulData success!');
-																	else 
-																		logger.error('saveUsefulData failed!');
-															});
-														}
-														if(!hashMap.hasOwnProperty(nctl._id)){
-															logger.info('Connecting...adding controller to hashmap!!!',scid,' hashKey:', nctl._id);
-															hashMap[nctl._id] = nctl;
-															var evt = new channelEvent({type:'controller-connect',data:nctl});
-															dispatchEventListener(evt,nctl._id);
-														}else{
-															var evt = new channelEvent({type:'update-data',data:nctl});
-															dispatchEventListener(evt,nctl._id);
-														}
-														hashMap[nctl._id].timestamp = new Date();
-														hashMap[nctl._id].cnnCode = newCode;
-														logger.info('Update ' + scid + ' to hashMap, newCode is ' + newCode);
-													} else {
-														logger.info('Connecting...getController failed!!!',scid);
-													}
-													callback('succeed');
-												});*/
-											});//updateControllerState
-										}//reply succeed
-									});	//replyCnn
+											callback('success');
+										}
+									});//replyCnn
 								});//getOneSetLight
-                            });	//newCnnCode													
-						});	//getSettingLight					
-					}//getController succeed
-				});	//getController				
-			}//dp.verifyCnt
+	                        });	//getSettingLights									
+						});	//newCnnCode
+					}//find controller
+				});	//getController
+			}//verify sec_code
 			else {
 				logger.info('Connecting...verfiy failed...idx:',idx,' code:',code,' cid:',cid,' sec:',sec);
 				dp.replyCnn(server,2,0,data.ip,data.port,null,null,function(res){
@@ -358,12 +321,15 @@ exports.communicate = function (spec) {
 					curTime = new Date();
 				hashMap[ctl_idx].cnnTime = curTime;
 				hashMap[ctl_idx].updateTime = curTime;
+				db.updateCtlUpdateTime(ctl,curTime,function(upResult){});
+				db.updateControllerState({index:hashMap[ctl_idx].index,code:hashMap[ctl_idx].code,cid:hashMap[ctl_idx].cid},1,function(res){});
 				if(hashMap[ctl_idx].state !== 1){
 					//当hashMap中有且状态为未连接时
 					hashMap[result._id].state = 1;
 					var evt = new channelEvent({type:'controller-connect',data:hashMap[ctl_idx]});
 					dispatchEventListener(evt,ctl_idx);
 				}
+				//更新连接时间
 				db.getLight({index:ctl.index,code:ctl.code,cid:ctl.cid},ltId,function(lt){
 					if(!lt){
 						logger.debug('Getting...Not found light ', ltId);
@@ -377,7 +343,6 @@ exports.communicate = function (spec) {
 							}
 						});
 					} else {
-						db.updateCtlUpdateTime(ctl,curTime,function(upResult){});
 						if(lt.bSet){
 							logger.debug('Getting...Light has setting ',ltId);
 							db.getNextOneSetLight({index:ctl.index,code:ctl.code,cid:ctl.cid},ltId,function(_lt){
