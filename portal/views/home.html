@@ -1221,7 +1221,6 @@ socket.on('onMaxCtlPowers', function (argument) {
 	       	for(var i in a){	       		
 	       		if(!$("#p-"+i)[0]) continue;
 	       	  	if($("#p-"+i)[0].hasOwnProperty('data') && $("#p-"+i)[0].data.cid === ctl.cid){
-	       	  		console.debug('debug data!!!!' + JSON.stringify($("#p-"+i)[0].data));
 	       	  		if($("#p-"+i)[0].data.state === 1){
 		       			var strMaxPower = "充放功率(充/放):",
 		       				maxCPower = 'NA',maxDPower = 'NA';

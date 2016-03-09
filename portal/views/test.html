@@ -6,7 +6,7 @@
 	<link rel="stylesheet" type="text/css" href="css/default/easyui.css">
 	<link rel="stylesheet" type="text/css" href="css/color.css">
 	<link rel="stylesheet" type="text/css" href="css/icon.css">
-	<link rel="stylesheet" type="text/css" href="css/main.css">
+	<!-- <link rel="stylesheet" type="text/css" href="css/main.css"> -->
 	<script type="text/javascript" src="lib/jquery.min.js"></script>
 	<script type="text/javascript" src="lib/jquery.easyui.min.js"></script>
 	<script type="text/javascript" src="lib/socket.io/socket.io.js"></script>
@@ -23,27 +23,18 @@
 	</div>
 	<div class="easyui-panel" id="container" title="控制器" style="padding:5px;width:100%;">
 		<style>.panel-title{font-size:16px}</style>	
-		<table id="ctltable">
-			<tbody>
-			<td>
-				<div class="easyui-panel c2" id="p-28" title="未使用"
-					data-options="footer:'#footer-28',closed:false, tools:[{iconCls:'icon-edit',handler:modifyName},
-							{iconCls:'icon-reload',handler:reloadData}]">
-					<a href="#" class="easyui-linkbutton c6">20 充 20W</a>
-					<a href="#" class="easyui-linkbutton c6"">20 放 20W</a>
-					<a href="#" class="easyui-linkbutton c6"">故障 12</a>
-					<a href="#" class="easyui-linkbutton"data-options="iconCls:'icon-redo',disabled:true">进入</a>
-					<div class="temperature" >
-						<span class="temptext">
-							流量/温度:10000 20000 -50.5℃
-						</span>
-					</div>
+		<table class="ctltable">
+			<td id="t" style="float:left;display:none;width:190px;padding:15px;">
+				<div id='p' style="width:190px;padding-left:5px;padding-right:5px;padding-bottom:5px;" >			
+					<a href="#" id='c' class="easyui-linkbutton c6" style="width:85px;height:25px;margin-top:5px;padding:5px">充</a>
+					<a href="#" id='d' class="easyui-linkbutton c6" style="width:85px;height:25px;margin-top:5px;padding:5px">放</a>
+					<a href="#" id='g' class="easyui-linkbutton c6" style="width:85px;height:25px;margin-top:5px;padding:5px">故障</a>
+					<a href="#" id='e' class="easyui-linkbutton" style="width:85px;margin-top:5px;" data-options="iconCls:'icon-redo'">进入</a>
+					<div id='t' class="temperature" style="margin-top:5px;padding:2px;background-color:rgb(38,121,150);">流量/温度:</div>
 				</div>
-				<div class="footer" id="footer-28">
-					未连接.
+				<div class="footer" id="f" style="padding:2px;height:15px;">
 				</div>
 			</td>
-			<tbody>			
 		</table>
 	</div>	
 	<div id="w" class="easyui-dialog" title="添加名称" closed="true" style="text-align:center;width:200px;height:110px;padding:5px;">		
@@ -60,19 +51,118 @@
 </body>
 <script type="text/javascript">
 
-function createCtl(){
-	var tr = $('<tr />'),
-	td = $('<td />'),
-	div = $('<div />');
-	td.attr("id","t_0");
-	$("td").css("width","160px");
-	$("td").css("padding","10px");
-	div.attr("class","easyui-panel c2");
-	div.attr("id","p_0");
-	div.attr("title","未使用");
+function formatDate(dtime){
+	if(!dtime || dtime === -1) return '';
+	var time = new Date(dtime),
+		tmp = time.toLocaleDateString().split('/'),
+		h = String(time.getHours()),
+		m = String(time.getMinutes());
+	if(tmp.length === 1){
+		//处理浏览器兼容问题，有的浏览器时间格式是用'-'分割。有的是'/'分割
+		tmp = time.toLocaleDateString().split('-');
+	}
+	if(tmp[1].length === 1) tmp[1] = '0' + tmp[1];
+	if(tmp[2].length === 1) tmp[2] = '0' + tmp[2];
+	if(h.length === 1) h = '0' + h;
+	if(m.length === 1) m = '0' + m;
+	datetime = tmp[1] + '-' + tmp[2] + ' ' + h + ':' + m;
+	
+	return datetime;
+}
+
+function removeAllCtl(){
+	$('.dynamictr').remove();
+	$('.dynamictd').remove();
+}
+
+function createCtl(cid){
+	var ct = $("#t").clone();
+	ct.css("display","block");
+	ct.css("horizon-align","left");
+	ct.attr("id","t_"+cid);
+	ct.attr('class','dynamictd');
+	ct.children("#p").attr("id","p_"+cid);
+	ct.children("#p_"+cid).children('#c').attr("id","c_"+cid);
+	ct.children("#p_"+cid).children('#d').attr("id","d_"+cid);
+	ct.children("#p_"+cid).children('#g').attr("id","g_"+cid);
+	ct.children("#p_"+cid).children('#e').attr("id","e_"+cid);
+	ct.children("#f").attr("id","f_"+cid);
+	var nTds = $('td').length - 1,
+		nTrs = $('tr').length;
+	if(parseInt(nTds/6) >= nTrs){
+		var tr = $('<tr />');
+		tr.attr('class','dynamictr');
+		$('table').append(tr);
+	}
+	$('tr:last').append(ct);
+	$('#p_'+cid).panel({
+	    title:'未使用',
+	    footer:'#f_'+cid,
+	    closed:false,
+	    tools:[{
+	        iconCls:'icon-edit',
+	        handler:modifyName
+	    },{
+	        iconCls:'icon-reload',
+	        handler:reloadData
+	    }]
+	});
+	$("#p_"+cid).attr('class','panel-body panel-body-nobottom c2');
+}
+
+function bindCtlData(data){
+	if(!data) return;
+	if(!data.chargeNum) data.chargeNum = 0;
+	if(!data.lightNum) data.lightNum = 0;
+	if(!data.brokenNum) data.brokenNum = 0; 
+	$("#p_"+data.cid).panel({title:data.name + ":" + data.cid + "/" + data.lightCount});	//title
+	$("#c_"+data.cid).text(data.chargeNum + " 充");	//充电
+	$("#d_"+data.cid).text(data.lightNum + " 放");	//放电
+	$("#g_"+data.cid).text("故障 " + data.brokenNum);	//故障
+	$("#e_"+data.cid).attr("href","/light?cid=" + data.cid);	//进入button
+	$("#e_"+data.cid).attr("target","_blank");
+	if(data.state === 1){
+		$("#p_"+data.cid).attr('class','panel-body panel-body-nobottom c4');
+		$("#f_"+data.cid).text("连接");
+		var thetime = formatDate(data.cnnTime);
+		if(thetime !== '')
+			$("#f_"+data.cid).text("连接(" + thetime + ")");
+		var thetime = formatDate(data.cnnTime);
+		$("#f_"+data.cid).text("已连接(" + thetime + ")");
+		if(data.chargeState === "charing"){
+			$("#c_"+data.cid).attr('class',"easyui-linkbutton c1 l-btn l-btn-small");
+		}else{
+			$("#c_"+data.cid).attr('class',"easyui-linkbutton c2 l-btn l-btn-small");
+		}
+		if(data.lightState === "lighting"){				
+			$("#d_"+data.cid).attr('class','easyui-linkbutton c7 l-btn l-btn-small');
+		}
+		else {
+			$("#d_"+data.cid).attr('class','easyui-linkbutton c2 l-btn l-btn-small');
+		}
+		if(data[i].brokenState === "broken"){
+			$("#g_"+data.cid).attr('class','easyui-linkbutton c5 l-btn l-btn-small');
+		}
+		else {
+			$("#g_"+data.cid).attr('class','easyui-linkbutton c1 l-btn l-btn-small');
+		}
+	}
+	else{
+		$("#p_"+data.cid).attr('class','panel-body panel-body-nobottom c2');
+		$("#f_"+data.cid).text("断开");
+		var thetime = formatDate(data.cnnTime);
+		if(thetime !== '')
+			$("#f_"+data.cid).text("断开(" + thetime + ")");
+		$("#c_"+data.cid).attr('class',"easyui-linkbutton c6 l-btn l-btn-small");
+		$("#d_"+data.cid).attr('class','easyui-linkbutton c6 l-btn l-btn-small');
+		$("#g_"+data.cid).attr('class','easyui-linkbutton c6 l-btn l-btn-small');
+	}
+	$('#t_'+data.cid).data('ctl',data);
 }
 
 function modifyName(){
+	alert('modifyName');
+	return;
 	var d = $('#p-28')[0].data;
 	$('#w')[0].data = d;
 	$('#cname').textbox('setText',d.name);
@@ -80,6 +170,8 @@ function modifyName(){
 }
 
 function reloadData(){
+	alert('reloadData');
+	return;
 	var d = $('#p-28')[0].data;
 	$('#container')[0].data = d;
 	refreshCtl();
@@ -138,6 +230,7 @@ socket.on('disconnect', function (argument) {
 });
 
 socket.on('onMaxCtlPowers', function (argument) {
+	return;
     console.log('!!!!!onMaxCtlPowers.');
     for(var c in argument){
     	var ctl = argument[c];
@@ -329,131 +422,18 @@ function reloadAll() {
 		idx = "<%= user.index %>",
 		co = "<%= user.code %>";
 	$.post('getAllControllers',{index:idx, code:co}, function(data, status){
-		return;
 		if(data === 'session expired'){
 			window.location = "/";
 		}
 		else if (data !== null && data !== undefined && data !== 'failed'){
-			var a=document.getElementById("ctltable").getElementsByTagName("td");			
 			for (var i=0;i<data.length;i++) {
-				if(i < a.length){
-					$("#p-"+i).panel({title:data[i].name + ":" + data[i].cid + "/" + data[i].lightCount});
-					$("#p-"+i)[0].data = data[i];
-					$("#p-"+i)[0].data.pid = "p-" + i;
-					$("#p-"+i)[0].data.fid = "footer-" + i;
-					var libtns = a[i].getElementsByClassName("easyui-linkbutton");
-					libtns[3].className = "easyui-linkbutton l-btn l-btn-small";
-					libtns[3].href = "/light?cid=" + data[i].cid;
-					libtns[3].target = "_blank";
-					if(data[i].chargeNum){
-						var sps1 = libtns[0].getElementsByTagName("span");
-						sps1[0].style.marginTop = 0;
-						sps1[1].innerHTML = "充电" + data[i].chargeNum;
-					}
-					else {
-						var sps1 = libtns[0].getElementsByTagName("span");
-						sps1[0].style.marginTop = 0;
-						sps1[1].innerHTML = "充电0";
-					}
-					if(data[i].lightNum){
-						var sps2 = libtns[1].getElementsByTagName("span");
-						sps2[0].style.marginTop = 0;
-						sps2[1].innerHTML = "亮灯" + data[i].lightNum;
-					}else {
-						var sps2 = libtns[1].getElementsByTagName("span");
-						sps2[0].style.marginTop = 0;
-						sps2[1].innerHTML = "亮灯0";
-					}					
-					if(data[i].brokenNum){
-						var sps3 = libtns[2].getElementsByTagName("span");
-						sps3[0].style.marginTop = 0;
-						sps3[1].innerHTML = "故障" + data[i].brokenNum;
-					}else {
-						var sps3 = libtns[2].getElementsByTagName("span");
-						sps3[0].style.marginTop = 0;
-						sps3[1].innerHTML = "故障0";
-					}				
-					if(data[i].state === 1){
-						$("#p-"+i)[0].className = "easyui-panel c4";
-						var cnnStr = "已连接";
-						if(data[i].cnnTime && data[i].cnnTime !== -1){
-							var time = new Date(data[i].cnnTime),
-								tmp = time.toLocaleDateString().split('/'),
-								h = String(time.getHours()),
-								m = String(time.getMinutes());
-							if(tmp.length === 1){
-								//处理浏览器兼容问题，有的浏览器时间格式是用'-'分割。有的是'/'分割
-								tmp = time.toLocaleDateString().split('-');
-							}
-							if(tmp[1].length === 1) tmp[1] = '0' + tmp[1];
-							if(tmp[2].length === 1) tmp[2] = '0' + tmp[2];
-							if(h.length === 1) h = '0' + h;
-							if(m.length === 1) m = '0' + m;
-							datetime = tmp[1] + '-' + tmp[2] + ' ' + h + ':' + m;
-							cnnStr += "(" + datetime + ")";
-						}
-						$("#footer-"+i).text(cnnStr);		
-						if(data[i].chargeState === "charing"){
-							libtns[0].className = "easyui-linkbutton c1 l-btn l-btn-small";
-						}
-						else {
-							libtns[0].className = "easyui-linkbutton c2 l-btn l-btn-small";
-						}
-						
-						if(data[i].lightState === "lighting"){				
-							libtns[1].className = "easyui-linkbutton c7 l-btn l-btn-small";
-						}
-						else {
-							libtns[1].className = "easyui-linkbutton c2 l-btn l-btn-small";
-						}
-						
-						if(data[i].brokenState === "broken"){
-							libtns[2].className = "easyui-linkbutton c5 l-btn l-btn-small";
-						}
-						else {
-							libtns[2].className = "easyui-linkbutton c1 l-btn l-btn-small";
-						}
-					} else {
-						$("#p-"+i)[0].className = "easyui-panel c2";
-						var cnnStr = "未连接";
-						if(data[i].cnnTime && data[i].cnnTime !== -1){
-							var time = new Date(data[i].cnnTime),
-								tmp = time.toLocaleDateString().split('/'),
-								h = String(time.getHours()),
-								m = String(time.getMinutes());
-							if(tmp.length === 1){
-								//处理浏览器兼容问题，有的浏览器时间格式是用'-'分割。有的是'/'分割
-								tmp = time.toLocaleDateString().split('-');
-							}
-							if(tmp[1].length === 1) tmp[1] = '0' + tmp[1];
-							if(tmp[2].length === 1) tmp[2] = '0' + tmp[2];
-							if(h.length === 1) h = '0' + h;
-							if(m.length === 1) m = '0' + m;
-							datetime = tmp[1] + '-' + tmp[2] + ' ' + h + ':' + m;
-							cnnStr += "(最近一次：" + datetime + ")";
-						}
-						$("#footer-"+i).text(cnnStr);
-						$("#p-"+i).panel({title:data[i].name + ":" + data[i].cid + "/" + data[i].lightCount});
-						var libtns = a[i].getElementsByClassName("easyui-linkbutton");
-						var sps1 = libtns[0].getElementsByTagName("span");
-						//sps1[0].style.marginTop = "10px";
-						//sps1[1].innerHTML = "充电";
-						libtns[0].className = "easyui-linkbutton c6 l-btn l-btn-small";
-						var sps2 = libtns[1].getElementsByTagName("span");
-						//sps2[0].style.marginTop = "10px";
-						//sps2[1].innerHTML = "亮灯";
-						libtns[1].className = "easyui-linkbutton c6 l-btn l-btn-small";
-						var sps3 = libtns[2].getElementsByTagName("span");
-						//sps3[0].style.marginTop = "10px";
-						//sps3[1].innerHTML = "故障";
-						libtns[2].className = "easyui-linkbutton c6 l-btn l-btn-small";
-					}
-				}
+				bindCtlData(data[i]);
 			}
 		}
 	});
 	setTimeout("reloadAll()", 10*1000);
 };
+
 $("#setName").click(function() {
 	console.debug($('#w')[0].data);
 	var ctl = $('#w')[0].data,
@@ -474,7 +454,21 @@ function refreshCtl(){
 };
 
 window.onload = function (){
-	reloadAll();	
+	var na = "<%= user.username %>",
+		idx = "<%= user.index %>",
+		co = "<%= user.code %>";
+	$.post('getAllControllers',{index:idx, code:co}, function(data, status){
+		if(data === 'session expired'){
+			window.location = "/";
+		}
+		else if (data !== null && data !== undefined && data !== 'failed'){
+			for (var i=0;i<data.length;i++) {
+				createCtl(data[i].cid);
+				bindCtlData(data[i]);
+				setTimeout("reloadAll()", 10*1000);
+			}
+		}
+	});
 }
 </script>
 </html>

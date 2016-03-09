@@ -1,3 +1,30 @@
 #settings span.textbox{
    margin: 0 -2.5px;
 }
+
+.ctltable td {
+	width: 185px;
+	padding:5px;
+}
+
+.ctltable .easyui-panel {
+	width:180px;
+	padding-left:5px;
+	padding-right:5px;
+	padding-bottom:5px;
+}
+
+.ctltable .easyui-linkbutton {
+	width:85px;
+	margin-top:5px;
+}
+
+.ctltable .temperature{
+	margin-top:5px;
+	padding:2px;
+	background-color:rgb(38,121,150);
+}
+
+.ctltable .footer{
+	padding:2px;
+}

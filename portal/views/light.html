@@ -654,6 +654,22 @@ socket.on('onLightPutSet', function (argument) {
     	setProcess(parseInt(argument.index),parseInt(argument.curTime));
 });
 
+socket.on('onCtlOnline', function (argument) {
+    console.log('!!!!onCtlOnline.',argument);
+    if(String(argument.index) === "<%= user.index %>" && 
+    	String(argument.code) === "<%= user.code %>"){
+	    $("#currTime").textbox('setText','N/A');
+    }
+});
+
+socket.on('onUpdateData', function (argument) {
+    console.log('!!!!onUpdateData.',argument);
+    if(String(argument.index) === "<%= user.index %>" && 
+    	String(argument.code) === "<%= user.code %>"){
+	    $("#currTime").textbox('setText','N/A');
+    }
+});
+
 window.onload = function(){
 	
 	setUpdateTime();
@@ -700,10 +716,12 @@ $('#dg').datagrid({
 		console.log('onAfterEdit...index:'+index+' name:'+row.name+' changes:'+JSON.stringify(changes));
 		$.post('saveName',{index:index,name:row.name},function(result, status){
 			if(result === "succeed"){
-				$.messager.alert('提示','修改成功!');
+				//$.messager.alert('提示','修改成功!');
+				console.log("修改成功!");
 			}
 			else {
-				$.messager.alert('提示','修改失败!');
+				//$.messager.alert('提示','修改失败!');
+				console.log("修改失败!");
 			}
 		});
 		row.editing = false;
