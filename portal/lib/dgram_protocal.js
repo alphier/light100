@@ -46,7 +46,7 @@ dp.getCnnCode = function (data){
 };
 
 dp.replyReg = function (conn, state, ip, port, callback){
-	var ab = new Buffer(3);
+	var ab = new Buffer(5);
 	ab.writeUInt8(0x0b,0);
 	if(state === 0)
 		ab.write('OK',1);
@@ -56,7 +56,10 @@ dp.replyReg = function (conn, state, ip, port, callback){
 		ab.write('EB',1);
 	if(state === 3)
 		ab.write('EC',1);
-	conn.send(ab, 0, 3, port, ip, function (err, bytes){	
+	if(state === 4)
+		ab.write('ED',1);
+	ab.write('\r\n',3);
+	conn.send(ab, 0, 5, port, ip, function (err, bytes){	
 		if(err) {
 			if(callback) callback(-1);
 		}else {
@@ -72,10 +75,10 @@ dp.newCnnCode = function(){
 
 dp.replyCnn = function (conn, state, num, ip, port, hasSet, ltid, callback){
 	var ab = {},
-		size = 3;
+		size = 5;
 	if(state === 0){
-		size = 12;
-		ab = new Buffer(12);
+		size = 14;
+		ab = new Buffer(14);
 		ab.writeUInt8(0x15,0);
 		ab.write('OK',1);
 		//var num = rand(1000,10000);
@@ -99,16 +102,19 @@ dp.replyCnn = function (conn, state, num, ip, port, hasSet, ltid, callback){
 		ab.writeUInt8(t.getMinutes(),9);
 		ab.writeUInt8(t.getSeconds(),10);
 		ab.writeUInt8(parseInt(ltid),11);
+		ab.write('\r\n',12);
 	}
 	if(state === 1){
-		ab = new Buffer(3);
+		ab = new Buffer(5);
 		ab.writeUInt8(0x15,0);
 		ab.write('EA',1);
+		ab.write('\r\n',3);
 	}
 	if(state === 2){
-		ab = new Buffer(3);
+		ab = new Buffer(5);
 		ab.writeUInt8(0x15,0);
 		ab.write('EB',1);
+		ab.write('\r\n',3);
 	}
 	conn.send(ab, 0, size, port, ip, function (err, bytes){	
 		if(err) {
@@ -121,10 +127,10 @@ dp.replyCnn = function (conn, state, num, ip, port, hasSet, ltid, callback){
 
 dp.replyGet = function (conn, state, ip, port, cnncode, light, nexLightId, callback){
 	var ab = {},
-		size = 3;
+		size = 5;
 	if(state === 0){
-		size = 19;
-		ab = new Buffer(19);
+		size = 21;
+		ab = new Buffer(21);
 		ab.writeUInt8(0x1f,0);
 		cnncode = String(cnncode);
 		var key = 'XUKE',
@@ -172,25 +178,31 @@ dp.replyGet = function (conn, state, ip, port, cnncode, light, nexLightId, callb
 		ab.writeUInt8(parseInt(light.dtime*10),17);
 		//下一个灯id
 		ab.writeUInt8(parseInt(nexLightId),18);
+		//\r\n
+		ab.write('\r\n',19);
 	}
 	if(state === 1){
-		ab = new Buffer(4);
+		size = 6;
+		ab = new Buffer(6);
 		ab.writeUInt8(0x1f,0);
 		ab.write('NA',1);
 		ab.writeUInt8(light,3);
-		size = 4;
+		ab.write('\r\n',4);
 	}
 	if(state === 2){
-		ab = new Buffer(3);
+		size = 5;
+		ab = new Buffer(5);
 		ab.writeUInt8(0x1f,0);
 		ab.write('ER',1);
+		ab.write('\r\n',3);
 	}
 	if(state === 3){
-		ab = new Buffer(4);
+		size = 6;
+		ab = new Buffer(6);
 		ab.writeUInt8(0x1f,0);
 		ab.write('NO',1);
 		ab.writeUInt8(light,3);
-		size = 4;
+		ab.write('\r\n',4);
 	}
 	conn.send(ab, 0, size, port, ip, function (err, bytes){	
 		if(err) {
@@ -203,23 +215,28 @@ dp.replyGet = function (conn, state, ip, port, cnncode, light, nexLightId, callb
 
 dp.replyPut = function (conn, state, ip, port, ltid, callback){
 	var ab = {},
-		size = 3;	
+		size = 5;	
 	if(state === 0){
-		ab = new Buffer(4);
+		size = 6;
+		ab = new Buffer(6);
 		ab.writeUInt8(0x1f,0);
 		ab.write('OK',1);
 		ab.writeUInt8(ltid,3);
-		size = 4;
+		ab.write('\r\n',4);
 	}
 	if(state === 1){
-		ab = new Buffer(3);
+		size = 5;
+		ab = new Buffer(5);
 		ab.writeUInt8(0x1f,0);
 		ab.write('ER',1);
+		ab.write('\r\n',3);
 	}
 	if(state === 2){
-		ab = new Buffer(3);
+		size = 5;
+		ab = new Buffer(5);
 		ab.writeUInt8(0x1f,0);
 		ab.write('CB',1);
+		ab.write('\r\n',3);
 	}
 	conn.send(ab, 0, size, port, ip, function (err, bytes){	
 		if(err) {

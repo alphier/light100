@@ -126,7 +126,7 @@
 				<span style="font-size:12px;align:center;font-weight:bolder">数据时间</span>
 				</th>
 				-->
-				<th data-options="field:'charging',width:35,
+				<th styler="chargeStyler" data-options="field:'charging',width:35,
 						formatter:function(value,row){
 							if(row.state === -1)
 								return '';
@@ -137,7 +137,7 @@
                         }">
 				<span style="font-size:12px;font-weight: bolder">充电</span>
 				</th>
-				<th data-options="field:'onoff',width:35,
+				<th styler="onoffStyler" data-options="field:'onoff',width:35,
 						formatter:function(value,row){
 							if(row.state === -1)
 								return '';
@@ -453,21 +453,7 @@ function onRowSelected(index,row){
 }
 
 function onLoadSuccess(data){
-	$('#dg')[0].data = jQuery.extend(true, {}, data);
-	/*var panel = $(this).datagrid('getPanel');
-    var tr = panel.find('div.datagrid-body tr');
-    tr.each(function(){
-    	var ltid = $(this).children('td[field="index"]').text();
-    	ltid = parseInt(ltid);
-    	if(ltid == 7){
-    		var td = $(this).children('td[field="cbright"]');
-    		td.children("div").css({
-				"background-color": "yellow"
-			});
-			//实现break功能
-			return false;
-    	}
-    });*/   
+	readlight();
 }
 
 function setProcess(lid,process){
@@ -658,6 +644,7 @@ socket.on('onCtlOnline', function (argument) {
     console.log('!!!!onCtlOnline.',argument);
     if(String(argument.index) === "<%= user.index %>" && 
     	String(argument.code) === "<%= user.code %>"){
+    	updateTime = "N/A";
 	    $("#currTime").textbox('setText','N/A');
     }
 });
@@ -666,6 +653,7 @@ socket.on('onUpdateData', function (argument) {
     console.log('!!!!onUpdateData.',argument);
     if(String(argument.index) === "<%= user.index %>" && 
     	String(argument.code) === "<%= user.code %>"){
+    	updateTime = "N/A";
 	    $("#currTime").textbox('setText','N/A');
     }
 });
@@ -684,6 +672,24 @@ function indexStyler(value,row,index){
 	if(row.state === 1 || row.state === -1)
 		return 'background-color:red;';
 	else
+		return 'background-color:none;';
+};
+
+function chargeStyler(value,row,index){
+	if(value === 0)
+		return 'background-color:rgb(195,195,195);';
+	if(value === 1)
+		return 'background-color:#aaeeff;';	//#aaeeff
+	if(row.state === -1)
+		return 'background-color:none;';
+};
+
+function onoffStyler(value,row,index){
+	if(value === 0)
+		return 'background-color:rgb(195,195,195);';
+	if(value === 1)
+		return 'background-color:rgb(203,254,152);';
+	if(row.state === -1)
 		return 'background-color:none;';
 };
 
@@ -739,25 +745,22 @@ $('#clearAll').click(function(){
 	});
 });
 
-/*
-$('#exportdata').click(function(){
-	$.post('exportUsefulData',{},function(result, status){
-		if(result !== "failed"){
-			window.open(result);
-		}
-		else {
-			$.messager.alert('提示','下载失败');
-		}
-	});
-});
-*/
-
-$('#readItem').click(function(){
-	var index=$('#currLight').textbox('getValue')+'';
-	if(index === '') return;
-	index = parseInt(index);
+function findLight(idx){
 	var rows = $('#dg').datagrid('getRows');
-	var row = rows[index];
+	for(var i in rows){
+		if(rows[i].hasOwnProperty('index') && rows[i].index === idx){
+			return rows[i];
+		}
+	}
+	return null;
+}
+
+function readlight(){
+	var index=$('#currLight').textbox('getText');
+	if(index === '') return;
+	var ltid = parseInt(index)-1,
+		row = findLight(ltid);
+	if(!row) return;
 	$('#ctrltype').combobox('setValue',row.ctltype);
 	$('#autotype').combobox('setValue',row.autotype);
 	$('#ontime').textbox('setValue',row.ontime);
@@ -779,12 +782,16 @@ $('#readItem').click(function(){
 	$('#fourlight').textbox('setText',row.dbright+'%');
 	$('#fourtime').textbox('setValue',row.dtime);
 	$('#fourtime').textbox('setText',row.dtime+'h');
+}
+
+$('#readItem').click(function(){
+	readlight();
 });
 
 function getNewData(old){
 	//clone object
 	//var row = jQuery.extend({}, old);
-	var row = {uindex:old.uindex,ucode:old.ucode,cid:old.cid}; 
+	var row = {_id:old._id,uindex:old.uindex,ucode:old.ucode,cid:old.cid}; 
 	row.ctltype = parseInt($('#ctrltype').combobox('getValue'));
 	row.autotype = parseInt($('#autotype').combobox('getValue'));
 	row.ontime = $('#ontime').textbox('getText');
@@ -810,23 +817,15 @@ function getNewData(old){
 };
 
 $('#modifyItem').click(function(){
-	//---------------v1.0---------------
-	//var row = $('#dg').datagrid('getSelected');	
-	//if(!row) return;
-	//var index = $('#dg').datagrid('getRowIndex',row);
-	//-----------------------------------
 	
 	//----------------v2.0--------------
-	var index=$('#currLight').textbox('getValue')+'';
+	var index=$('#currLight').textbox('getText');
 	if(index === '') return;
-	index = parseInt(index);
-	var rows = $('#dg').datagrid('getRows');
-	var old = rows[index];
+	var ltid = parseInt(index)-1,
+		old = findLight(ltid);
+	if(!old) return;
 	var row = getNewData(old);
 	//-----------------------------------
-	
-	var changes = chooseChangeFileds(old, row);
-	if(jQuery.isEmptyObject(changes)) return;	
 	
 	$.post('updateLight',row,function(result, status){
 		if(result === "success"){
@@ -840,24 +839,18 @@ $('#modifyItem').click(function(){
 });
 
 $('#modifyAll').click(function(){
-	//---------------v1.0---------------
-	//var row = $('#dg').datagrid('getSelected');	
-	//if(!row) return;	
-	//var index = $('#dg').datagrid('getRowIndex',row);
-	//----------------------------------
 	
 	//----------------v2.0--------------
-	var index=$('#currLight').textbox('getValue')+'';
+	var index=$('#currLight').textbox('getText');
 	if(index === '') return;
-	index = parseInt(index);
-	var rows = $('#dg').datagrid('getRows');
-	var old = rows[index];
+	var ltid = parseInt(index)-1,
+		old = findLight(ltid);
+	if(!old) return;
 	var row = getNewData(old);
 	//-----------------------------------
 	
 	$.post('updateAllLights',row,function(result, status){
 		if(result === "success"){
-			//location.reload();
 			$('#dg').datagrid('reload');
 		}
 		else {
@@ -867,18 +860,13 @@ $('#modifyAll').click(function(){
 });
 
 $('#modifySingle').click(function(){
-	//---------------v1.0---------------
-	//var row = $('#dg').datagrid('getSelected');	
-	//if(!row) return;
-	//var index = $('#dg').datagrid('getRowIndex',row);
-	//-----------------------------------
 	
 	//----------------v2.0--------------
-	var index=$('#currLight').textbox('getValue')+'';
+	var index=$('#currLight').textbox('getText');
 	if(index === '') return;
-	index = parseInt(index);
-	var rows = $('#dg').datagrid('getRows');
-	var old = rows[index];
+	var ltid = parseInt(index)-1,
+		old = findLight(ltid);
+	if(!old) return;
 	var row = getNewData(old);
 	//-----------------------------------
 	
@@ -894,18 +882,13 @@ $('#modifySingle').click(function(){
 });
 
 $('#modifyDouble').click(function(){
-	//---------------v1.0---------------
-	//var row = $('#dg').datagrid('getSelected');	
-	//if(!row) return;
-	//var index = $('#dg').datagrid('getRowIndex',row);
-	//-----------------------------------
 	
 	//----------------v2.0--------------
-	var index=$('#currLight').textbox('getValue')+'';
+	var index=$('#currLight').textbox('getText');
 	if(index === '') return;
-	index = parseInt(index);
-	var rows = $('#dg').datagrid('getRows');
-	var old = rows[index];
+	var ltid = parseInt(index)-1,
+		old = findLight(ltid);
+	if(!old) return;
 	var row = getNewData(old);
 	//-----------------------------------
 	

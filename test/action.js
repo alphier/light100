@@ -12,8 +12,30 @@ function dtstr(){
 	return dtstr;
 };	
 
+function registerInst(){
+	message = new Buffer(14);
+	message.writeUInt8(0x0a, 0);
+	message.writeUInt8(0x01, 1);
+	message.writeUInt8(0x15, 2);
+	message.writeUInt8(0xf0, 3);
+	//控制器编号9001
+	message.writeUInt8(57, 4);
+	message.writeUInt8(48, 5);
+	message.writeUInt8(48, 6);
+	message.writeUInt8(49, 7);
+	//控制器编号9001^NEW1
+	message.writeUInt8(8, 8);
+	message.writeUInt8(126, 9);
+	message.writeUInt8(117, 10);
+	message.writeUInt8(102, 11);
+	//\r\n
+	message.write('\r\n', 12);
+	
+	return message;
+}
+
 function connectInst(){
-	message = new Buffer(12);
+	message = new Buffer(20);
 	//指令：HARO - 0x48 0x41 0x52 0x4f
 	//指令类型 20
 	message.writeUInt8(0x14, 0);
@@ -35,7 +57,7 @@ function connectInst(){
 	message.writeUInt8(0x71, 9);
 	message.writeUInt8(0x62, 10);
 	message.writeUInt8(0x7f, 11);
-	/*
+	
 	//人流量
 	message.writeUInt16BE(4000, 12);
 	//车流量
@@ -44,13 +66,14 @@ function connectInst(){
 	message.writeUInt8(110, 16);
 	//是否保存，是
 	message.writeUInt8(1, 17);
-	*/
+	//\r\n
+	message.write('\r\n', 18);
 	
 	return message;
 };
 
 function putInst(s,lid){
-	var message = new Buffer(29),
+	var message = new Buffer(32),
 		k = 'INTO',
 		a = s.charCodeAt(0) ^ k.charCodeAt(0),
 		b = s.charCodeAt(1) ^ k.charCodeAt(1),
@@ -104,74 +127,16 @@ function putInst(s,lid){
 	message.writeUInt8(2, 26);
 	message.writeUInt16BE(21, 27);
 	//灯当前进度
-	//message.writeUInt8(1, 29);
-	
-	return message;
-};
-
-function putInst0(s,lid){
-	var message = new Buffer(29),
-		k = 'INTO',
-		a = s.charCodeAt(0) ^ k.charCodeAt(0),
-		b = s.charCodeAt(1) ^ k.charCodeAt(1),
-		c = s.charCodeAt(2) ^ k.charCodeAt(2),
-		d = s.charCodeAt(3) ^ k.charCodeAt(3);
-	
-	//指令类型 40
-	message.writeUInt8(0x28, 0);
-	//临时码 1234 ^ INTO
-	message.writeUInt8(a, 1);
-	message.writeUInt8(b, 2);
-	message.writeUInt8(c, 3);
-	message.writeUInt8(d, 4);
-	//灯编号 1
-	message.writeUInt8(lid, 5);
-	//状态字 1011 0101 自动 铅24V 光控 充电 关灯 故障
-	message.writeUInt8(0, 6);
-	//光控时间 18:35
-	message.writeUInt8(0, 7);
-	message.writeUInt8(0, 8);
-	//光控电压 3.5V
-	message.writeUInt8(0, 9);
-	//1亮度 100%
-	message.writeUInt8(0, 10);
-	//1时间 2.5h
-	message.writeUInt8(0, 11);
-	//2亮度 90%
-	message.writeUInt8(0, 12);
-	//2时间 2.7h
-	message.writeUInt8(0, 13);
-	//3亮度 80%
-	message.writeUInt8(0, 14);
-	//3时间 2.9h
-	message.writeUInt8(0, 15);
-	//4亮度 70%
-	message.writeUInt8(0, 16);
-	//4时间 3.5h
-	message.writeUInt8(0, 17);
-	//电量 78%
-	message.writeUInt8(0, 18);
-	//温度 62C°
-	message.writeUInt8(0, 19);
-	//容量 89A
-	message.writeUInt8(0, 20);
-	//充电功率 350W
-	message.writeUInt16BE(0, 21);
-	//放电功率 260W
-	message.writeUInt16BE(0, 23);
-	//生产日期 15/04/0322
-	message.writeUInt8(0, 25);
-	message.writeUInt8(0, 26);
-	message.writeUInt16BE(0, 27);
-	//灯当前进度
 	message.writeUInt8(1, 29);
+	//\r\n
+	message.write('\r\n', 30);
 	
 	return message;
 };
 
 function getInst(s,lid) {
 
-	message = new Buffer(6);
+	message = new Buffer(8);
 
 	k = 'INTO',
 	a = s.charCodeAt(0) ^ k.charCodeAt(0),
@@ -188,6 +153,8 @@ function getInst(s,lid) {
 	message.writeUInt8(d, 4);
 	//灯编号
 	message.writeUInt8(lid, 5);
+	//\r\n
+	message.write('\r\n', 6);
 	
 	return message;
 };
@@ -215,6 +182,14 @@ function start(){
 	});
 };
 
+function startRegister(){
+	var cMsg = registerInst();
+	client.send(cMsg, 0, cMsg.length, PORT, HOST, function(err, bytes) {
+		if (err) throw err;
+		console.log(dtstr() + 'Registering!!!' + HOST + ':' + PORT);
+	});
+}
+
 client.on('message', function (msg, remote) {
 	var buffer = new Buffer(msg).toJSON(),		
 		data = new Buffer(buffer);
@@ -238,15 +213,15 @@ client.on('message', function (msg, remote) {
 			sec_code = String(getCnnCode(sec_code,'XUKE')),	
 			setLid = data.readUInt8(11);
 			console.log(dtstr() + ' receive connect reply...', sec_code, ' buffer:',msg,' lid:',setLid);
-		/*	
+		
 		//get instruction old version
-		for(var i=0;i<5;i++){
+		/*for(var i=0;i<5;i++){
 			pMsg = getInst(sec_code,i);
 			client.send(pMsg, 0, pMsg.length, PORT, HOST, function(err, bytes) {
 				if (err) throw err;
 				console.log(dtstr() + 'Getting!!!' + HOST + ':' + PORT);
 			});
-		}
+		}*/
 		
 		//get instruction
 		if(setLid !== 255){
@@ -257,9 +232,8 @@ client.on('message', function (msg, remote) {
 			});
 		}
 		
-		
 		//put instruction
-		for(var i=0;i<5;i++){
+		/*for(var i=0;i<5;i++){
 			pMsg = putInst(sec_code,i);
 			client.send(pMsg, 0, pMsg.length, PORT, HOST, function(err, bytes) {
 				if (err) throw err;
@@ -270,17 +244,17 @@ client.on('message', function (msg, remote) {
 		break;
 	case 31:
 		if(data[1] === 0x4e && data[2] === 0x41){
-			console.log(dtstr() + ' light not found!!!');
+			console.log(dtstr() + ' light not found!!!',msg);
 			return;
 		}
 		
 		if(data[1] === 0x45 && data[2] === 0x52){
-			console.log(dtstr() + ' controller not found!!!');
+			console.log(dtstr() + ' controller not found!!!',msg);
 			return;
 		}
 		
 		if(data[1] === 0x4e && data[2] === 0x4f){
-			console.log(dtstr() + ' light has no setting!!!');
+			console.log(dtstr() + ' light has no setting!!!',msg);
 			return;
 		}
 		if(data[1] === 0x4f && data[2] === 0x4b){
@@ -317,3 +291,4 @@ client.on('message', function (msg, remote) {
 });
 
 start();
+//startRegister();

@@ -6,7 +6,6 @@
 	<link rel="stylesheet" type="text/css" href="css/default/easyui.css">
 	<link rel="stylesheet" type="text/css" href="css/color.css">
 	<link rel="stylesheet" type="text/css" href="css/icon.css">
-	<!-- <link rel="stylesheet" type="text/css" href="css/main.css"> -->
 	<script type="text/javascript" src="lib/jquery.min.js"></script>
 	<script type="text/javascript" src="lib/jquery.easyui.min.js"></script>
 	<script type="text/javascript" src="lib/socket.io/socket.io.js"></script>
@@ -30,7 +29,7 @@
 					<a href="#" id='d' class="easyui-linkbutton c6" style="width:85px;height:25px;margin-top:5px;padding:5px">放</a>
 					<a href="#" id='g' class="easyui-linkbutton c6" style="width:85px;height:25px;margin-top:5px;padding:5px">故障</a>
 					<a href="#" id='e' class="easyui-linkbutton" style="width:85px;margin-top:5px;" data-options="iconCls:'icon-redo'">进入</a>
-					<div id='t' class="temperature" style="margin-top:5px;padding:2px;background-color:rgb(38,121,150);">流量/温度:</div>
+					<div id='tt' class="temperature" style="color:white;margin-top:5px;padding:2px;background-color:rgb(38,121,150);">流量/温度:</div>
 				</div>
 				<div class="footer" id="f" style="padding:2px;height:15px;">
 				</div>
@@ -86,6 +85,7 @@ function createCtl(cid){
 	ct.children("#p_"+cid).children('#d').attr("id","d_"+cid);
 	ct.children("#p_"+cid).children('#g').attr("id","g_"+cid);
 	ct.children("#p_"+cid).children('#e').attr("id","e_"+cid);
+	ct.children("#p_"+cid).children('#tt').attr("id","tt_"+cid);
 	ct.children("#f").attr("id","f_"+cid);
 	var nTds = $('td').length - 1,
 		nTrs = $('tr').length;
@@ -114,11 +114,19 @@ function bindCtlData(data){
 	if(!data) return;
 	if(!data.chargeNum) data.chargeNum = 0;
 	if(!data.lightNum) data.lightNum = 0;
-	if(!data.brokenNum) data.brokenNum = 0; 
+	if(!data.brokenNum) data.brokenNum = 0;
 	$("#p_"+data.cid).panel({title:data.name + ":" + data.cid + "/" + data.lightCount});	//title
-	$("#c_"+data.cid).text(data.chargeNum + " 充");	//充电
-	$("#d_"+data.cid).text(data.lightNum + " 放");	//放电
+	var maxCharge = '',maxDischarge = '';
+	var tmp1 = $("#c_"+data.cid).data('maxCharge');
+	if(tmp1) maxCharge = tmp1 + 'W';
+	var tmp2 = $("#d_"+data.cid).data('maxDischarge');
+	if(tmp2) maxDischarge = tmp2 + 'W';
+	$("#c_"+data.cid).text(data.chargeNum + " 充 " + maxCharge);	//充电
+	$("#c_"+data.cid).data('charge',data.chargeNum);
+	$("#d_"+data.cid).text(data.lightNum + " 放 " + maxDischarge);	//放电
+	$("#d_"+data.cid).data('discharge',data.lightNum);
 	$("#g_"+data.cid).text("故障 " + data.brokenNum);	//故障
+	$("#g_"+data.cid).data('broke',data.brokenNum);
 	$("#e_"+data.cid).attr("href","/light?cid=" + data.cid);	//进入button
 	$("#e_"+data.cid).attr("target","_blank");
 	if(data.state === 1){
@@ -140,7 +148,7 @@ function bindCtlData(data){
 		else {
 			$("#d_"+data.cid).attr('class','easyui-linkbutton c2 l-btn l-btn-small');
 		}
-		if(data[i].brokenState === "broken"){
+		if(data.brokenState === "broken"){
 			$("#g_"+data.cid).attr('class','easyui-linkbutton c5 l-btn l-btn-small');
 		}
 		else {
@@ -158,23 +166,6 @@ function bindCtlData(data){
 		$("#g_"+data.cid).attr('class','easyui-linkbutton c6 l-btn l-btn-small');
 	}
 	$('#t_'+data.cid).data('ctl',data);
-}
-
-function modifyName(){
-	alert('modifyName');
-	return;
-	var d = $('#p-28')[0].data;
-	$('#w')[0].data = d;
-	$('#cname').textbox('setText',d.name);
-	$('#w').window('open');
-}
-
-function reloadData(){
-	alert('reloadData');
-	return;
-	var d = $('#p-28')[0].data;
-	$('#container')[0].data = d;
-	refreshCtl();
 }
 
 function loadSystemTime() { 
@@ -210,18 +201,8 @@ socket.on('onCtlRegistered', function (data) {
     console.log('onCtlRegistered...',data);
     if(data.index === "<%= user.index %>" && 
     	data.code === "<%= user.code %>"){
-	    var a=document.getElementById("ctltable").getElementsByTagName("td");
-	    for(var i in a){
-	    	if(!$("#p-"+i)[0].data){
-	    		console.log('#####None used panel!!!p-',i);
-	    		$("#p-"+i).panel({title:data.name + ":" + data.cid + "/0"});
-				$("#p-"+i)[0].data = data;
-				$("#p-"+i)[0].data.pid = "p-" + i;
-				$("#p-"+i)[0].data.fid = "footer-" + i;
-				reloadCtl($("#p-"+i)[0].data);
-	    		break;
-	    	}
-	    }
+    	createCtl(data.cid);
+    	bindCtlData(data);
     }
 });
 
@@ -230,31 +211,27 @@ socket.on('disconnect', function (argument) {
 });
 
 socket.on('onMaxCtlPowers', function (argument) {
-	return;
     console.log('!!!!!onMaxCtlPowers.');
     for(var c in argument){
     	var ctl = argument[c];
 	    if(String(ctl.index) === "<%= user.index %>" && 
 	        String(ctl.code) === "<%= user.code %>"){
-	       	var a=document.getElementById("ctltable").getElementsByTagName("td");
-	       	for(var i in a){	       		
-	       		if(!$("#p-"+i)[0]) continue;
-	       	  	if($("#p-"+i)[0].hasOwnProperty('data') && $("#p-"+i)[0].data.cid === ctl.cid){
-	       	  		console.debug('debug data!!!!' + JSON.stringify($("#p-"+i)[0].data));
-	       	  		if($("#p-"+i)[0].data.state === 1){
-		       			var strMaxPower = "充放功率(充/放):",
-		       				maxCPower = 'NA',maxDPower = 'NA';
-		       			if(ctl.hasOwnProperty('cpower') && ctl.cpower !== -1)
-		       				maxCPower = ctl.cpower+'W';
-		       			if(ctl.hasOwnProperty('dpower') && ctl.dpower !== -1)
-		       				maxDPower = ctl.dpower+'W';
-		       			strMaxPower += maxCPower + '/' + maxDPower;
-		       			$("#pw-"+i).text(strMaxPower);
-		       			//reloadCtl($("#p-"+i)[0].data);
-	       	  		}
-	       	    	break;
-	       	   }
-	        }
+	    	var cNum = '0',dNum = '0';
+	    	var tmp1 = $("#c_"+ctl.cid).data('charge');
+	    	if(tmp1) cNum = tmp1;
+	    	var tmp2 = $("#c_"+ctl.cid).data('discharge');
+	    	if(tmp2) dNum = tmp2;
+	    	var maxCPower = '',maxDPower = '';
+			if(ctl.hasOwnProperty('cpower') && ctl.cpower !== -1){
+				maxCPower = ctl.cpower+'W';
+				$("#c_"+ctl.cid).data('maxCharge',ctl.cpower);
+			}
+			if(ctl.hasOwnProperty('dpower') && ctl.dpower !== -1){
+				maxDPower = ctl.dpower+'W';
+				$("#d_"+ctl.cid).data('maxDischarge',ctl.dpower);
+			}
+			$("#c_"+ctl.cid).text(cNum + ' 充 ' + maxCPower);
+			$("#d_"+ctl.cid).text(dNum + ' 放 ' + maxDPower);
 	    }
     }
 });
@@ -263,21 +240,13 @@ socket.on('onUpdateData', function (argument) {
     console.log('!!!!!update data.',argument);
     if(String(argument.index) === "<%= user.index %>" && 
        	String(argument.code) === "<%= user.code %>"){
-   	    var a=document.getElementById("ctltable").getElementsByTagName("td");
-   	    for(var i in a){
-   	    	if(!$("#p-"+i)[0]) continue;
-   	    	if($("#p-"+i)[0].data && $("#p-"+i)[0].data.cid === argument.cid){
-   				$("#p-"+i)[0].data.state = 1;
-   				var strTraffic = "人流/车流/温度:";
-   				if(argument.people !== undefined && argument.people !== -1 && 
-   					argument.vehicle !== undefined && argument.vehicle !== -1 && 
-   					argument.temperature !== undefined && argument.temperature !== -1)
-   					strTraffic += argument.people + '/' + argument.vehicle + '/' + argument.temperature + '℃';
-   				$("#t-"+i).text(strTraffic);
-   				//reloadCtl($("#p-"+i)[0].data);
-   	    		break;
-   	    	}
-   	    }
+    	var strTraffic = "流量/温度:";
+		if(argument.people !== undefined && argument.people !== -1 && 
+			argument.vehicle !== undefined && argument.vehicle !== -1 && 
+			argument.temperature !== undefined && argument.temperature !== -1){
+			strTraffic += argument.people + ' ' + argument.vehicle + ' ' + argument.temperature + '℃';
+		}
+		$("#tt_"+argument.cid).text(strTraffic);
    }
 });
 
@@ -285,19 +254,7 @@ socket.on('onCtlOnline', function (argument) {
     console.log('!!!!onCtlOnline.',argument);
     if(String(argument.index) === "<%= user.index %>" && 
     	String(argument.code) === "<%= user.code %>"){
-	    var a=document.getElementById("ctltable").getElementsByTagName("td");
-	    for(var i in a){
-	    	if(!$("#p-"+i)[0]) continue;
-	    	if($("#p-"+i)[0].data && $("#p-"+i)[0].data.cid === argument.cid){
-				$("#p-"+i)[0].data.state = 1;
-				var strTraffic = "人流/车流/温度:";
-				if(argument.people && argument.vehicle && argument.temperature)
-					strTraffic += argument.people + '/' + argument.vehicle + '/' + argument.temperature + '℃';
-				$("#t-"+i).text(strTraffic);
-				reloadCtl($("#p-"+i)[0].data);
-	    		break;
-	    	}
-	    }
+    	bindCtlData(argument);
     }
 });
 
@@ -305,114 +262,15 @@ socket.on('onCtlOffline', function (argument) {
     console.log('!!!!onCtlOffline.',argument);
     if(String(argument.index) === "<%= user.index %>" && 
     	String(argument.code) === "<%= user.code %>"){
-	    var a=document.getElementById("ctltable").getElementsByTagName("td");
-	    for(var i in a){
-	    	if(!$("#p-"+i)[0]) continue;
-	    	if($("#p-"+i)[0].hasOwnProperty('data') && $("#p-"+i)[0].data.cid === argument.cid){
-				$("#p-"+i)[0].data.state = 0;
-				$("#t-"+i).text("人流/车流/温度:");
-				$("#pw-"+i).text("充放功率(充/放):");
-				reloadCtl($("#p-"+i)[0].data);
-	    		break;
-	    	}
-	    }
+    	bindCtlData(argument);
     }
 });
 
 function reloadCtl(ctl){
+	if(!ctl) return;
 	$.post('getControllerInfo',{index:ctl.index, code:ctl.code, cid:ctl.cid}, function(data, status){
 		if(data !== "failed"){
-			console.debug('reloadCtl...',data);
-			var pa = document.getElementById(ctl.pid);
-			var libtns = pa.getElementsByClassName("easyui-linkbutton");
-			libtns[3].className = "easyui-linkbutton l-btn l-btn-small";
-			libtns[3].href = "/light?cid=" + data.cid;
-			libtns[3].target = "_blank";
-			$("#"+ctl.pid).panel({title:ctl.name+":"+ctl.cid+"/"+data.lightCount});
-			var sps1 = libtns[0].getElementsByTagName("span");
-			sps1[0].style.marginTop = 0;
-			sps1[1].innerHTML = "充电" + data.chargeNum;
-			var sps2 = libtns[1].getElementsByTagName("span");
-			sps2[0].style.marginTop = 0;
-			sps2[1].innerHTML = "亮灯" + data.lightNum;
-			var sps3 = libtns[2].getElementsByTagName("span");
-			sps3[0].style.marginTop = 0;
-			sps3[1].innerHTML = "故障" + data.brokenNum;
-			if(data.state === 1){
-				$("#"+ctl.pid)[0].className = "easyui-panel c4";
-				var cnnStr = "已连接";
-				if(data.cnnTime && data.cnnTime !== -1){
-					var time = new Date(data.cnnTime),
-						tmp = time.toLocaleDateString().split('/'),
-						h = String(time.getHours()),
-						m = String(time.getMinutes());
-					if(tmp.length === 1){
-						//处理浏览器兼容问题，有的浏览器时间格式是用'-'分割。有的是'/'分割
-						tmp = time.toLocaleDateString().split('-');
-					}
-					if(tmp[1].length === 1) tmp[1] = '0' + tmp[1];
-					if(tmp[2].length === 1) tmp[2] = '0' + tmp[2];
-					if(h.length === 1) h = '0' + h;
-					if(m.length === 1) m = '0' + m;
-					datetime = tmp[1] + '-' + tmp[2] + ' ' + h + ':' + m;
-					cnnStr += "(" + datetime + ")";
-				}
-				$("#"+ctl.fid).text(cnnStr);
-				if(data.chargeState === "charing"){
-					libtns[0].className = "easyui-linkbutton c1 l-btn l-btn-small";
-				}
-				else {
-					libtns[0].className = "easyui-linkbutton c2 l-btn l-btn-small";
-				}
-				if(data.lightState === "lighting"){				
-					libtns[1].className = "easyui-linkbutton c7 l-btn l-btn-small";
-				}
-				else {
-					libtns[1].className = "easyui-linkbutton c2 l-btn l-btn-small";
-				}
-				if(data.brokenState === "broken"){
-					libtns[2].className = "easyui-linkbutton c5 l-btn l-btn-small";
-				}
-				else {
-					libtns[2].className = "easyui-linkbutton c1 l-btn l-btn-small";
-				}
-			}
-			else {
-				$("#"+ctl.pid)[0].className = "easyui-panel c2";
-				var cnnStr = "未连接";
-				if(data.cnnTime && data.cnnTime !== -1){
-					var time = new Date(data.cnnTime),
-						tmp = time.toLocaleDateString().split('/'),
-						h = String(time.getHours()),
-						m = String(time.getMinutes());
-					if(tmp.length === 1){
-						//处理浏览器兼容问题，有的浏览器时间格式是用'-'分割。有的是'/'分割
-						tmp = time.toLocaleDateString().split('-');
-					}
-					if(tmp[1].length === 1) tmp[1] = '0' + tmp[1];
-					if(tmp[2].length === 1) tmp[2] = '0' + tmp[2];
-					if(h.length === 1) h = '0' + h;
-					if(m.length === 1) m = '0' + m;
-					datetime = tmp[1] + '-' + tmp[2] + ' ' + h + ':' + m;
-					cnnStr += "(最近一次：" + datetime + ")";
-				}
-				$("#"+ctl.fid).text(cnnStr);
-				$("#"+ctl.pid).panel({title:ctl.name+":"+ctl.cid+"/"+data.lightCount});
-				//libtns[3].className = "easyui-linkbutton l-btn l-btn-small l-btn-disabled";		
-				//libtns[3].href = "#";
-				var sps1 = libtns[0].getElementsByTagName("span");
-				//sps1[0].style.marginTop = "10px";
-				//sps1[1].innerHTML = "充电";
-				libtns[0].className = "easyui-linkbutton c6 l-btn l-btn-small";
-				var sps2 = libtns[1].getElementsByTagName("span");
-				//sps2[0].style.marginTop = "10px";
-				//sps2[1].innerHTML = "亮灯";
-				libtns[1].className = "easyui-linkbutton c6 l-btn l-btn-small";
-				var sps3 = libtns[2].getElementsByTagName("span");
-				//sps3[0].style.marginTop = "10px";
-				//sps3[1].innerHTML = "故障";
-				libtns[2].className = "easyui-linkbutton c6 l-btn l-btn-small";
-			}
+			bindCtlData(data);
 		}
 	});
 }
@@ -434,24 +292,30 @@ function reloadAll() {
 	setTimeout("reloadAll()", 10*1000);
 };
 
+function reloadData(){
+	var ctl = $(this).parent().parent().parent().parent().data('ctl');
+	reloadCtl(ctl);
+}
+
+function modifyName(){
+	var d = $(this).parent().parent().parent().parent().data('ctl');
+	$('#w').data('data',d);
+	$('#cname').textbox('setText',d.name);
+	$('#w').window('open');
+}
+
 $("#setName").click(function() {
-	console.debug($('#w')[0].data);
-	var ctl = $('#w')[0].data,
+	console.debug($('#w').data('data'));
+	var ctl = $('#w').data('data'),
 		na = $('#cname').val();
-	if(!ctl || na == "") return;
+	if(!ctl || na === "") return;
 	$.post('updateCtlName',{index:ctl.index,code:ctl.code,cid:ctl.cid,name:na},function(result, status){
 		if(result === "success"){
-			$("#"+ctl.pid).panel({title:na+":"+ctl.cid});
+			$("#p_"+ctl.cid).panel({title:na+":"+ctl.cid});
 			$('#w').window('close');
 		}
 	});
 });
-
-function refreshCtl(){	
-	var ctl = $('#container')[0].data;
-	if(!ctl) return;
-	reloadCtl(ctl);
-};
 
 window.onload = function (){
 	var na = "<%= user.username %>",

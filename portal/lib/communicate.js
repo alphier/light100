@@ -142,24 +142,34 @@ exports.communicate = function (spec) {
 						db.getController({index:idx,code:code,cid:scid},function(result){
 							if(!result){
 								logger.info('Ready to register ',scid);
-								dp.replyReg(server,0,data.ip,data.port,function(bytes){
-									if(bytes === -1) {
-										logger.debug('Registering!!!Sending error...');
-										callback('error');
-									}else {
-										logger.info('Registering!!!Sending bytes:',bytes,' begin to register...');
-										db.addController({index:idx,code:code,cid:scid},function(result){
-											db.getController({index:idx,code:code,cid:scid},function(nctl){
-												if(nctl){
-													var evt = new channelEvent({type:'controller-registered',data:nctl});
-													dispatchEventListener(evt,nctl._id);
-												} else {
-													logger.info('Register failed!!!',scid);
+								db.addController({index:idx,code:code,cid:scid},function(result){
+									db.getController({index:idx,code:code,cid:scid},function(nctl){
+										if(nctl){
+											logger.info('Register succeed!!!',scid);
+											var evt = new channelEvent({type:'controller-registered',data:nctl});
+											dispatchEventListener(evt,nctl._id);
+											dp.replyReg(server,0,data.ip,data.port,function(bytes){
+												if(bytes === -1) {
+													logger.debug('Registering!!!Sending error...');
+													callback('error');
+												}else {
+													logger.info('Registering!!!Sending bytes:',bytes,' begin to register...');
+													callback('succeed');
 												}
-												callback('succeed');
 											});
-										});
-									}
+										} else {
+											logger.info('Register failed!!!',scid);
+											dp.replyReg(server,4,data.ip,data.port,function(bytes){
+												if(bytes === -1) {
+													logger.debug('Registering!!!Sending error...');
+													callback('error');
+												}else {
+													logger.info('Registering!!!Sending bytes:',bytes,' begin to register...');
+													callback('succeed');
+												}
+											});
+										}
+									});
 								});
 							}else {
 								logger.info('Has been registered of ',scid);
@@ -233,6 +243,7 @@ exports.communicate = function (spec) {
 						newCnnCode(scid, ccode, function(newCode){
 							if(hashMap.hasOwnProperty(result._id)){
 								hashMap[result._id].cnnTime = new Date();
+								hashMap[result._id].updateTime = -1;
 								hashMap[result._id].cnnCode = newCode;
 								hashMap[result._id].people = pt;
 								hashMap[result._id].vehicle = vt;
