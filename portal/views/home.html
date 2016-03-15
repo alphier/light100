@@ -136,8 +136,6 @@ function bindCtlData(data){
 		var thetime = formatDate(data.cnnTime);
 		if(thetime !== '')
 			$("#f_"+data.cid).text("连接(" + thetime + ")");
-		var thetime = formatDate(data.cnnTime);
-		$("#f_"+data.cid).text("已连接(" + thetime + ")");
 		if(data.chargeState === "charing"){
 			$("#c_"+data.cid).attr('class',"easyui-linkbutton c1 l-btn l-btn-small");
 		}else{
